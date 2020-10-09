@@ -4,8 +4,6 @@ import { NavLink } from 'react-router-dom'
 
 import styled from 'styled-components'
 
-import theme from '../theme.js'
-
 const List = styled.ul`
   margin: 0;
   padding: 0;
@@ -21,10 +19,10 @@ const List = styled.ul`
 `
 
 const Item = styled.li`
-  border-bottom: 1px solid ${theme.border};
+  border-bottom: 1px solid ${(props) => props.theme.border};
 
   &:first-child {
-    border-top: 1px solid ${theme.border};
+    border-top: 1px solid ${(props) => props.theme.border};
   }
 
   & li,
@@ -33,8 +31,8 @@ const Item = styled.li`
   }
 
   & a.active {
-    border-right: 3px solid ${theme.primary};
-    background: ${theme.background_secondary};
+    border-right: 3px solid ${(props) => props.theme.primary_color};
+    background: ${(props) => props.theme.background_secondary};
   }
 
   &.active ul {
@@ -50,12 +48,12 @@ const StyledLink = styled(NavLink)`
   font-weight: bold;
   text-decoration: none;
   text-transform: uppercase;
-  color: ${theme.text_color};
+  color: ${(props) => props.theme.text_color};
 
   &:hover,
   &.active {
     text-decoration: underline;
-    color: ${theme.primary};
+    color: ${(props) => props.theme.primary_color};
   }
 `
 
@@ -65,12 +63,12 @@ const StyledSubLink = styled(NavLink)`
 
   font-size: 14px;
   text-decoration: none;
-  color: ${theme.text_color};
+  color: ${(props) => props.theme.text_color};
 
   &:hover,
   &.active {
     text-decoration: underline;
-    color: ${theme.primary};
+    color: ${(props) => props.theme.primary_color};
   }
 `
 

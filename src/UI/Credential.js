@@ -2,8 +2,6 @@ import React from 'react'
 
 import styled from 'styled-components'
 
-import theme from '../theme.js'
-
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
 
@@ -33,8 +31,8 @@ const DataTable = styled.table`
 `
 
 const DataRow = styled.tr`
-  :nth-child(2n+2) td {
-    background: ${theme.background_secondary};
+  :nth-child(2n + 2) td {
+    background: ${(props) => props.theme.background_secondary};
   }
   :hover td {
     cursor: pointer;
@@ -45,7 +43,7 @@ const DataRow = styled.tr`
 const DataHeader = styled.th`
   padding: 8px 12px;
   text-align: left;
-  border-bottom: 1px solid ${theme.primary};
+  border-bottom: 1px solid ${(props) => props.theme.primary_color};
 `
 
 const DataCell = styled.td`
@@ -129,7 +127,7 @@ function Credential(props) {
 
   let credentialSelected = ''
 
-  for (let i=0; i < credentials.length; i++) {
+  for (let i = 0; i < credentials.length; i++) {
     if (credentials[i].id == credential) {
       credentialSelected = credentials[i]
       break
@@ -138,14 +136,22 @@ function Credential(props) {
 
   return (
     <div id="contact">
-      <PageHeader title={(credentialSelected.name || '') + ' for ' + (credentialSelected.patient_first_name || '') + ' ' + (credentialSelected.patient_last_name || '')} />
+      <PageHeader
+        title={
+          (credentialSelected.name || '') +
+          ' for ' +
+          (credentialSelected.patient_first_name || '') +
+          ' ' +
+          (credentialSelected.patient_last_name || '')
+        }
+      />
       <PageSection>
         <h2>General Information</h2>
         <AttributeTable>
           <tbody>
             <AttributeRow>
               <th>ID:</th>
-              <td>{(credentialSelected.id || '')}</td>
+              <td>{credentialSelected.id || ''}</td>
             </AttributeRow>
           </tbody>
         </AttributeTable>
@@ -156,7 +162,7 @@ function Credential(props) {
           <tbody>
             <AttributeRow>
               <th>First Name:</th>
-              <td>{(credentialSelected.patient_first_name || '')}</td>
+              <td>{credentialSelected.patient_first_name || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Last Name:</th>

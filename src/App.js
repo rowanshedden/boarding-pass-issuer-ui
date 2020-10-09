@@ -1,19 +1,17 @@
-import React from 'react'
-
-import { useContext } from 'react'
+import React, { useState } from 'react'
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import styled, { ThemeProvider } from 'styled-components'
 
-import styled from 'styled-components'
-import { ThemeContext, ThemeProvider } from 'styled-components'
+import AppHeader from './UI/AppHeader'
+import Contact from './UI/Contact'
+import Contacts from './UI/Contacts'
+import Credential from './UI/Credential'
+import Credentials from './UI/Credentials'
+import Settings from './UI/Settings'
 
-import AppHeader from './UI/AppHeader.js'
-import Contact from './UI/Contact.js'
-import Contacts from './UI/Contacts.js'
-import Credential from './UI/Credential.js'
-import Credentials from './UI/Credentials.js'
+import logo from './logo.gif'
 
-//import theme from './theme.js'
 import './App.css'
 
 const Frame = styled.div`
@@ -26,8 +24,73 @@ const Main = styled.main`
   padding: 30px;
 `
 
-function App(theme) {
-  const themeContext = useContext(ThemeContext)
+function App() {
+  const defaultTheme = {
+    primary_color: '#0068B6',
+    secondary_color: '#00B0F1',
+    neutral_color: '#808080',
+    negative_color: '#e33636',
+    warning_color: '#ff8c42',
+    positive_color: '#4CB944',
+    text_color: '#555',
+    text_light: '#fff',
+    border: '#e3e3e3',
+    drop_shadow: '3px 3px 3px rgba(0, 0, 0, 0.3)',
+    background_primary: '#fff',
+    background_secondary: '#f5f5f5',
+  }
+
+  // Fetch the initial state from DB
+  const [theme, setTheme] = useState(defaultTheme)
+
+  // Logo change test state
+  const [logoPath, setLogoPath] = useState(logo)
+
+  // Styles to change array
+  // const [resource, setResource] = useState([])
+  const [stylesArray, setStylesArray] = useState([])
+
+  // Update theme
+  const updateTheme = (update) => {
+    return setTheme({ ...theme, ...update })
+  }
+
+  const addStylesToArray = (key) => {
+    let position = stylesArray.indexOf(key)
+    //if cannot find indexOf style
+    if (!~position) {
+      setStylesArray((oldArray) => [...oldArray, `${key}`])
+    }
+  }
+
+  const removeStylesFromArray = (undoKey) => {
+    // removing a style from an array of styles
+    let index = stylesArray.indexOf(undoKey)
+    if (index > -1) {
+      stylesArray.splice(index, 1)
+      setStylesArray(stylesArray)
+    }
+  }
+
+  // Undo theme change
+  const undoStyle = (undoKey) => {
+    console.log(undoKey)
+    if (undoKey !== undefined) {
+      for (let key in defaultTheme)
+        if ((key = undoKey)) {
+          const undo = { [`${key}`]: defaultTheme[key] }
+          return setTheme({ ...theme, ...undo })
+        }
+      console.log('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz')
+    }
+  }
+
+  //Change logo test
+  function changeLogo() {
+    setLogoPath(
+      window.location.origin + '/assets/uploads/fashion-logo-design.jpg'
+    )
+  }
 
   const contacts = [
     {
@@ -46,7 +109,7 @@ function App(theme) {
           city: 'Anytown',
           state: 'PA',
           zip_code: '17101',
-          country: 'United States'
+          country: 'United States',
         },
       },
       connection_status: 'Connected',
@@ -68,7 +131,7 @@ function App(theme) {
           city: 'Anytown',
           state: 'TX',
           zip_code: '34101',
-          country: 'United States'
+          country: 'United States',
         },
       },
       connection_status: 'Connected',
@@ -157,7 +220,7 @@ function App(theme) {
             render={({ match }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
                     <p>Home</p>
                   </Main>
@@ -171,7 +234,7 @@ function App(theme) {
             render={({ match, history }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
                     <Contacts history={history} contacts={contacts} />
                   </Main>
@@ -185,9 +248,12 @@ function App(theme) {
             render={({ match, history }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
-                    <Contact history={history} contact={match.params.contactId} />
+                    <Contact
+                      history={history}
+                      contact={match.params.contactId}
+                    />
                   </Main>
                 </Frame>
               )
@@ -199,7 +265,7 @@ function App(theme) {
             render={({ match }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
                     <p>Invitations</p>
                   </Main>
@@ -213,7 +279,7 @@ function App(theme) {
             render={({ match, history }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
                     <Credentials history={history} credentials={credentials} />
                   </Main>
@@ -226,9 +292,12 @@ function App(theme) {
             render={({ match, history }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
-                    <Credential history={history} credential={match.params.credentialId} />
+                    <Credential
+                      history={history}
+                      credential={match.params.credentialId}
+                    />
                   </Main>
                 </Frame>
               )
@@ -240,7 +309,7 @@ function App(theme) {
             render={({ match }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
                     <p>Verification</p>
                   </Main>
@@ -253,7 +322,7 @@ function App(theme) {
             render={({ match }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
                     <p>Messages</p>
                   </Main>
@@ -266,9 +335,16 @@ function App(theme) {
             render={({ match }) => {
               return (
                 <Frame id="app-frame">
-                  <AppHeader match={match} />
+                  <AppHeader logoPath={logoPath} match={match} />
                   <Main>
-                    <p>Settings</p>
+                    <Settings
+                      updateTheme={updateTheme}
+                      undoStyle={undoStyle}
+                      changeLogo={changeLogo}
+                      stylesArray={stylesArray}
+                      addStylesToArray={addStylesToArray}
+                      removeStylesFromArray={removeStylesFromArray}
+                    />
                   </Main>
                 </Frame>
               )

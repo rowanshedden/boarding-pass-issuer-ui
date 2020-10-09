@@ -4,15 +4,11 @@ import styled from 'styled-components'
 
 import AppMenu from './AppMenu.js'
 
-import theme from '../theme.js'
-
-import logo from '../logo.gif'
-
 const Header = styled.header`
   flex: 3;
   max-width: 240px;
   min-height: 100vh;
-  background: ${theme.background};
+  background: ${(props) => props.theme.background_primary};
 `
 
 const Logo = styled.img`
@@ -23,7 +19,7 @@ const Logo = styled.img`
 function AppHeader(match) {
   return (
     <Header id="app-header">
-      <Logo src={logo} alt="Logo" />
+      <Logo src={match.logoPath} alt="Logo" />
       <AppMenu match={match} />
     </Header>
   )

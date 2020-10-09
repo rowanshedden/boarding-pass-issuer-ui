@@ -2,8 +2,6 @@ import React from 'react'
 
 import styled from 'styled-components'
 
-import theme from '../theme.js'
-
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
 
@@ -33,8 +31,8 @@ const DataTable = styled.table`
 `
 
 const DataRow = styled.tr`
-  :nth-child(2n+2) td {
-    background: ${theme.background_secondary};
+  :nth-child(2n + 2) td {
+    background: ${(props) => props.theme.background_secondary};
   }
   :hover td {
     cursor: pointer;
@@ -45,7 +43,7 @@ const DataRow = styled.tr`
 const DataHeader = styled.th`
   padding: 8px 12px;
   text-align: left;
-  border-bottom: 1px solid ${theme.primary};
+  border-bottom: 1px solid ${(props) => props.theme.primary_color};
 `
 
 const DataCell = styled.td`
@@ -77,7 +75,7 @@ function Contact(props) {
           city: 'Anytown',
           state: 'PA',
           zip_code: '17101',
-          country: 'United States'
+          country: 'United States',
         },
       },
       connection_status: 'Connected',
@@ -99,7 +97,7 @@ function Contact(props) {
           city: 'Anytown',
           state: 'TX',
           zip_code: '34101',
-          country: 'United States'
+          country: 'United States',
         },
       },
       connection_status: 'Connected',
@@ -177,53 +175,69 @@ function Contact(props) {
   ]
 
   const history = props.history
- 
+
   const contact = props.contact
 
   let contactSelected = ''
 
-  for (let i=0; i < contacts.length; i++) {
+  for (let i = 0; i < contacts.length; i++) {
     if (contacts[i].id == contact) {
       contactSelected = contacts[i]
       break
     }
   }
 
-  const credentialRows = credentials.map(credential => {
+  const credentialRows = credentials.map((credential) => {
     console.log(credential)
     return (
-      <DataRow key={credential.id} onClick={() => {openCredential(history, credential.id)}}>
+      <DataRow
+        key={credential.id}
+        onClick={() => {
+          openCredential(history, credential.id)
+        }}
+      >
         <DataCell>{credential.name}</DataCell>
         <DataCell>{credential.status}</DataCell>
         <DataCell>{credential.result}</DataCell>
         <DataCell>{credential.lab_specimen_collected_date}</DataCell>
-        <DataCell><Icon name="revoke" /></DataCell>
+        <DataCell>
+          <Icon name="revoke" />
+        </DataCell>
       </DataRow>
     )
   })
 
   return (
     <div id="contact">
-      <PageHeader title={'Contact Details: ' + (contactSelected.demographics.first_name || '') + ' ' + (contactSelected.demographics.middle_name || '') + ' ' + (contactSelected.demographics.last_name || '')} />
+      <PageHeader
+        title={
+          'Contact Details: ' +
+          (contactSelected.demographics.first_name || '') +
+          ' ' +
+          (contactSelected.demographics.middle_name || '') +
+          ' ' +
+          (contactSelected.demographics.last_name || '')
+        }
+      />
       <PageSection>
         <h2>General Information</h2>
         <AttributeTable>
           <tbody>
             <AttributeRow>
               <th>ID:</th>
-              <td>{(contactSelected.id || '')}</td>
+              <td>{contactSelected.id || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>MPID:</th>
-              <td>{(contactSelected.mpid || '')}</td>
+              <td>{contactSelected.mpid || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Connection Status:</th>
-              <td>{(contactSelected.connection_status || '')}</td>
+              <td>{contactSelected.connection_status || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Credential Status:</th>
-              <td>{(contactSelected.credential_status || '')}</td>
+              <td>{contactSelected.credential_status || ''}</td>
             </AttributeRow>
           </tbody>
         </AttributeTable>
@@ -234,7 +248,7 @@ function Contact(props) {
           <tbody>
             <AttributeRow>
               <th>First Name:</th>
-              <td>{(contactSelected.demographics.first_name || '')}</td>
+              <td>{contactSelected.demographics.first_name || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Middle Name:</th>
@@ -242,19 +256,19 @@ function Contact(props) {
             </AttributeRow>
             <AttributeRow>
               <th>Last Name:</th>
-              <td>{(contactSelected.demographics.last_name || '')}</td>
+              <td>{contactSelected.demographics.last_name || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Date of Birth:</th>
-              <td>{(contactSelected.demographics.date_of_birth || '')}</td>
+              <td>{contactSelected.demographics.date_of_birth || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Gender:</th>
-              <td>{(contactSelected.demographics.gender || '')}</td>
+              <td>{contactSelected.demographics.gender || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Phone:</th>
-              <td>{(contactSelected.demographics.phone || '')}</td>
+              <td>{contactSelected.demographics.phone || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Address 1:</th>
@@ -266,19 +280,19 @@ function Contact(props) {
             </AttributeRow>
             <AttributeRow>
               <th>City:</th>
-              <td>{(contactSelected.demographics.address.city || '')}</td>
+              <td>{contactSelected.demographics.address.city || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>State:</th>
-              <td>{(contactSelected.demographics.address.state || '')}</td>
+              <td>{contactSelected.demographics.address.state || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Zip Code:</th>
-              <td>{(contactSelected.demographics.address.zip_code || '')}</td>
+              <td>{contactSelected.demographics.address.zip_code || ''}</td>
             </AttributeRow>
             <AttributeRow>
               <th>Country:</th>
-              <td>{(contactSelected.demographics.address.country || '')}</td>
+              <td>{contactSelected.demographics.address.country || ''}</td>
             </AttributeRow>
           </tbody>
         </AttributeTable>
@@ -294,9 +308,7 @@ function Contact(props) {
               <DataHeader>Revoke</DataHeader>
             </DataRow>
           </thead>
-          <tbody>
-            {credentialRows}
-          </tbody>
+          <tbody>{credentialRows}</tbody>
         </DataTable>
       </PageSection>
     </div>

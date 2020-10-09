@@ -26,18 +26,18 @@ _TODO_
 
 _TODO_
 
-* Philosophy
-* Goals/Requirements
-* Use cases
-* Big-picture diagrams
+- Philosophy
+- Goals/Requirements
+- Use cases
+- Big-picture diagrams
 
 ## Installation
 
 _TODO_
 
-* Installing this app and dependencies (including cloud agent, network, etc.)
-* OS requirements, etc.
-* Quick test to make sure everything is working
+- Installing this app and dependencies (including cloud agent, network, etc.)
+- OS requirements, etc.
+- Quick test to make sure everything is working
 
 ## Quickstart
 
@@ -77,11 +77,11 @@ If you are a new contributor to the project, please read our [contribution guide
 
 ## License
 
-Copyright © SITA Information Networking Computing USA inc 2020. Confidential. All rights reserved. 
+Copyright © SITA Information Networking Computing USA inc 2020. Confidential. All rights reserved.
 
-The use, republication or redistribution of this software is prohibited without the prior written consent of SITA Information Networking Computing USA or in accordance with a valid licence issued by SITA. 
+The use, republication or redistribution of this software is prohibited without the prior written consent of SITA Information Networking Computing USA or in accordance with a valid licence issued by SITA.
 
-Other than as set out in any licence issued by SITA governing your use of this software, and to the extent allowed by law: (1) no warranty or representation (express or  implied), including but not limited to the suitability, accuracy or fitness of this software for any purpose, or in respect of non-infringement of third party rights, is given; and (2) under no circumstances shall SITA be liable in respect of any use of this software by you, or any losses caused or suffered as a result.
+Other than as set out in any licence issued by SITA governing your use of this software, and to the extent allowed by law: (1) no warranty or representation (express or implied), including but not limited to the suitability, accuracy or fitness of this software for any purpose, or in respect of non-infringement of third party rights, is given; and (2) under no circumstances shall SITA be liable in respect of any use of this software by you, or any losses caused or suffered as a result.
 
 ## Developer Certificate of Origin (DCO)
 
@@ -100,23 +100,23 @@ Developer's Certificate of Origin 1.1
 By making a contribution to this project, I certify that:
 
 (a) The contribution was created in whole or in part by me and I
-   have the right to submit it under the open source license
-   indicated in the file; or
+have the right to submit it under the open source license
+indicated in the file; or
 
 (b) The contribution is based upon previous work that, to the best
-   of my knowledge, is covered under an appropriate open source
-   license and I have the right under that license to submit that
-   work with modifications, whether created in whole or in part
-   by me, under the same open source license (unless I am
-   permitted to submit under a different license), as indicated
-   in the file; or
+of my knowledge, is covered under an appropriate open source
+license and I have the right under that license to submit that
+work with modifications, whether created in whole or in part
+by me, under the same open source license (unless I am
+permitted to submit under a different license), as indicated
+in the file; or
 
 (c) The contribution was provided directly to me by some other
-   person who certified (a), (b) or (c) and I have not modified
-   it.
+person who certified (a), (b) or (c) and I have not modified
+it.
 
 (d) I understand and agree that this project and the contribution
-   are public and that a record of the contribution (including all
-   personal information I submit with it, including my sign-off) is
-   maintained indefinitely and may be redistributed consistent with
-   this project or the open source license(s) involved.
+are public and that a record of the contribution (including all
+personal information I submit with it, including my sign-off) is
+maintained indefinitely and may be redistributed consistent with
+this project or the open source license(s) involved.

@@ -16,12 +16,12 @@ Please note that all contributors and maintainers of this project are subject to
 
 This project is built with React.
 
-* [React documentation](https://reactjs.org/)
-* [Code Splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-* [Analyzing the Bundle Size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-* [Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-* [Deployment](https://facebook.github.io/create-react-app/docs/deployment)
-* [Minification Troubleshooting](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [React documentation](https://reactjs.org/)
+- [Code Splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- [Analyzing the Bundle Size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- [Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- [Deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- [Minification Troubleshooting](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
 ### Pull Requests
 
@@ -48,6 +48,7 @@ Pull requests must maintain 100% test coverage of all code branches. This helps 
 ```bash
 $ scripts/preflight
 ```
+
 _TODO: Actually implement coverage reporting, and talk about how the developer can examine the report._
 
 ### Coding Style
@@ -91,6 +92,7 @@ Alternatively, you can launch the test runner in the interactive watch mode like
 ```bash
 $ npm test
 ```
+
 See also the section in the React docs about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### Documentation
@@ -99,16 +101,16 @@ _TODO_
 
 ### Code style rules
 
-* Format non-trivial comments using your GitHub nick and one of these prefixes:
-    * TODO(riker): Damage report!
-    * NOTE(riker): Well, that's certainly good to know.
-    * PERF(riker): Travel time to the nearest starbase?
-    * APPSEC(riker): In all trust, there is the possibility for betrayal.
-* Use whitespace to separate logical blocks of code and to improve readability.
-* No single-character variable names except for trivial indexes when looping,
-or in mathematical expressions implementing well-known formulas.
-* Heavily document code that is especially complex and/or clever.
-* When in doubt, optimize for readability.
+- Format non-trivial comments using your GitHub nick and one of these prefixes:
+  - TODO(riker): Damage report!
+  - NOTE(riker): Well, that's certainly good to know.
+  - PERF(riker): Travel time to the nearest starbase?
+  - APPSEC(riker): In all trust, there is the possibility for betrayal.
+- Use whitespace to separate logical blocks of code and to improve readability.
+- No single-character variable names except for trivial indexes when looping,
+  or in mathematical expressions implementing well-known formulas.
+- Heavily document code that is especially complex and/or clever.
+- When in doubt, optimize for readability.
 
 _TODO: Add more guidelines as needed_
 
@@ -118,10 +120,10 @@ _TODO: Talk about how the changelog is generated/maintained._
 
 ### TODO
 
-* Copyright policy / DCO
-* CI/Gates
-* Required skills / proficiency (contributors of all levels welcome?)
-* Release process
-* Security testing/auditing (appsec)
+- Copyright policy / DCO
+- CI/Gates
+- Required skills / proficiency (contributors of all levels welcome?)
+- Release process
+- Security testing/auditing (appsec)
 
 [coc]: ./CODE_OF_CONDUCT.md
