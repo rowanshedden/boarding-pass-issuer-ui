@@ -62,14 +62,17 @@ const LastName = styled.span``
 const Icon = styled.span``
 
 function Credentials(props) {
+  // Notification states
   const [notification, setNotification] = useState(
     'There is no notification to display'
   )
   const [notificationState, setNotificationState] = useState('closed')
   const [notificationType, setNotificationType] = useState('notice')
 
-  const [modalIsOpen, setModalIsOpen] = useState(false)
-  const closeModal = () => setModalIsOpen(false)
+  // Modal state
+  const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
+
+  const closeCredentialModal = () => setCredentialModalIsOpen(false)
 
   function openCredential(history, id) {
     if (history !== undefined) {
@@ -143,13 +146,13 @@ function Credentials(props) {
         </PageSection>
         <ActionButton
           title="Manually Issue a Credential"
-          onClick={() => setModalIsOpen((o) => !o)}
+          onClick={() => setCredentialModalIsOpen((o) => !o)}
         >
           +
         </ActionButton>
         <FormCredentials
-          modalIsOpen={modalIsOpen}
-          closeModal={closeModal}
+          credentialModalIsOpen={credentialModalIsOpen}
+          closeCredentialModal={closeCredentialModal}
           submitNewCredential={submitNewCredential}
         ></FormCredentials>
       </div>

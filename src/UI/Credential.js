@@ -52,78 +52,9 @@ const DataCell = styled.td`
 `
 
 function Credential(props) {
-  const credentials = [
-    {
-      id: 1,
-      name: 'COVID-19 Test',
-      status: 'Accepted',
-      result: 'negative',
-      normality: 'normal',
-      result_status: 'determined',
-      comment: 'Good to go to the Bahamas!',
-      date_time_of_message: '2001-08-25 03:11:33',
-      sending_facility: 'Bronx RHIO',
-      ordering_facility_name: 'Bronx RHIO Travel Dept.',
-      ordering_facility_address: '456 E. 200 N. Bronx',
-      performing_lab: 'Lab 2345',
-      visit_location: '123 S. 200 W. Brooklyn',
-      lab_order_id: '12345',
-      lab_code: '67890',
-      lab_coding_qualifer: 'PCR',
-      lab_description: 'COVID-19 swab test',
-      lab_specimen_collected_date: '2020-08-05',
-      observation_date_time: '14:27',
-      mpid: '34537912',
-      patient_local_id: '1',
-      patient_first_name: 'Sherry',
-      patient_last_name: 'Smith',
-      patient_date_of_birth: '1967-08-25',
-      patient_gender_legal: 'female',
-      patient_phone: '567-456-7890',
-      patient_street_address: '123 Main St',
-      patient_city: 'Anytown',
-      patient_state: 'TX',
-      patient_postalcode: '34101',
-      patient_country: 'United States',
-    },
-    {
-      id: 2,
-      name: 'COVID-19 Test',
-      status: 'Offered',
-      result: 'positive',
-      normality: 'normal',
-      result_status: 'determined',
-      comment: 'Uh-oh!',
-      date_time_of_message: '2001-08-25 03:11:33',
-      sending_facility: 'Bronx RHIO',
-      ordering_facility_name: 'Bronx RHIO Travel Dept.',
-      ordering_facility_address: '456 E. 200 N. Bronx',
-      performing_lab: 'Lab 2345',
-      visit_location: '123 S. 200 W. Brooklyn',
-      lab_order_id: '12345',
-      lab_code: '67890',
-      lab_coding_qualifer: 'PCR',
-      lab_description: 'COVID-19 swab test',
-      lab_specimen_collected_date: '2020-09-14',
-      observation_date_time: '14:27',
-      mpid: '34537912',
-      patient_local_id: '1',
-      patient_first_name: 'Sherry',
-      patient_last_name: 'Smith',
-      patient_date_of_birth: '1967-08-25',
-      patient_gender_legal: 'female',
-      patient_phone: '567-456-7890',
-      patient_street_address: '123 Main St',
-      patient_city: 'Anytown',
-      patient_state: 'TX',
-      patient_postalcode: '34101',
-      patient_country: 'United States',
-    },
-  ]
-
   const history = props.history
-
   const credential = props.credential
+  const credentials = props.credentials
 
   let credentialSelected = ''
 
@@ -155,8 +86,6 @@ function Credential(props) {
             </AttributeRow>
           </tbody>
         </AttributeTable>
-      </PageSection>
-      <PageSection>
         <h2>Demographic Information</h2>
         <AttributeTable>
           <tbody>

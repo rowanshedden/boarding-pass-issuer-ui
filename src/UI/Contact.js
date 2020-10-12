@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import styled from 'styled-components'
 
+import FormCredentials from './FormCredentials'
+import FormContacts from './FormContacts'
+import Notification from './Notification'
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
 
@@ -17,9 +20,9 @@ const AttributeRow = styled.tr`
   }
 `
 
-const FirstName = styled.span``
-const MiddleInitial = styled.span``
-const LastName = styled.span``
+// const FirstName = styled.span``
+// const MiddleInitial = styled.span``
+// const LastName = styled.span``
 const Icon = styled.span``
 
 const DataTable = styled.table`
@@ -51,144 +54,111 @@ const DataCell = styled.td`
   text-align: left;
 `
 
+const ActionButton = styled.span`
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  display: block;
+  height: 64px;
+  width: 64px;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 64px;
+  color: ${(props) => props.theme.text_light};
+  border-radius: 32px;
+  box-shadow: ${(props) => props.theme.drop_shadow};
+  background: ${(props) => props.theme.primary_color};
+
+  :hover {
+    cursor: pointer;
+  }
+`
+
+const EditContact = styled.button`
+  width: 80px;
+  background: ${(props) => props.theme.primary_color};
+  padding: 10px;
+  color: ${(props) => props.theme.text_light};
+  border: none;
+  float: right;
+  box-shadow: ${(props) => props.theme.drop_shadow};
+`
+
 function Contact(props) {
+  const source = 'contact'
+  const history = props.history
+  const contact = props.contact
+
+  let contactSelected = ''
+
+  for (let i = 0; i < props.contacts.length; i++) {
+    if (props.contacts[i].id == contact) {
+      contactSelected = props.contacts[i]
+      break
+    }
+  }
+
   function openCredential(history, id) {
     if (history !== undefined) {
       history.push('/credentials/' + id)
     }
   }
 
-  const contacts = [
-    {
-      id: 1,
-      mpid: '34537657',
-      demographics: {
-        first_name: 'John',
-        middle_name: null,
-        last_name: 'Doe',
-        date_of_birth: '2001-08-25 03:11:33',
-        gender: 'male',
-        phone: '123-456-7890',
-        address: {
-          address_1: '123 Main St',
-          address_2: 'Apt #382',
-          city: 'Anytown',
-          state: 'PA',
-          zip_code: '17101',
-          country: 'United States',
-        },
-      },
-      connection_status: 'Connected',
-      credential_status: 'None',
-    },
-    {
-      id: 2,
-      mpid: '34537912',
-      demographics: {
-        first_name: 'Sherry',
-        middle_name: null,
-        last_name: 'Smith',
-        date_of_birth: '1967-08-25 03:11:33',
-        gender: 'female',
-        phone: '567-456-7890',
-        address: {
-          address_1: '123 Main St',
-          address_2: 'Apt #382',
-          city: 'Anytown',
-          state: 'TX',
-          zip_code: '34101',
-          country: 'United States',
-        },
-      },
-      connection_status: 'Connected',
-      credential_status: 'None',
-    },
-  ]
+  // Contact form customization (no contact search dropdown)
+  const [contactSearch, setContactSearch] = useState(false)
 
-  const credentials = [
-    {
-      id: 1,
-      name: 'COVID-19 Test',
-      status: 'Accepted',
-      result: 'negative',
-      normality: 'normal',
-      result_status: 'determined',
-      comment: 'Good to go to the Bahamas!',
-      date_time_of_message: '2001-08-25 03:11:33',
-      sending_facility: 'Bronx RHIO',
-      ordering_facility_name: 'Bronx RHIO Travel Dept.',
-      ordering_facility_address: '456 E. 200 N. Bronx',
-      performing_lab: 'Lab 2345',
-      visit_location: '123 S. 200 W. Brooklyn',
-      lab_order_id: '12345',
-      lab_code: '67890',
-      lab_coding_qualifer: 'PCR',
-      lab_description: 'COVID-19 swab test',
-      lab_specimen_collected_date: '2020-08-05',
-      observation_date_time: '14:27',
-      mpid: '34537912',
-      patient_local_id: '1',
-      patient_first_name: 'Sherry',
-      patient_last_name: 'Smith',
-      patient_date_of_birth: '1967-08-25',
-      patient_gender_legal: 'female',
-      patient_phone: '567-456-7890',
-      patient_street_address: '123 Main St',
-      patient_city: 'Anytown',
-      patient_state: 'TX',
-      patient_postalcode: '34101',
-      patient_country: 'United States',
-    },
-    {
-      id: 2,
-      name: 'COVID-19 Test',
-      status: 'Offered',
-      result: 'positive',
-      normality: 'normal',
-      result_status: 'determined',
-      comment: 'Uh-oh!',
-      date_time_of_message: '2001-08-25 03:11:33',
-      sending_facility: 'Bronx RHIO',
-      ordering_facility_name: 'Bronx RHIO Travel Dept.',
-      ordering_facility_address: '456 E. 200 N. Bronx',
-      performing_lab: 'Lab 2345',
-      visit_location: '123 S. 200 W. Brooklyn',
-      lab_order_id: '12345',
-      lab_code: '67890',
-      lab_coding_qualifer: 'PCR',
-      lab_description: 'COVID-19 swab test',
-      lab_specimen_collected_date: '2020-09-14',
-      observation_date_time: '14:27',
-      mpid: '34537912',
-      patient_local_id: '1',
-      patient_first_name: 'Sherry',
-      patient_last_name: 'Smith',
-      patient_date_of_birth: '1967-08-25',
-      patient_gender_legal: 'female',
-      patient_phone: '567-456-7890',
-      patient_street_address: '123 Main St',
-      patient_city: 'Anytown',
-      patient_state: 'TX',
-      patient_postalcode: '34101',
-      patient_country: 'United States',
-    },
-  ]
+  // Notification states
+  const [notification, setNotification] = useState(
+    'There is no notification to display'
+  )
+  const [notificationState, setNotificationState] = useState('closed')
+  const [notificationType, setNotificationType] = useState('notice')
+
+
+  // Modal state
+  const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
+  const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
 
   const history = props.history
 
   const contact = props.contact
 
-  let contactSelected = ''
+  const closeContactModal = () => setContactModalIsOpen(false)
+  const closeCredentialModal = () => setCredentialModalIsOpen(false)
 
-  for (let i = 0; i < contacts.length; i++) {
-    if (contacts[i].id == contact) {
-      contactSelected = contacts[i]
-      break
-    }
+  const [selectedContact, setSelectedContact] = useState(contactSelected)
+
+  console.log(selectedContact)
+
+  function updateContact(update) {
+    console.log(update)
+    return setSelectedContact({ ...selectedContact, ...update })
   }
 
-  const credentialRows = credentials.map((credential) => {
-    console.log(credential)
+  // Submits the form and shows notification
+  function submitNewCredential(e) {
+    console.log('new credential submitted')
+    // e.preventDefault()
+
+    setNotificationState('open')
+    setNotification('Credential was successfully added!')
+  }
+
+  // Submits the contact form and shows notification
+  function editContact(e) {
+    console.log('new contact submitted')
+    e.preventDefault()
+    setNotificationState('open')
+    setNotification('Contact was successfully updated!')
+  }
+
+  // Closes notification
+  const closeNotification = (e) => {
+    setNotificationState('closed')
+  }
+
+  const credentialRows = props.credentials.map((credential) => {
     return (
       <DataRow
         key={credential.id}
@@ -208,110 +178,140 @@ function Contact(props) {
   })
 
   return (
-    <div id="contact">
-      <PageHeader
-        title={
-          'Contact Details: ' +
-          (contactSelected.demographics.first_name || '') +
-          ' ' +
-          (contactSelected.demographics.middle_name || '') +
-          ' ' +
-          (contactSelected.demographics.last_name || '')
-        }
-      />
-      <PageSection>
-        <h2>General Information</h2>
-        <AttributeTable>
-          <tbody>
-            <AttributeRow>
-              <th>ID:</th>
-              <td>{contactSelected.id || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>MPID:</th>
-              <td>{contactSelected.mpid || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Connection Status:</th>
-              <td>{contactSelected.connection_status || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Credential Status:</th>
-              <td>{contactSelected.credential_status || ''}</td>
-            </AttributeRow>
-          </tbody>
-        </AttributeTable>
-      </PageSection>
-      <PageSection>
-        <h2>Demographic Information</h2>
-        <AttributeTable>
-          <tbody>
-            <AttributeRow>
-              <th>First Name:</th>
-              <td>{contactSelected.demographics.first_name || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Middle Name:</th>
-              <td>{contactSelected.demographics.middle_name || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Last Name:</th>
-              <td>{contactSelected.demographics.last_name || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Date of Birth:</th>
-              <td>{contactSelected.demographics.date_of_birth || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Gender:</th>
-              <td>{contactSelected.demographics.gender || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Phone:</th>
-              <td>{contactSelected.demographics.phone || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Address 1:</th>
-              <td>{contactSelected.demographics.address.address_1 || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Address 2:</th>
-              <td>{contactSelected.demographics.address.address_2 || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>City:</th>
-              <td>{contactSelected.demographics.address.city || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>State:</th>
-              <td>{contactSelected.demographics.address.state || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Zip Code:</th>
-              <td>{contactSelected.demographics.address.zip_code || ''}</td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Country:</th>
-              <td>{contactSelected.demographics.address.country || ''}</td>
-            </AttributeRow>
-          </tbody>
-        </AttributeTable>
-      </PageSection>
-      <PageSection>
-        <DataTable>
-          <thead>
-            <DataRow>
-              <DataHeader>Credential Name</DataHeader>
-              <DataHeader>Status</DataHeader>
-              <DataHeader>Result</DataHeader>
-              <DataHeader>Date</DataHeader>
-              <DataHeader>Revoke</DataHeader>
-            </DataRow>
-          </thead>
-          <tbody>{credentialRows}</tbody>
-        </DataTable>
-      </PageSection>
-    </div>
+    <>
+      <Notification
+        type={notificationType}
+        message={notification}
+        state={notificationState}
+        closeNotification={closeNotification}
+      ></Notification>
+      <div id="contact">
+        <PageHeader
+          title={
+            'Contact Details: ' +
+            (selectedContact.demographics.first_name || '') +
+            ' ' +
+            (selectedContact.demographics.middle_name || '') +
+            ' ' +
+            (selectedContact.demographics.last_name || '')
+          }
+        />
+        <PageSection>
+          <EditContact onClick={() => setContactModalIsOpen((o) => !o)}>
+            Edit
+          </EditContact>
+          <h2>General Information</h2>
+          <AttributeTable>
+            <tbody>
+              <AttributeRow>
+                <th>ID:</th>
+                <td>{selectedContact.id || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>MPID:</th>
+                <td>{selectedContact.mpid || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Connection Status:</th>
+                <td>{selectedContact.connection_status || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Credential Status:</th>
+                <td>{selectedContact.credential_status || ''}</td>
+              </AttributeRow>
+            </tbody>
+          </AttributeTable>
+          <h2>Demographic Information</h2>
+          <AttributeTable>
+            <tbody>
+              <AttributeRow>
+                <th>First Name:</th>
+                <td>{selectedContact.demographics.first_name || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Middle Name:</th>
+                <td>{selectedContact.demographics.middle_name || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Last Name:</th>
+                <td>{selectedContact.demographics.last_name || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Date of Birth:</th>
+                <td>{selectedContact.demographics.date_of_birth || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Gender:</th>
+                <td>{selectedContact.demographics.gender || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Phone:</th>
+                <td>{selectedContact.demographics.phone || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Address 1:</th>
+                <td>{selectedContact.demographics.address.address_1 || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Address 2:</th>
+                <td>{selectedContact.demographics.address.address_2 || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>City:</th>
+                <td>{selectedContact.demographics.address.city || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>State:</th>
+                <td>{selectedContact.demographics.address.state || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Zip Code:</th>
+                <td>{selectedContact.demographics.address.zip_code || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Country:</th>
+                <td>{selectedContact.demographics.address.country || ''}</td>
+              </AttributeRow>
+            </tbody>
+          </AttributeTable>
+        </PageSection>
+        <PageSection>
+          <DataTable>
+            <thead>
+              <DataRow>
+                <DataHeader>Credential Name</DataHeader>
+                <DataHeader>Status</DataHeader>
+                <DataHeader>Result</DataHeader>
+                <DataHeader>Date</DataHeader>
+                <DataHeader>Revoke</DataHeader>
+              </DataRow>
+            </thead>
+            <tbody>{credentialRows}</tbody>
+          </DataTable>
+        </PageSection>
+        <ActionButton
+          title="Manually Issue a Credential"
+          onClick={() => setCredentialModalIsOpen((o) => !o)}
+        >
+          +
+        </ActionButton>
+        <FormContacts
+          source={source}
+          updateContact={updateContact}
+          contactSelected={contactSelected}
+          contactModalIsOpen={contactModalIsOpen}
+          closeContactModal={closeContactModal}
+          submitNewContact={editContact}
+        ></FormContacts>
+        <FormCredentials
+          selectedContact={contactSelected}
+          contactSearch={contactSearch}
+          credentialModalIsOpen={credentialModalIsOpen}
+          closeCredentialModal={closeCredentialModal}
+          submitNewCredential={submitNewCredential}
+        ></FormCredentials>
+      </div>
+    </>
   )
 }
 

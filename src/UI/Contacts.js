@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import FormContacts from './FormContacts'
+// import FormContacts from './FormContacts'
+import FormQR from './FormQR'
 import Notification from './Notification'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
@@ -66,8 +67,9 @@ function Contacts(props) {
   const [notificationState, setNotificationState] = useState('closed')
   const [notificationType, setNotificationType] = useState('notice')
 
-  const [modalIsOpen, setModalIsOpen] = useState(false)
-  const closeModal = () => setModalIsOpen(false)
+  const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
+
+  const closeContactModal = () => setContactModalIsOpen(false)
 
   function openContact(history, id) {
     if (history !== undefined) {
@@ -97,7 +99,7 @@ function Contacts(props) {
       <DataRow
         key={contact.id}
         onClick={() => {
-          openContact(history, contact.id)
+          openContact(history, contact.id, contact)
         }}
       >
         <DataCell>
@@ -141,15 +143,15 @@ function Contacts(props) {
         </PageSection>
         <ActionButton
           title="Add a New Contact"
-          onClick={() => setModalIsOpen((o) => !o)}
+          onClick={() => setContactModalIsOpen((o) => !o)}
         >
           +
         </ActionButton>
-        <FormContacts
-          modalIsOpen={modalIsOpen}
-          closeModal={closeModal}
+        <FormQR
+          contactModalIsOpen={contactModalIsOpen}
+          closeContactModal={closeContactModal}
           submitNewContact={submitNewContact}
-        ></FormContacts>
+        ></FormQR>
       </div>
     </>
   )

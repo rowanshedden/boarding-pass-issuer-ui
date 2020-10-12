@@ -8,6 +8,7 @@ import Contact from './UI/Contact'
 import Contacts from './UI/Contacts'
 import Credential from './UI/Credential'
 import Credentials from './UI/Credentials'
+import Home from './UI/Home'
 import Settings from './UI/Settings'
 
 import logo from './logo.gif'
@@ -81,7 +82,6 @@ function App() {
           const undo = { [`${key}`]: defaultTheme[key] }
           return setTheme({ ...theme, ...undo })
         }
-      console.log('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz')
     }
   }
 
@@ -100,7 +100,7 @@ function App() {
         first_name: 'John',
         middle_name: null,
         last_name: 'Doe',
-        date_of_birth: '2001-08-25 03:11:33',
+        date_of_birth: '2001-08-25',
         gender: 'male',
         phone: '123-456-7890',
         address: {
@@ -122,7 +122,7 @@ function App() {
         first_name: 'Sherry',
         middle_name: null,
         last_name: 'Smith',
-        date_of_birth: '1967-08-25 03:11:33',
+        date_of_birth: '1967-08-25',
         gender: 'female',
         phone: '567-456-7890',
         address: {
@@ -135,6 +135,28 @@ function App() {
         },
       },
       connection_status: 'Connected',
+      credential_status: 'None',
+    },
+    {
+      id: 3,
+      mpid: '',
+      demographics: {
+        first_name: 'Carlos',
+        middle_name: 'Ray',
+        last_name: 'Norris',
+        date_of_birth: '1940-03-10',
+        gender: 'male',
+        phone: '567-456-7890',
+        address: {
+          address_1: '123 Main St',
+          address_2: 'Apt #382',
+          city: 'Ausitn',
+          state: 'TX',
+          zip_code: '34101',
+          country: 'United States',
+        },
+      },
+      connection_status: 'Disconnected',
       credential_status: 'None',
     },
   ]
@@ -222,7 +244,7 @@ function App() {
                 <Frame id="app-frame">
                   <AppHeader logoPath={logoPath} match={match} />
                   <Main>
-                    <p>Home</p>
+                    <Home contacts={contacts} />
                   </Main>
                 </Frame>
               )
@@ -253,12 +275,13 @@ function App() {
                     <Contact
                       history={history}
                       contact={match.params.contactId}
+                      contacts={contacts}
+                      credentials={credentials}
                     />
                   </Main>
                 </Frame>
               )
             }}
-            contacts={contacts}
           />
           <Route
             path="/contacts/invitations"
@@ -297,6 +320,7 @@ function App() {
                     <Credential
                       history={history}
                       credential={match.params.credentialId}
+                      credentials={credentials}
                     />
                   </Main>
                 </Frame>
