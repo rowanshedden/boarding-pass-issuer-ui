@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+
 import styled from 'styled-components'
+
+import QRCode from 'qrcode.react'
 
 // import FormContacts from './FormContacts'
 import FormQR from './FormQR'

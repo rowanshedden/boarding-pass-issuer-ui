@@ -115,14 +115,13 @@ function Contact(props) {
   const [notificationState, setNotificationState] = useState('closed')
   const [notificationType, setNotificationType] = useState('notice')
 
-
   // Modal state
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
   const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
 
-  const history = props.history
+  //const history = props.history
 
-  const contact = props.contact
+  //const contact = props.contact
 
   const closeContactModal = () => setContactModalIsOpen(false)
   const closeCredentialModal = () => setCredentialModalIsOpen(false)

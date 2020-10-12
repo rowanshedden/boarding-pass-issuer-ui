@@ -13,7 +13,7 @@ const List = styled.ul`
   & ul {
     display: none;
     position: relative;
-    top: -12px;
+    /*top: -12px;*/
     padding: 0 0 0 20px;
   }
 `
@@ -53,7 +53,11 @@ const StyledLink = styled(NavLink)`
   &:hover,
   &.active {
     text-decoration: underline;
+
     color: ${(props) => props.theme.primary_color};
+
+    border-right: 3px solid ${(props) => props.theme.primary_color};
+    background: ${(props) => props.theme.background_secondary};
   }
 `
 
@@ -69,13 +73,15 @@ const StyledSubLink = styled(NavLink)`
   &.active {
     text-decoration: underline;
     color: ${(props) => props.theme.primary_color};
+    background: none;
   }
 `
 
-function AppMenu(match) {
+function AppMenu(props) {
   let pathMatch = ''
-  if (match.path !== undefined) {
-    pathMatch = match.path
+
+  if (props.match.path !== undefined) {
+    pathMatch = props.match.path
   }
 
   return (
@@ -86,10 +92,17 @@ function AppMenu(match) {
             Home
           </StyledLink>
         </Item>
-        <Item className={pathMatch === '/contacts' ? 'active' : undefined}>
+        {/*<Item className={pathMatch === '/invitations' ? 'active' : undefined}>
+          <StyledLink to="/invitations">
+            Invitations
+          </StyledLink>
+        </Item>*/}
+        <Item
+          className={pathMatch.includes('/contacts') ? 'active' : undefined}
+        >
           <StyledLink to="/contacts">Contacts</StyledLink>
           {/*<List>
-            <Item>
+            <Item className={pathMatch === '/contacts' ? 'active' : undefined}>
               <StyledSubLink exact to="/contacts">
                 Contacts
               </StyledSubLink>

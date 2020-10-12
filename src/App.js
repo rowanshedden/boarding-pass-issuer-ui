@@ -28,66 +28,68 @@ const Main = styled.main`
 
 function App() {
   //(JamesKEbert)Note: We may want to abstract the websockets out into a high-order component for better abstraction, especially potentially with authentication/authorization
-  
+
   //Websocket reference hook
-  const controllerSocket = useRef();
+  const controllerSocket = useRef()
 
   //Perform First Time Setup. Connect to Controller Server via Websockets
   useEffect(() => {
-    console.log("Performing first time setup");
+    console.log('Performing first time setup')
 
-    let url = new URL('/api/ws', window.location.href);
-    url.protocol = url.protocol.replace('http', 'ws');
+    let url = new URL('/api/ws', window.location.href)
+    url.protocol = url.protocol.replace('http', 'ws')
 
-    console.log(url);
+    console.log(url)
 
-    controllerSocket.current = new WebSocket(url.href);
+    controllerSocket.current = new WebSocket(url.href)
   }, [])
 
   //Define Websocket event listeners
   useEffect(() => {
     //Perform operation on websocket open
     controllerSocket.current.onopen = () => {
-      console.log("Websocket Connection established");
-    };
+      console.log('Websocket Connection established')
+    }
 
     //Error Handler
     controllerSocket.current.onerror = (event) => {
-      console.error("Websocket error:", event);
+      console.error('Websocket error:', event)
 
       setNotification('Client Error - Websockets')
-      setNotificationType('error');
+      setNotificationType('error')
       setNotificationState('open')
     }
 
     //Receive new message from Controller Server
     controllerSocket.current.onmessage = (message) => {
-      const parsedMessage = JSON.parse(message.data);
-      console.log("New Websocket Message:", parsedMessage);
+      const parsedMessage = JSON.parse(message.data)
+      console.log('New Websocket Message:', parsedMessage)
 
-      messageHandler(parsedMessage.messageType, parsedMessage.messageData);
+      messageHandler(parsedMessage.messageType, parsedMessage.messageData)
     }
   })
 
   //Send a message to the Controller server
   const sendMessage = (messageType, messageData = {}) => {
-    controllerSocket.current.send(
-      JSON.stringify({messageType, messageData})
-    )
+    controllerSocket.current.send(JSON.stringify({ messageType, messageData }))
   }
 
   //Handle inbound messages
   const messageHandler = async (messageType, messageData = {}) => {
-    try{
+    try {
       switch (messageType) {
         case 'SERVER_ERROR':
-          console.error(`Server Error: Code - ${messageData.errorCode}, Reason: '${messageData.errorReason}'`);
+          console.error(
+            `Server Error: Code - ${messageData.errorCode}, Reason: '${messageData.errorReason}'`
+          )
 
-          setNotification(`Server Error - ${messageData.errorCode} \n Reason: '${messageData.errorReason}'`)
-          setNotificationType('error');
+          setNotification(
+            `Server Error - ${messageData.errorCode} \n Reason: '${messageData.errorReason}'`
+          )
+          setNotificationType('error')
           setNotificationState('open')
 
-          break;
+          break
         /* Used in Demo - Message Cases for reference, CREDENTIAL case potentially helpful for future state update mechanics:
 
 
@@ -137,20 +139,21 @@ function App() {
         default:
           console.error(`Unrecognized Message Type: ${messageType}`)
 
-          setNotification(`Error - Unrecognized Websocket Message Type: ${messageType}`)
-          setNotificationType('error');
+          setNotification(
+            `Error - Unrecognized Websocket Message Type: ${messageType}`
+          )
+          setNotificationType('error')
           setNotificationState('open')
-          break;
+          break
       }
-    } catch (error){
-      console.error("Error In Websocket Message Handling", error);
+    } catch (error) {
+      console.error('Error In Websocket Message Handling', error)
 
       setNotification('Client Error - Websockets')
-      setNotificationType('error');
+      setNotificationType('error')
       setNotificationState('open')
     }
   }
-
 
   const defaultTheme = {
     primary_color: '#0068B6',
@@ -391,19 +394,36 @@ function App() {
             }}
           />
           <Route
+            path="/invitations"
+            render={({ match }) => {
+              return (
+                <Frame id="app-frame">
+                  <AppHeader logoPath={logoPath} match={match} />
+                  <Main>
+                    <p>Invitations</p>
+                  </Main>
+                </Frame>
+              )
+            }}
+          />
+          <Route
             path="/contacts"
             exact
             render={({ match, history }) => {
               return (
                 <Frame id="app-frame">
                   <AppHeader logoPath={logoPath} match={match} />
-                  <Main>{/*(JamesKEbert)Note:sendRequest Prop the technique to use to send websocket messages to the Controller Server in other components:*/}
-                    <Contacts history={history} contacts={contacts} sendRequest={sendMessage}/>
+                  <Main>
+                    {/*(JamesKEbert)Note:sendRequest Prop the technique to use to send websocket messages to the Controller Server in other components:*/}
+                    <Contacts
+                      history={history}
+                      contacts={contacts}
+                      sendRequest={sendMessage}
+                    />
                   </Main>
                 </Frame>
               )
             }}
-            contacts={contacts}
           />
           <Route
             path={`/contacts/:contactId`}
@@ -418,19 +438,6 @@ function App() {
                       contacts={contacts}
                       credentials={credentials}
                     />
-                  </Main>
-                </Frame>
-              )
-            }}
-          />
-          <Route
-            path="/contacts/invitations"
-            render={({ match }) => {
-              return (
-                <Frame id="app-frame">
-                  <AppHeader logoPath={logoPath} match={match} />
-                  <Main>
-                    <p>Invitations</p>
                   </Main>
                 </Frame>
               )

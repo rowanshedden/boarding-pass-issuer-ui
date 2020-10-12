@@ -16,11 +16,11 @@ const Logo = styled.img`
   width: 240px;
 `
 
-function AppHeader(match) {
+function AppHeader(props) {
   return (
     <Header id="app-header">
-      <Logo src={match.logoPath} alt="Logo" />
-      <AppMenu match={match} />
+      <Logo src={props.logoPath} alt="Logo" />
+      <AppMenu match={props.match} />
     </Header>
   )
 }
