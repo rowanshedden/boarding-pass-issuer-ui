@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
@@ -9,6 +9,7 @@ import Contacts from './UI/Contacts'
 import Credential from './UI/Credential'
 import Credentials from './UI/Credentials'
 import Home from './UI/Home'
+import Notification from './UI/Notification'
 import Settings from './UI/Settings'
 
 import logo from './logo.gif'
@@ -26,6 +27,131 @@ const Main = styled.main`
 `
 
 function App() {
+  //(JamesKEbert)Note: We may want to abstract the websockets out into a high-order component for better abstraction, especially potentially with authentication/authorization
+  
+  //Websocket reference hook
+  const controllerSocket = useRef();
+
+  //Perform First Time Setup. Connect to Controller Server via Websockets
+  useEffect(() => {
+    console.log("Performing first time setup");
+
+    let url = new URL('/api/ws', window.location.href);
+    url.protocol = url.protocol.replace('http', 'ws');
+
+    console.log(url);
+
+    controllerSocket.current = new WebSocket(url.href);
+  }, [])
+
+  //Define Websocket event listeners
+  useEffect(() => {
+    //Perform operation on websocket open
+    controllerSocket.current.onopen = () => {
+      console.log("Websocket Connection established");
+    };
+
+    //Error Handler
+    controllerSocket.current.onerror = (event) => {
+      console.error("Websocket error:", event);
+
+      setNotification('Client Error - Websockets')
+      setNotificationType('error');
+      setNotificationState('open')
+    }
+
+    //Receive new message from Controller Server
+    controllerSocket.current.onmessage = (message) => {
+      const parsedMessage = JSON.parse(message.data);
+      console.log("New Websocket Message:", parsedMessage);
+
+      messageHandler(parsedMessage.messageType, parsedMessage.messageData);
+    }
+  })
+
+  //Send a message to the Controller server
+  const sendMessage = (messageType, messageData = {}) => {
+    controllerSocket.current.send(
+      JSON.stringify({messageType, messageData})
+    )
+  }
+
+  //Handle inbound messages
+  const messageHandler = async (messageType, messageData = {}) => {
+    try{
+      switch (messageType) {
+        case 'SERVER_ERROR':
+          console.error(`Server Error: Code - ${messageData.errorCode}, Reason: '${messageData.errorReason}'`);
+
+          setNotification(`Server Error - ${messageData.errorCode} \n Reason: '${messageData.errorReason}'`)
+          setNotificationType('error');
+          setNotificationState('open')
+
+          break;
+        /* Used in Demo - Message Cases for reference, CREDENTIAL case potentially helpful for future state update mechanics:
+
+
+        case 'NEW_INVITATION':
+          console.log("Received new Invitation", messageData.invitationURL);
+          setQRCodeURL(messageData.invitationURL)
+
+          break;
+        case 'CONTACT':
+          console.log("Received new Contact Data", messageData.connectionMessage);
+          
+          const nextState = contacts;
+          let objIndex = nextState.findIndex((obj => obj.connection_id == messageData.connectionMessage.connection_id));
+          console.log(objIndex)
+
+          if(objIndex === -1){
+            console.log("Contact Doesn't Already Exist");
+            nextState.push(messageData.connectionMessage)
+          }
+          else{
+            console.log("Contact Already Exists");
+
+            nextState[objIndex] = messageData.connectionMessage
+          }
+
+          setContacts(nextState)
+          break;
+        case 'CREDENTIAL':
+          console.log("Received new Credential Data", messageData.issuanceMessage);
+          
+          const nextCredState = credentials;
+          let objIndexC = nextCredState.findIndex((obj => obj.credential_exchange_id == messageData.issuanceMessage.credential_exchange_id));
+          console.log(objIndexC)
+
+          if(objIndexC === -1){
+            console.log("Credential Doesn't Already Exist");
+            nextCredState.push(messageData.issuanceMessage)
+          }
+          else{
+            console.log("Credential Already Exists");
+
+            nextCredState[objIndexC] = messageData.issuanceMessage
+          }
+
+          setCredentials(nextCredState)
+          break;*/
+        default:
+          console.error(`Unrecognized Message Type: ${messageType}`)
+
+          setNotification(`Error - Unrecognized Websocket Message Type: ${messageType}`)
+          setNotificationType('error');
+          setNotificationState('open')
+          break;
+      }
+    } catch (error){
+      console.error("Error In Websocket Message Handling", error);
+
+      setNotification('Client Error - Websockets')
+      setNotificationType('error');
+      setNotificationState('open')
+    }
+  }
+
+
   const defaultTheme = {
     primary_color: '#0068B6',
     secondary_color: '#00B0F1',
@@ -232,8 +358,22 @@ function App() {
     },
   ]
 
+  const [notification, setNotification] = useState('')
+  const [notificationState, setNotificationState] = useState('closed')
+  const [notificationType, setNotificationType] = useState('notice')
+
+  const closeNotification = (e) => {
+    setNotificationState('closed')
+  }
+
   return (
     <ThemeProvider theme={theme}>
+      <Notification
+        type={notificationType}
+        message={notification}
+        state={notificationState}
+        closeNotification={closeNotification}
+      ></Notification>
       <Router>
         <Switch>
           <Route
@@ -257,8 +397,8 @@ function App() {
               return (
                 <Frame id="app-frame">
                   <AppHeader logoPath={logoPath} match={match} />
-                  <Main>
-                    <Contacts history={history} contacts={contacts} />
+                  <Main>{/*(JamesKEbert)Note:sendRequest Prop the technique to use to send websocket messages to the Controller Server in other components:*/}
+                    <Contacts history={history} contacts={contacts} sendRequest={sendMessage}/>
                   </Main>
                 </Frame>
               )

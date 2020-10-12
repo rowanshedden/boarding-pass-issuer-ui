@@ -10,6 +10,7 @@
     "axios": "^0.20.0",
     "nan": "^2.14.1",
     "onchange": "^7.0.2",
+    "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
