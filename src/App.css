@@ -81,6 +81,7 @@ html {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  width: 100%;
   font-family: 'Source Sans Pro';
   background-image: radial-gradient(
     farthest-side at 95% 90%,
@@ -98,7 +99,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  min-width: 100vw;
+  min-width: 100%;
   min-height: 100vh;
   font-size: 16px;
 }
@@ -118,4 +119,8 @@ h2 {
 
 p {
   margin: 0 0 1.4em 0;
+}
+
+.title-case {
+  text-transform: capitalize;
 }

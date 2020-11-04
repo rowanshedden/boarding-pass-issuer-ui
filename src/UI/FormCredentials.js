@@ -136,131 +136,203 @@ function FormCredentials(props) {
     e.preventDefault()
     const form = new FormData(credentialForm.current)
 
-    // constructing JSON to send to the backend
-    const newContact = {}
-    newContact.contactID = '3'
-    newContact.schemaID = 'W1vtCQVTy1aMJAjsHt5UK4:2:Covid_19_Lab_Result:1.3'
-    newContact.schemaVersion = '1.3'
-    newContact.schemaName = 'Covid_19_Lab_Result'
-    newContact.schemaIssuerDID = 'W1vtCQVTy1aMJAjsHt5UK4'
-    newContact.comment = ' '
-    newContact.attributes = []
-    newContact.attributes[0] = {}
-    newContact.attributes[0].name = 'result'
-    newContact.attributes[0]['mime-type'] = 'string'
-    newContact.attributes[0].value = form.get('result')
-    newContact.attributes[1] = {}
-    newContact.attributes[1].name = 'sending_facility'
-    newContact.attributes[1]['mime-type'] = 'string'
-    newContact.attributes[1].value = form.get('sending_facility')
-    newContact.attributes[2] = {}
-    newContact.attributes[2].name = 'lab_specimen_collected_date'
-    newContact.attributes[2].value = form.get('lab_specimen_collected_date')
-    newContact.attributes[3] = {}
-    newContact.attributes[3].name = 'patient_first_name'
-    newContact.attributes[3].value = props.selectedContact
-      ? props.selectedContact.demographics.first_name
-      : ''
-    newContact.attributes[4] = {}
-    newContact.attributes[4].name = 'patient_last_name'
-    newContact.attributes[4].value = props.selectedContact
-      ? props.selectedContact.demographics.last_name
-      : ''
-    newContact.attributes[5] = {}
-    newContact.attributes[5].name = 'lab_description'
-    newContact.attributes[5].value = form.get('lab_description')
-    newContact.attributes[6] = {}
-    newContact.attributes[6].name = 'normality'
-    newContact.attributes[6].value = form.get('normality')
-    newContact.attributes[7] = {}
-    newContact.attributes[7].name = 'result_status'
-    newContact.attributes[7].value = form.get('status')
-    newContact.attributes[8] = {}
-    newContact.attributes[8].name = 'comment'
-    newContact.attributes[8].value = form.get('comment')
-    newContact.attributes[9] = {}
-    newContact.attributes[9].name = 'date_time_of_message'
-    newContact.attributes[9].value = form.get('date_time_of_message')
-    newContact.attributes[10] = {}
-    newContact.attributes[10].name = 'ordering_facility_name'
-    newContact.attributes[10].value = form.get('ordering_facility_name')
-    newContact.attributes[11] = {}
-    newContact.attributes[11].name = 'ordering_facility_address'
-    newContact.attributes[11].value = form.get('ordering_facility_address')
-    newContact.attributes[12] = {}
-    newContact.attributes[12].name = 'performing_lab'
-    newContact.attributes[12].value = form.get('performing_lab')
-    newContact.attributes[13] = {}
-    newContact.attributes[13].name = 'visit_location'
-    newContact.attributes[13].value = form.get('visit_location')
-    newContact.attributes[14] = {}
-    newContact.attributes[14].name = 'lab_order_id'
-    newContact.attributes[14].value = form.get('lab_order_id')
-    newContact.attributes[15] = {}
-    newContact.attributes[15].name = 'lab_code'
-    newContact.attributes[15].value = form.get('lab_code')
-    newContact.attributes[16] = {}
-    newContact.attributes[16].name = 'lab_coding_qualifer'
-    newContact.attributes[16].value = form.get('lab_coding_qualifer')
-    newContact.attributes[17] = {}
-    newContact.attributes[17].name = 'observation_date_time'
-    newContact.attributes[17].value = form.get('observation_date_time')
-    newContact.attributes[18] = {}
-    newContact.attributes[18].name = 'mpid'
-    newContact.attributes[18].value = props.selectedContact
-      ? props.selectedContact.mpid
-      : ''
-    newContact.attributes[19] = {}
-    newContact.attributes[19].name = 'patient_local_id'
-    newContact.attributes[19].value = props.selectedContact
-      ? props.selectedContact.id
-      : ''
-    newContact.attributes[20] = {}
-    newContact.attributes[20].name = 'patient_date_of_birth'
-    newContact.attributes[20].value = props.selectedContact
-      ? props.selectedContact.demographics.date_of_birth
-      : ''
-    newContact.attributes[21] = {}
-    newContact.attributes[21].name = 'patient_gender_legal'
-    newContact.attributes[21].value = props.selectedContact
-      ? props.selectedContact.demographics.gender
-      : ''
-    newContact.attributes[22] = {}
-    newContact.attributes[22].name = 'patient_phone'
-    newContact.attributes[22].value = props.selectedContact
-      ? props.selectedContact.demographics.phone
-      : ''
-    newContact.attributes[23] = {}
-    newContact.attributes[23].name = 'patient_street_address'
-    newContact.attributes[23].value = props.selectedContact
-      ? props.selectedContact.demographics.address.address_1 +
-        ' ' +
-        props.selectedContact.demographics.address.address_2
-      : ''
-    newContact.attributes[24] = {}
-    newContact.attributes[24].name = 'patient_city'
-    newContact.attributes[24].value = props.selectedContact
-      ? props.selectedContact.demographics.address.city
-      : ''
-    newContact.attributes[25] = {}
-    newContact.attributes[25].name = 'patient_state'
-    newContact.attributes[25].value = props.selectedContact
-      ? props.selectedContact.demographics.address.state
-      : ''
-    newContact.attributes[26] = {}
-    newContact.attributes[26].name = 'patient_postalcode'
-    newContact.attributes[26].value = props.selectedContact
-      ? props.selectedContact.demographics.address.zip_code
-      : ''
-    newContact.attributes[27] = {}
-    newContact.attributes[27].name = 'patient_country'
-    newContact.attributes[27].value = props.selectedContact
-      ? props.selectedContact.demographics.address.country
-      : ''
+    let demographic_attributes = {}
+    if (props.selectedContact && props.selectedContact.Demographic != null) {
+      const demographics = props.selectedContact.Demographic
+      demographic_attributes = [
+        {
+          name: 'mpid',
+          value: demographics.mpid || '',
+        },
+        {
+          name: 'patient_local_id',
+          value: props.selectedContact.contact_id.toString() || '',
+        },
+        {
+          name: 'patient_first_name',
+          value: demographics.first_name || '',
+        },
+        {
+          name: 'patient_last_name',
+          value: demographics.last_name || '',
+        },
+        {
+          name: 'patient_date_of_birth',
+          value: demographics.date_of_birth || '',
+        },
+        {
+          name: 'patient_gender_legal',
+          value: demographics.gender || '',
+        },
+        {
+          name: 'patient_phone',
+          value: demographics.phone || '',
+        },
+      ]
 
-    console.log(JSON.stringify(newContact))
+      const address = demographics.address
+      let address_attributes = [
+        {
+          name: 'patient_street_address',
+          value: address.address_1 + address.address_2 || '',
+        },
+        {
+          name: 'patient_city',
+          value: address.city || '',
+        },
+        {
+          name: 'patient_state',
+          value: address.state || '',
+        },
+        {
+          name: 'patient_postalcode',
+          value: address.zip_code || '',
+        },
+        {
+          name: 'patient_country',
+          value: address.country || '',
+        },
+      ]
 
-    props.submitNewCredential(e)
+      demographic_attributes = demographic_attributes.concat(address_attributes)
+    } else {
+      demographic_attributes = [
+        {
+          name: 'mpid',
+          value: '',
+        },
+        {
+          name: 'patient_local_id',
+          value: '',
+        },
+        {
+          name: 'patient_first_name',
+          value: '',
+        },
+        {
+          name: 'patient_last_name',
+          value: '',
+        },
+        {
+          name: 'patient_date_of_birth',
+          value: '',
+        },
+        {
+          name: 'patient_gender_legal',
+          value: '',
+        },
+        {
+          name: 'patient_phone',
+          value: '',
+        },
+      ]
+
+      let address_attributes = [
+        {
+          name: 'patient_street_address',
+          value: '',
+        },
+        {
+          name: 'patient_city',
+          value: '',
+        },
+        {
+          name: 'patient_state',
+          value: '',
+        },
+        {
+          name: 'patient_postalcode',
+          value: '',
+        },
+        {
+          name: 'patient_country',
+          value: '',
+        },
+      ]
+
+      demographic_attributes = demographic_attributes.concat(address_attributes)
+    }
+
+    let attributes = [
+      {
+        name: 'result',
+        value: form.get('result'),
+      },
+      {
+        name: 'normality',
+        value: form.get('normality'),
+      },
+      {
+        name: 'result_status',
+        value: form.get('result_status'),
+      },
+      {
+        name: 'comment',
+        value: form.get('comment'),
+      },
+      {
+        name: 'date_time_of_message',
+        value: form.get('date_time_of_message'),
+      },
+      {
+        name: 'sending_facility',
+        value: form.get('sending_facility'),
+      },
+      {
+        name: 'ordering_facility_name',
+        value: form.get('ordering_facility_name'),
+      },
+      {
+        name: 'ordering_facility_address',
+        value: form.get('ordering_facility_address'),
+      },
+      {
+        name: 'performing_lab',
+        value: form.get('performing_lab'),
+      },
+      {
+        name: 'visit_location',
+        value: form.get('visit_location'),
+      },
+      {
+        name: 'lab_order_id',
+        value: form.get('lab_order_id'),
+      },
+      {
+        name: 'lab_code',
+        value: form.get('lab_code'),
+      },
+      {
+        name: 'lab_coding_qualifer',
+        value: form.get('lab_coding_qualifer'),
+      },
+      {
+        name: 'lab_description',
+        value: form.get('lab_description'),
+      },
+      {
+        name: 'lab_specimen_collected_date',
+        value: form.get('lab_specimen_collected_date'),
+      },
+      {
+        name: 'observation_date_time',
+        value: form.get('observation_date_time'),
+      },
+    ]
+
+    attributes = attributes.concat(demographic_attributes)
+
+    let newCredential = {
+      connectionID: props.selectedContact.Connections[0].connection_id,
+      schemaID: 'W1vtCQVTy1aMJAjsHt5UK4:2:Covid_19_Lab_Result:1.3',
+      schemaVersion: '1.3',
+      schemaName: 'Covid_19_Lab_Result',
+      schemaIssuerDID: 'W1vtCQVTy1aMJAjsHt5UK4',
+      comment: form.get('comment'),
+      attributes: attributes,
+    }
+
+    props.submitCredential(newCredential, e)
     props.closeCredentialModal()
   }
 
@@ -279,9 +351,7 @@ function FormCredentials(props) {
             </option>
             {contacts.map((contact) => (
               <option key={contact.id} value={contact.id}>
-                {contact.demographics.first_name +
-                  ' ' +
-                  contact.demographics.last_name}
+                {contact.label}
               </option>
             ))}
           </Select>
@@ -300,67 +370,55 @@ function FormCredentials(props) {
         <ModalHeader>Add New Credential</ModalHeader>
         <ModalContentWrapper>
           <ModalContent>
-            <InputBox className={props.contactSearch === false ? 'active' : ''}>
-              {getContacts()}
-            </InputBox>
             <form onSubmit={handleSubmit} ref={credentialForm}>
-              <InputBox>
+              <InputBox
+                className={props.contactSearch === false ? 'active' : ''}
+              >
+                {getContacts()}
+              </InputBox>
+              {/*<InputBox>
                 <ModalLabel htmlFor="name">Test Name</ModalLabel>
                 <InputField
                   type="text"
                   name="name"
                   placeholder="COVID-19 Test"
                 ></InputField>
-              </InputBox>
-              <InputBox>
+              </InputBox>*/}
+              {/*<InputBox>
                 <ModalLabel htmlFor="date_issued">Date-Time Issued</ModalLabel>
                 <InputField
                   type="datetime-local"
                   name="date_issued"
                 ></InputField>
-              </InputBox>
-              <InputBox>
-                <ModalLabel htmlFor="status">Status</ModalLabel>
-                <Select name="status">
+              </InputBox>*/}
+              {/*<InputBox>
+                <ModalLabel htmlFor="result_status">Status</ModalLabel>
+                <Select name="result_status">
                   <option value="" hidden>
                     Choose status
                   </option>
                   <option value="accepted">Accepted</option>
                   <option value="rejected">Rejected</option>
                 </Select>
-              </InputBox>
+              </InputBox>*/}
               <InputBox>
                 <ModalLabel htmlFor="result">Result</ModalLabel>
-                <Select name="result">
-                  <option value="" hidden>
-                    Choose result
-                  </option>
-                  <option value="negative">Negative</option>
-                  <option value="positive">Positive</option>
-                </Select>
+                <InputField
+                  type="text"
+                  name="result"
+                  placeholder="Negative"
+                ></InputField>
               </InputBox>
               <InputBox>
                 <ModalLabel htmlFor="normality">Normality</ModalLabel>
-                <Select name="normality">
-                  <option value="" hidden>
-                    Choose normality
-                  </option>
-                  <option value="normal">Normal</option>
-                  <option value="weird">Weird</option>
-                </Select>
+                <InputField type="text" name="normality"></InputField>
               </InputBox>
               <InputBox>
                 <ModalLabel htmlFor="result_status">Result Status</ModalLabel>
-                <Select name="result_status">
-                  <option value="" hidden>
-                    Choose result status
-                  </option>
-                  <option value="determined">Determined</option>
-                  <option value="stuff">Something else</option>
-                </Select>
+                <InputField type="text" name="result_status"></InputField>
               </InputBox>
               <InputBox>
-                <ModalLabel htmlFor="comment">Credential</ModalLabel>
+                <ModalLabel htmlFor="comment">Comment</ModalLabel>
                 <TextArea
                   name="comment"
                   rows="4"
@@ -470,10 +528,10 @@ function FormCredentials(props) {
               </InputBox>
               <InputBox>
                 <ModalLabel htmlFor="observation_date_time">
-                  Credential
+                  Observation Date & Time
                 </ModalLabel>
                 <InputField
-                  type="time"
+                  type="datetime-local"
                   name="observation_date_time"
                 ></InputField>
               </InputBox>
@@ -487,29 +545,6 @@ function FormCredentials(props) {
           </ModalContent>
         </ModalContentWrapper>
         <CloseBtn onClick={closeModal}>&times;</CloseBtn>
-        <ModalContent>
-          <form onSubmit={handleSubmit}>
-            <InputBox>
-              <ModalLabel htmlFor="credential">Credential</ModalLabel>
-              <InputField type="test" name="credential"></InputField>
-            </InputBox>
-            <InputBox>
-              <ModalLabel htmlFor="recipient">Recipient</ModalLabel>
-              <InputField type="test" name="recipient"></InputField>
-            </InputBox>
-            <InputBox>
-              <ModalLabel htmlFor="dateIssued">Date Issued</ModalLabel>
-              <InputField type="test" name="dateIssued"></InputField>
-            </InputBox>
-            <Actions>
-              <CancelBtn type="button" onClick={closeModal}>
-                Cancel
-              </CancelBtn>
-              <SubmitBtn type="submit">Submit</SubmitBtn>
-            </Actions>
-          </form>
-        </ModalContent>
-        <CloseBtn onClick={props.closeModal}>&times;</CloseBtn>
       </Modal>
     </StyledPopup>
   )

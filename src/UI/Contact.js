@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import styled from 'styled-components'
 
@@ -19,11 +19,6 @@ const AttributeRow = styled.tr`
     text-align: right;
   }
 `
-
-// const FirstName = styled.span``
-// const MiddleInitial = styled.span``
-// const LastName = styled.span``
-const Icon = styled.span``
 
 const DataTable = styled.table`
   box-sizing: content-box;
@@ -76,28 +71,40 @@ const ActionButton = styled.span`
 `
 
 const EditContact = styled.button`
-  width: 80px;
-  background: ${(props) => props.theme.primary_color};
+  float: right;
   padding: 10px;
   color: ${(props) => props.theme.text_light};
   border: none;
-  float: right;
   box-shadow: ${(props) => props.theme.drop_shadow};
+  background: ${(props) => props.theme.primary_color};
+`
+
+const IssueCredential = styled.button`
+  float: right;
+  padding: 10px;
+  color: ${(props) => props.theme.text_light};
+  border: none;
+  box-shadow: ${(props) => props.theme.drop_shadow};
+  background: ${(props) => props.theme.primary_color};
 `
 
 function Contact(props) {
-  const source = 'contact'
   const history = props.history
-  const contact = props.contact
+  const contactId = props.contactId
+  const credentials = props.credentials
 
   let contactSelected = ''
 
   for (let i = 0; i < props.contacts.length; i++) {
-    if (props.contacts[i].id == contact) {
+    if (props.contacts[i].contact_id == contactId) {
       contactSelected = props.contacts[i]
       break
     }
   }
+
+  useEffect(() => {
+    setSelectedContact(contactSelected)
+  }, [contactSelected])
 
   function openCredential(history, id) {
     if (history !== undefined) {
@@ -110,7 +117,7 @@ function Contact(props) {
 
   // Notification states
   const [notification, setNotification] = useState(
-    'There is no notification to display'
+    'No notifications to display'
   )
   const [notificationState, setNotificationState] = useState('closed')
   const [notificationType, setNotificationType] = useState('notice')
@@ -128,28 +135,28 @@ function Contact(props) {
 
   const [selectedContact, setSelectedContact] = useState(contactSelected)
 
-  console.log(selectedContact)
+  function updateContact(updatedDemographic, e) {
+    e.preventDefault()
+    const Demographic = {
+      Demographic: { ...updatedDemographic },
+    }
 
-  function updateContact(update) {
-    console.log(update)
-    return setSelectedContact({ ...selectedContact, ...update })
+    props.sendRequest('DEMOGRAPHICS', 'UPDATE_OR_CREATE', updatedDemographic)
+
+    setNotificationState('open')
+    setNotification('Contact was updated!')
+
+    setSelectedContact({ ...selectedContact, ...Demographic })
   }
 
-  // Submits the form and shows notification
-  function submitNewCredential(e) {
-    console.log('new credential submitted')
-    // e.preventDefault()
+  // Submits the credential form and shows notification
+  function submitNewCredential(newCredential, e) {
+    e.preventDefault()
+
+    props.sendRequest('CREDENTIALS', 'ISSUE_USING_SCHEMA', newCredential)
 
     setNotificationState('open')
     setNotification('Credential was successfully added!')
-  }
-
-  // Submits the contact form and shows notification
-  function editContact(e) {
-    console.log('new contact submitted')
-    e.preventDefault()
-    setNotificationState('open')
-    setNotification('Contact was successfully updated!')
   }
 
   // Closes notification
@@ -157,23 +164,52 @@ function Contact(props) {
     setNotificationState('closed')
   }
 
-  const credentialRows = props.credentials.map((credential) => {
-    return (
-      <DataRow
-        key={credential.id}
-        onClick={() => {
-          openCredential(history, credential.id)
-        }}
-      >
-        <DataCell>{credential.name}</DataCell>
-        <DataCell>{credential.status}</DataCell>
-        <DataCell>{credential.result}</DataCell>
-        <DataCell>{credential.lab_specimen_collected_date}</DataCell>
-        <DataCell>
-          <Icon name="revoke" />
-        </DataCell>
-      </DataRow>
-    )
+  const credentialRows = props.credentials.map((credential_record) => {
+    if (
+      selectedContact.Connections[0].connection_id ===
+      credential_record.connection_id
+    ) {
+      const credential_id = credential_record.credential_exchange_id
+      const credentialState = credential_record.state.replaceAll('_', ' ') || ''
+      const dateCreated =
+        new Date(credential_record.created_at).toLocaleString() || ''
+
+      let credentialName = ''
+      if (
+        credential_record.credential_proposal_dict !== null &&
+        credential_record.credential_proposal_dict !== undefined
+      ) {
+        credentialName = credential_record.credential_proposal_dict.schema_name.replaceAll(
+          '_',
+          ' '
+        )
+      }
+
+      let testName = ''
+      let testResult = ''
+      if (
+        credential_record.credential !== null &&
+        credential_record.credential !== undefined
+      ) {
+        testName = credential_record.credential.values.lab_description.raw || ''
+        testResult = credential_record.credential.values.result.raw || ''
+      }
+
+      return (
+        <DataRow
+          key={credential_id}
+          onClick={() => {
+            openCredential(history, credential_id)
+          }}
+        >
+          <DataCell>{credentialName}</DataCell>
+          <DataCell className="title-case">{credentialState}</DataCell>
+          <DataCell>{testName}</DataCell>
+          <DataCell className="title-case">{testResult}</DataCell>
+          <DataCell>{dateCreated}</DataCell>
+        </DataRow>
+      )
+    }
   })
 
   return (
@@ -183,17 +219,10 @@ function Contact(props) {
         message={notification}
         state={notificationState}
         closeNotification={closeNotification}
-      ></Notification>
+      />
       <div id="contact">
         <PageHeader
-          title={
-            'Contact Details: ' +
-            (selectedContact.demographics.first_name || '') +
-            ' ' +
-            (selectedContact.demographics.middle_name || '') +
-            ' ' +
-            (selectedContact.demographics.last_name || '')
-          }
+          title={'Contact Details: ' + (selectedContact.label || '')}
         />
         <PageSection>
           <EditContact onClick={() => setContactModalIsOpen((o) => !o)}>
@@ -203,112 +232,159 @@ function Contact(props) {
           <AttributeTable>
             <tbody>
               <AttributeRow>
-                <th>ID:</th>
-                <td>{selectedContact.id || ''}</td>
+                <th>Contact ID:</th>
+                <td>{selectedContact.contact_id || ''}</td>
               </AttributeRow>
               <AttributeRow>
                 <th>MPID:</th>
-                <td>{selectedContact.mpid || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined
+                    ? selectedContact.Demographic.mpid || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Connection Status:</th>
-                <td>{selectedContact.connection_status || ''}</td>
+                <td>
+                  {selectedContact.Connections !== undefined
+                    ? selectedContact.Connections[0].state || ''
+                    : ''}
+                </td>
               </AttributeRow>
-              <AttributeRow>
+              {/*<AttributeRow>
                 <th>Credential Status:</th>
                 <td>{selectedContact.credential_status || ''}</td>
-              </AttributeRow>
+              </AttributeRow>*/}
             </tbody>
           </AttributeTable>
           <h2>Demographic Information</h2>
           <AttributeTable>
             <tbody>
               <AttributeRow>
-                <th>First Name:</th>
-                <td>{selectedContact.demographics.first_name || ''}</td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Middle Name:</th>
-                <td>{selectedContact.demographics.middle_name || ''}</td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Last Name:</th>
-                <td>{selectedContact.demographics.last_name || ''}</td>
+                <th>Name:</th>
+                <td>{selectedContact.label || ''}</td>
               </AttributeRow>
               <AttributeRow>
                 <th>Date of Birth:</th>
-                <td>{selectedContact.demographics.date_of_birth || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined
+                    ? selectedContact.Demographic.date_of_birth || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Gender:</th>
-                <td>{selectedContact.demographics.gender || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined
+                    ? selectedContact.Demographic.gender || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Phone:</th>
-                <td>{selectedContact.demographics.phone || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined
+                    ? selectedContact.Demographic.phone || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Address 1:</th>
-                <td>{selectedContact.demographics.address.address_1 || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined &&
+                  selectedContact.Demographic.address
+                    ? selectedContact.Demographic.address.address_1 || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Address 2:</th>
-                <td>{selectedContact.demographics.address.address_2 || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined &&
+                  selectedContact.Demographic.address
+                    ? selectedContact.Demographic.address.address_2 || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>City:</th>
-                <td>{selectedContact.demographics.address.city || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined &&
+                  selectedContact.Demographic.address
+                    ? selectedContact.Demographic.address.city || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>State:</th>
-                <td>{selectedContact.demographics.address.state || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined &&
+                  selectedContact.Demographic.address
+                    ? selectedContact.Demographic.address.state || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Zip Code:</th>
-                <td>{selectedContact.demographics.address.zip_code || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined &&
+                  selectedContact.Demographic.address
+                    ? selectedContact.Demographic.address.zip_code || ''
+                    : ''}
+                </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Country:</th>
-                <td>{selectedContact.demographics.address.country || ''}</td>
+                <td>
+                  {selectedContact.Demographic !== null &&
+                  selectedContact.Demographic !== undefined &&
+                  selectedContact.Demographic.address
+                    ? selectedContact.Demographic.address.country || ''
+                    : ''}
+                </td>
               </AttributeRow>
             </tbody>
           </AttributeTable>
         </PageSection>
         <PageSection>
+          <IssueCredential onClick={() => setCredentialModalIsOpen((o) => !o)}>
+            Issue Test Credential
+          </IssueCredential>
           <DataTable>
             <thead>
               <DataRow>
-                <DataHeader>Credential Name</DataHeader>
+                <DataHeader>Credential</DataHeader>
                 <DataHeader>Status</DataHeader>
-                <DataHeader>Result</DataHeader>
-                <DataHeader>Date</DataHeader>
-                <DataHeader>Revoke</DataHeader>
+                <DataHeader>Test Name</DataHeader>
+                <DataHeader>Test Results</DataHeader>
+                <DataHeader>Date Issued</DataHeader>
               </DataRow>
             </thead>
             <tbody>{credentialRows}</tbody>
           </DataTable>
         </PageSection>
-        <ActionButton
-          title="Manually Issue a Credential"
-          onClick={() => setCredentialModalIsOpen((o) => !o)}
-        >
-          +
-        </ActionButton>
         <FormContacts
-          source={source}
-          updateContact={updateContact}
           contactSelected={contactSelected}
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}
-          submitNewContact={editContact}
-        ></FormContacts>
+          submitContact={updateContact}
+        />
         <FormCredentials
           selectedContact={contactSelected}
           contactSearch={contactSearch}
           credentialModalIsOpen={credentialModalIsOpen}
           closeCredentialModal={closeCredentialModal}
-          submitNewCredential={submitNewCredential}
-        ></FormCredentials>
+          submitCredential={submitNewCredential}
+        />
       </div>
     </>
   )

@@ -64,28 +64,15 @@ const Icon = styled.span``
 function Credentials(props) {
   // Notification states
   const [notification, setNotification] = useState(
-    'There is no notification to display'
+    'No notifications to display'
   )
   const [notificationState, setNotificationState] = useState('closed')
   const [notificationType, setNotificationType] = useState('notice')
-
-  // Modal state
-  const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
-
-  const closeCredentialModal = () => setCredentialModalIsOpen(false)
 
   function openCredential(history, id) {
     if (history !== undefined) {
       history.push('/credentials/' + id)
     }
-  }
-
-  // Submits the form and shows notification
-  function submitNewCredential(e) {
-    console.log('new credential submitted')
-    e.preventDefault()
-    setNotificationState('open')
-    setNotification('Credential was successfully added!')
   }
 
   // Closes notification
@@ -97,25 +84,50 @@ function Credentials(props) {
 
   const credentials = props.credentials
 
-  const credentialRows = credentials.map((credential) => {
-    console.log(credential)
+  const credentialRows = credentials.map((credential_record) => {
+    const credential_id = credential_record.credential_exchange_id
+    const credentialState = credential_record.state.replaceAll('_', ' ') || ''
+    const dateCreated =
+      new Date(credential_record.created_at).toLocaleString() || ''
+
+    let credentialName = ''
+    if (
+      credential_record.credential_proposal_dict !== null &&
+      credential_record.credential_proposal_dict !== undefined
+    ) {
+      credentialName =
+        credential_record.credential_proposal_dict.schema_name.replaceAll(
+          '_',
+          ' '
+        ) || ''
+    }
+
+    let patientName = ''
+    let testName = ''
+    let testResult = ''
+    if (
+      credential_record.credential !== null &&
+      credential_record.credential !== undefined
+    ) {
+      patientName =
+        credential_record.credential.values.patient_first_name.raw +
+        ' ' +
+        credential_record.credential.values.patient_last_name.raw
+      testName = credential_record.credential.values.lab_description.raw || ''
+      testResult = credential_record.credential.values.result.raw || ''
+    }
+
     return (
       <DataRow
-        key={credential.id}
+        key={credential_id}
         onClick={() => {
-          openCredential(history, credential.id)
+          openCredential(history, credential_id)
         }}
       >
-        <DataCell>{credential.name}</DataCell>
-        <DataCell>
-          {credential.patient_first_name || ''}{' '}
-          {credential.patient_last_name || ''}
-        </DataCell>
-        <DataCell>{credential.date_issued}</DataCell>
-        <DataCell>{credential.status}</DataCell>
-        <DataCell>
-          <Icon name="revoke" />
-        </DataCell>
+        <DataCell>{patientName}</DataCell>
+        <DataCell>{credentialName}</DataCell>
+        <DataCell>{testName}</DataCell>
+        <DataCell>{dateCreated}</DataCell>
       </DataRow>
     )
   })
@@ -127,34 +139,22 @@ function Credentials(props) {
         message={notification}
         state={notificationState}
         closeNotification={closeNotification}
-      ></Notification>
+      />
       <div id="credentials">
         <PageHeader title={'Credentials'} />
         <PageSection>
           <DataTable>
             <thead>
               <DataRow>
+                <DataHeader>Patient Name</DataHeader>
                 <DataHeader>Credential</DataHeader>
-                <DataHeader>Recipient</DataHeader>
+                <DataHeader>Test Name</DataHeader>
                 <DataHeader>Date Issued</DataHeader>
-                <DataHeader>Credential Status</DataHeader>
-                <DataHeader>Delete</DataHeader>
               </DataRow>
             </thead>
             <tbody>{credentialRows}</tbody>
           </DataTable>
         </PageSection>
-        <ActionButton
-          title="Manually Issue a Credential"
-          onClick={() => setCredentialModalIsOpen((o) => !o)}
-        >
-          +
-        </ActionButton>
-        <FormCredentials
-          credentialModalIsOpen={credentialModalIsOpen}
-          closeCredentialModal={closeCredentialModal}
-          submitNewCredential={submitNewCredential}
-        ></FormCredentials>
       </div>
     </>
   )

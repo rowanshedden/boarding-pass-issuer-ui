@@ -32,28 +32,42 @@ function App() {
   //Websocket reference hook
   const controllerSocket = useRef()
 
+  //used for websocket auto reconnect
+  const [websocket, setWebsocket] = useState(false)
+
   //Perform First Time Setup. Connect to Controller Server via Websockets
   useEffect(() => {
-    console.log('Performing first time setup')
+    //console.log('Performing first time setup')
 
     let url = new URL('/api/ws', window.location.href)
     url.protocol = url.protocol.replace('http', 'ws')
 
-    console.log(url)
-
+    //console.log(url)
+    //console.log(websocket)
     controllerSocket.current = new WebSocket(url.href)
-  }, [])
+  }, [websocket])
 
   //Define Websocket event listeners
   useEffect(() => {
     //Perform operation on websocket open
     controllerSocket.current.onopen = () => {
-      console.log('Websocket Connection established')
+      //console.log('Websocket Connection established, requesting data')
+      sendMessage('CONTACTS', 'GET_ALL', { additional_tables: ['Demographic'] })
+      sendMessage('CREDENTIALS', 'GET_ALL', {})
+      sendMessage('SETTINGS', 'GET_THEME', {})
+    }
+
+    controllerSocket.current.onclose = (event) => {
+      //console.log('Websocket Connection Closed', event)
+
+      //Auto Reopen websocket connection
+      //(JamesKEbert)TODO: Converse on sessions, session timeout and associated UI
+      setWebsocket(!websocket)
     }
 
     //Error Handler
     controllerSocket.current.onerror = (event) => {
-      console.error('Websocket error:', event)
+      //console.error('Websocket error:', event)
 
       setNotification('Client Error - Websockets')
       setNotificationType('error')
@@ -63,91 +77,193 @@ function App() {
     //Receive new message from Controller Server
     controllerSocket.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data)
-      console.log('New Websocket Message:', parsedMessage)
+      //console.log('New Websocket Message:', parsedMessage)
 
-      messageHandler(parsedMessage.messageType, parsedMessage.messageData)
+      messageHandler(
+        parsedMessage.context,
+        parsedMessage.type,
+        parsedMessage.data
+      )
     }
   })
 
   //Send a message to the Controller server
-  const sendMessage = (messageType, messageData = {}) => {
-    controllerSocket.current.send(JSON.stringify({ messageType, messageData }))
+  function sendMessage(context, type, data = {}) {
+    controllerSocket.current.send(JSON.stringify({ context, type, data }))
   }
 
   //Handle inbound messages
-  const messageHandler = async (messageType, messageData = {}) => {
+  const messageHandler = async (context, type, data = {}) => {
     try {
-      switch (messageType) {
-        case 'SERVER_ERROR':
-          console.error(
-            `Server Error: Code - ${messageData.errorCode}, Reason: '${messageData.errorReason}'`
-          )
+      console.log(`New Message with context: '${context}' and type: '${type}'`)
+      switch (context) {
+        case 'ERROR':
+          switch (type) {
+            case 'SERVER_ERROR':
+              setNotification(
+                `Server Error - ${data.errorCode} \n Reason: '${data.errorReason}'`
+              )
+              setNotificationType('error')
+              setNotificationState('open')
 
-          setNotification(
-            `Server Error - ${messageData.errorCode} \n Reason: '${messageData.errorReason}'`
-          )
-          setNotificationType('error')
-          setNotificationState('open')
+              break
+            default:
+              //console.error(`Unrecognized Message Type: ${type}`)
+
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`
+              )
+              setNotificationType('error')
+              setNotificationState('open')
+              break
+          }
 
           break
-        /* Used in Demo - Message Cases for reference, CREDENTIAL case potentially helpful for future state update mechanics:
+        case 'INVITATIONS':
+          switch (type) {
+            case 'INVITATION':
+              //console.log(data)
 
+              setQRCodeURL(data.invitation_record.invitation_url)
 
-        case 'NEW_INVITATION':
-          console.log("Received new Invitation", messageData.invitationURL);
-          setQRCodeURL(messageData.invitationURL)
+              break
+            case 'SINGLE_USE_USED':
+              //console.log(data)
 
-          break;
-        case 'CONTACT':
-          console.log("Received new Contact Data", messageData.connectionMessage);
-          
-          const nextState = contacts;
-          let objIndex = nextState.findIndex((obj => obj.connection_id == messageData.connectionMessage.connection_id));
-          console.log(objIndex)
+              setQRCodeURL('')
+              break
+            default:
+              //console.error(`Unrecognized Message Type: ${type}`)
 
-          if(objIndex === -1){
-            console.log("Contact Doesn't Already Exist");
-            nextState.push(messageData.connectionMessage)
-          }
-          else{
-            console.log("Contact Already Exists");
-
-            nextState[objIndex] = messageData.connectionMessage
-          }
-
-          setContacts(nextState)
-          break;
-        case 'CREDENTIAL':
-          console.log("Received new Credential Data", messageData.issuanceMessage);
-          
-          const nextCredState = credentials;
-          let objIndexC = nextCredState.findIndex((obj => obj.credential_exchange_id == messageData.issuanceMessage.credential_exchange_id));
-          console.log(objIndexC)
-
-          if(objIndexC === -1){
-            console.log("Credential Doesn't Already Exist");
-            nextCredState.push(messageData.issuanceMessage)
-          }
-          else{
-            console.log("Credential Already Exists");
-
-            nextCredState[objIndexC] = messageData.issuanceMessage
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`
+              )
+              setNotificationType('error')
+              setNotificationState('open')
+              break
           }
 
-          setCredentials(nextCredState)
-          break;*/
+          break
+        case 'CONTACTS':
+          switch (type) {
+            case 'CONTACTS':
+              let oldContacts = contacts
+              let newContacts = data.contacts
+              let updatedContacts = []
+
+              // Loop through the new contacts and check them against the existing array
+              newContacts.forEach((newContact) => {
+                oldContacts.forEach((oldContact, index) => {
+                  if (
+                    oldContact !== null &&
+                    newContact !== null &&
+                    oldContact.contact_id === newContact.contact_id
+                  ) {
+                    // If you find a match, delete the old copy from the old array
+                    oldContacts.splice(index, 1)
+                  }
+                })
+                updatedContacts.push(newContact)
+              })
+
+              // When you reach the end of the list of new contacts, simply add any remaining old contacts to the new array
+              updatedContacts = [...updatedContacts, ...oldContacts]
+
+              // Sort the array by data created, newest on top
+              updatedContacts.sort((a, b) =>
+                a.created_at < b.created_at ? 1 : -1
+              )
+
+              setContacts(updatedContacts)
+
+              break
+            default:
+              //console.error(`Unrecognized Message Type: ${type}`)
+
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`
+              )
+              setNotificationType('error')
+              setNotificationState('open')
+              break
+          }
+
+          break
+        case 'CREDENTIALS':
+          switch (type) {
+            case 'CREDENTIALS':
+              let oldCredentials = credentials
+              let newCredentials = data.credential_records
+              let updatedCredentials = []
+
+              // Loop through the new credentials and check them against the existing array
+              newCredentials.forEach((newCredential) => {
+                oldCredentials.forEach((oldCredential, index) => {
+                  if (
+                    oldCredential.credential_exchange_id ===
+                    newCredential.credential_exchange_id
+                  ) {
+                    // If you find a match, delete the old copy from the old array
+                    oldCredentials.splice(index, 1)
+                  }
+                })
+                updatedCredentials.push(newCredential)
+              })
+
+              // When you reach the end of the list of new credentials, simply add any remaining old credentials to the new array
+              updatedCredentials = [...updatedCredentials, ...oldCredentials]
+
+              // Sort the array by data created, newest on top
+              updatedCredentials.sort((a, b) =>
+                a.created_at < b.created_at ? 1 : -1
+              )
+
+              setCredentials(updatedCredentials)
+
+              break
+            default:
+              //console.error(`Unrecognized Message Type: ${type}`)
+
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`
+              )
+              setNotificationType('error')
+              setNotificationState('open')
+              break
+          }
+
+          break
+        case 'SETTINGS':
+          switch (type) {
+            case 'THEME_SETTINGS':
+              //console.log(data)
+              setTheme(data.value)
+
+              break
+            default:
+              //console.error(`Unrecognized Message Type: ${type}`)
+
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`
+              )
+              setNotificationType('error')
+              setNotificationState('open')
+              break
+          }
+
+          break
         default:
-          console.error(`Unrecognized Message Type: ${messageType}`)
+          //console.error(`Unrecognized Message Context: ${context}`)
 
           setNotification(
-            `Error - Unrecognized Websocket Message Type: ${messageType}`
+            `Error - Unrecognized Websocket Message Context: ${context}`
           )
           setNotificationType('error')
           setNotificationState('open')
           break
       }
     } catch (error) {
-      console.error('Error In Websocket Message Handling', error)
+      //console.error('Error In Websocket Message Handling', error)
 
       setNotification('Client Error - Websockets')
       setNotificationType('error')
@@ -180,9 +296,14 @@ function App() {
   // const [resource, setResource] = useState([])
   const [stylesArray, setStylesArray] = useState([])
 
-  // Update theme
+  // Update theme state locally
   const updateTheme = (update) => {
     return setTheme({ ...theme, ...update })
+  }
+
+  // Update theme in the database
+  const saveTheme = () => {
+    sendMessage('SETTINGS', 'SET_THEME', theme)
   }
 
   const addStylesToArray = (key) => {
@@ -204,7 +325,6 @@ function App() {
 
   // Undo theme change
   const undoStyle = (undoKey) => {
-    console.log(undoKey)
     if (undoKey !== undefined) {
       for (let key in defaultTheme)
         if ((key = undoKey)) {
@@ -216,150 +336,12 @@ function App() {
 
   //Change logo test
   function changeLogo() {
-    setLogoPath(
-      window.location.origin + '/assets/uploads/fashion-logo-design.jpg'
-    )
+    setLogoPath(window.location.origin + '/assets/uploads/logo.gif')
   }
 
-  const contacts = [
-    {
-      id: 1,
-      mpid: '34537657',
-      demographics: {
-        first_name: 'John',
-        middle_name: null,
-        last_name: 'Doe',
-        date_of_birth: '2001-08-25',
-        gender: 'male',
-        phone: '123-456-7890',
-        address: {
-          address_1: '123 Main St',
-          address_2: 'Apt #382',
-          city: 'Anytown',
-          state: 'PA',
-          zip_code: '17101',
-          country: 'United States',
-        },
-      },
-      connection_status: 'Connected',
-      credential_status: 'None',
-    },
-    {
-      id: 2,
-      mpid: '34537912',
-      demographics: {
-        first_name: 'Sherry',
-        middle_name: null,
-        last_name: 'Smith',
-        date_of_birth: '1967-08-25',
-        gender: 'female',
-        phone: '567-456-7890',
-        address: {
-          address_1: '123 Main St',
-          address_2: 'Apt #382',
-          city: 'Anytown',
-          state: 'TX',
-          zip_code: '34101',
-          country: 'United States',
-        },
-      },
-      connection_status: 'Connected',
-      credential_status: 'None',
-    },
-    {
-      id: 3,
-      mpid: '',
-      demographics: {
-        first_name: 'Carlos',
-        middle_name: 'Ray',
-        last_name: 'Norris',
-        date_of_birth: '1940-03-10',
-        gender: 'male',
-        phone: '567-456-7890',
-        address: {
-          address_1: '123 Main St',
-          address_2: 'Apt #382',
-          city: 'Ausitn',
-          state: 'TX',
-          zip_code: '34101',
-          country: 'United States',
-        },
-      },
-      connection_status: 'Disconnected',
-      credential_status: 'None',
-    },
-  ]
-
-  const credentials = [
-    {
-      id: 1,
-      name: 'COVID-19 Test',
-      date_issued: '2020-08-25 03:11:33',
-      status: 'Accepted',
-      result: 'negative',
-      normality: 'normal',
-      result_status: 'determined',
-      comment: 'Good to go to the Bahamas!',
-      date_time_of_message: '2001-08-25 03:11:33',
-      sending_facility: 'Bronx RHIO',
-      ordering_facility_name: 'Bronx RHIO Travel Dept.',
-      ordering_facility_address: '456 E. 200 N. Bronx',
-      performing_lab: 'Lab 2345',
-      visit_location: '123 S. 200 W. Brooklyn',
-      lab_order_id: '12345',
-      lab_code: '67890',
-      lab_coding_qualifer: 'PCR',
-      lab_description: 'COVID-19 swab test',
-      lab_specimen_collected_date: '2020-08-05',
-      observation_date_time: '14:27',
-      mpid: '34537912',
-      patient_local_id: '1',
-      patient_first_name: 'Sherry',
-      patient_last_name: 'Smith',
-      patient_date_of_birth: '1967-08-25',
-      patient_gender_legal: 'female',
-      patient_phone: '567-456-7890',
-      patient_street_address: '123 Main St',
-      patient_city: 'Anytown',
-      patient_state: 'TX',
-      patient_postalcode: '34101',
-      patient_country: 'United States',
-    },
-    {
-      id: 2,
-      name: 'COVID-19 Test',
-      date_issued: '2020-08-27 03:11:33',
-      status: 'Offered',
-      result: 'positive',
-      normality: 'normal',
-      result_status: 'determined',
-      comment: 'Uh-oh!',
-      date_time_of_message: '2001-08-25 03:11:33',
-      sending_facility: 'Bronx RHIO',
-      ordering_facility_name: 'Bronx RHIO Travel Dept.',
-      ordering_facility_address: '456 E. 200 N. Bronx',
-      performing_lab: 'Lab 2345',
-      visit_location: '123 S. 200 W. Brooklyn',
-      lab_order_id: '12345',
-      lab_code: '67890',
-      lab_coding_qualifer: 'PCR',
-      lab_description: 'COVID-19 swab test',
-      lab_specimen_collected_date: '2020-09-14',
-      observation_date_time: '14:27',
-      mpid: '34537912',
-      patient_local_id: '1',
-      patient_first_name: 'Sherry',
-      patient_last_name: 'Smith',
-      patient_date_of_birth: '1967-08-25',
-      patient_gender_legal: 'female',
-      patient_phone: '567-456-7890',
-      patient_street_address: '123 Main St',
-      patient_city: 'Anytown',
-      patient_state: 'TX',
-      patient_postalcode: '34101',
-      patient_country: 'United States',
-    },
-  ]
+  const [contacts, setContacts] = useState([])
+  const [credentials, setCredentials] = useState([])
+  const [QRCodeURL, setQRCodeURL] = useState('')
 
   const [notification, setNotification] = useState('')
   const [notificationState, setNotificationState] = useState('closed')
@@ -387,7 +369,7 @@ function App() {
                 <Frame id="app-frame">
                   <AppHeader logoPath={logoPath} match={match} />
                   <Main>
-                    <Home contacts={contacts} />
+                    <Home sendRequest={sendMessage} QRCodeURL={QRCodeURL} />
                   </Main>
                 </Frame>
               )
@@ -417,8 +399,9 @@ function App() {
                     {/*(JamesKEbert)Note:sendRequest Prop the technique to use to send websocket messages to the Controller Server in other components:*/}
                     <Contacts
                       history={history}
-                      contacts={contacts}
                       sendRequest={sendMessage}
+                      contacts={contacts}
+                      QRCodeURL={QRCodeURL}
                     />
                   </Main>
                 </Frame>
@@ -434,7 +417,8 @@ function App() {
                   <Main>
                     <Contact
                       history={history}
-                      contact={match.params.contactId}
+                      sendRequest={sendMessage}
+                      contactId={match.params.contactId}
                       contacts={contacts}
                       credentials={credentials}
                     />
@@ -510,6 +494,7 @@ function App() {
                   <Main>
                     <Settings
                       updateTheme={updateTheme}
+                      saveTheme={saveTheme}
                       undoStyle={undoStyle}
                       changeLogo={changeLogo}
                       stylesArray={stylesArray}

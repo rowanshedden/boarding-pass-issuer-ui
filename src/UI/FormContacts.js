@@ -124,71 +124,96 @@ const Select = styled.select`
 `
 
 function FormContacts(props) {
-  console.log(props)
-
   // Assigning contact values from props
-  const id = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.id))
+  const contact_id = props.contactSelected
+    ? JSON.parse(JSON.stringify(props.contactSelected.contact_id))
     : ''
-  const mpid = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.mpid))
-    : ''
-  const first_name = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.demographics.first_name))
-    : ''
-  const middle_name = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.demographics.middle_name))
-    : ''
-  const last_name = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.demographics.last_name))
-    : ''
-  const date_of_birth = props.contactSelected
-    ? JSON.parse(
-        JSON.stringify(props.contactSelected.demographics.date_of_birth)
-      )
-    : ''
-  const gender = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.demographics.gender))
-    : ''
-  const phone = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.demographics.phone))
-    : ''
-  const address_1 = props.contactSelected
-    ? JSON.parse(
-        JSON.stringify(props.contactSelected.demographics.address.address_1)
-      )
-    : ''
-  const address_2 = props.contactSelected
-    ? JSON.parse(
-        JSON.stringify(props.contactSelected.demographics.address.address_2)
-      )
-    : ''
-  const city = props.contactSelected
-    ? JSON.parse(
-        JSON.stringify(props.contactSelected.demographics.address.city)
-      )
-    : ''
-  const state = props.contactSelected
-    ? JSON.parse(
-        JSON.stringify(props.contactSelected.demographics.address.state)
-      )
-    : ''
-  const zip_code = props.contactSelected
-    ? JSON.parse(
-        JSON.stringify(props.contactSelected.demographics.address.zip_code)
-      )
-    : ''
-  const country = props.contactSelected
-    ? JSON.parse(
-        JSON.stringify(props.contactSelected.demographics.address.country)
-      )
-    : ''
-  const connection_status = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.connection_status))
-    : ''
-  const credential_status = props.contactSelected
-    ? JSON.parse(JSON.stringify(props.contactSelected.credential_status))
-    : ''
+  const mpid =
+    props.contactSelected && props.contactSelected.Demographic
+      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.mpid))
+      : ''
+  const first_name =
+    props.contactSelected && props.contactSelected.Demographic
+      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.first_name))
+      : ''
+  const middle_name =
+    props.contactSelected && props.contactSelected.Demographic
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.middle_name)
+        )
+      : ''
+  const last_name =
+    props.contactSelected && props.contactSelected.Demographic
+      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.last_name))
+      : ''
+  const date_of_birth =
+    props.contactSelected && props.contactSelected.Demographic
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.date_of_birth)
+        )
+      : ''
+  const gender =
+    props.contactSelected && props.contactSelected.Demographic
+      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.gender))
+      : ''
+  const phone =
+    props.contactSelected && props.contactSelected.Demographic
+      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.phone))
+      : ''
+  const address_1 =
+    props.contactSelected &&
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.address.address_1)
+        )
+      : ''
+  const address_2 =
+    props.contactSelected &&
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.address.address_2)
+        )
+      : ''
+  const city =
+    props.contactSelected &&
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.address.city)
+        )
+      : ''
+  const state =
+    props.contactSelected &&
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.address.state)
+        )
+      : ''
+  const zip_code =
+    props.contactSelected &&
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.address.zip_code)
+        )
+      : ''
+  const country =
+    props.contactSelected &&
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Demographic.address.country)
+        )
+      : ''
+  // const connection_status = props.contactSelected
+  //   ? JSON.parse(JSON.stringify(props.contactSelected.connection_status))
+  //   : ''
+  // const credential_status = props.contactSelected
+  //   ? JSON.parse(JSON.stringify(props.contactSelected.credential_status))
+  //   : ''
 
   const contactForm = useRef()
 
@@ -198,30 +223,27 @@ function FormContacts(props) {
 
     // Assembling contact JSON
     const contact = {}
-    contact.id = form.get('id')
+    contact.contact_id = form.get('contact_id')
     contact.mpid = form.get('mpid')
-    contact.demographics = {}
-    contact.demographics.first_name = form.get('first_name')
-    contact.demographics.middle_name = form.get('mid_name')
-    contact.demographics.last_name = form.get('last_name')
-    contact.demographics.date_of_birth = form.get('date_of_birth')
-    contact.demographics.gender = form.get('gender')
-    contact.demographics.phone = form.get('phone')
-    contact.demographics.address = {}
-    contact.demographics.address.address_1 = form.get('address_1')
-    contact.demographics.address.address_2 = form.get('address_2')
-    contact.demographics.address.city = form.get('city')
-    contact.demographics.address.state = form.get('state')
-    contact.demographics.address.zip_code = form.get('zip_code')
-    contact.demographics.address.country = form.get('country')
-    contact.connection_status = form.get('connection_status')
-    contact.credential_status = form.get('credential_status')
+    //contact.demographic = {}
+    contact.first_name = form.get('first_name')
+    contact.middle_name = form.get('mid_name')
+    contact.last_name = form.get('last_name')
+    contact.date_of_birth = form.get('date_of_birth')
+    contact.gender = form.get('gender')
+    contact.phone = form.get('phone')
+    contact.address = {}
+    contact.address.address_1 = form.get('address_1')
+    contact.address.address_2 = form.get('address_2')
+    contact.address.city = form.get('city')
+    contact.address.state = form.get('state')
+    contact.address.zip_code = form.get('zip_code')
+    contact.address.country = form.get('country')
+    //contact.connection_status = form.get('connection_status')
+    //contact.credential_status = form.get('credential_status')
 
-    // update existing contact if calling the form from contact page
-    if (props.source === 'contact') {
-      props.updateContact(contact)
-    }
-    props.submitNewContact(e)
+    props.submitContact(contact, e)
+
     props.closeContactModal()
   }
 
@@ -257,7 +279,7 @@ function FormContacts(props) {
                 ></InputField>
               </InputBox>
               <InputBox>
-                <ModalLabel htmlFor="mid_name">Middile Name</ModalLabel>
+                <ModalLabel htmlFor="mid_name">Middle Name</ModalLabel>
                 <InputField
                   type="text"
                   name="mid_name"
@@ -282,13 +304,12 @@ function FormContacts(props) {
               </InputBox>
               <InputBox>
                 <ModalLabel htmlFor="gender">Gender</ModalLabel>
-                <Select name="gender" defaultValue={gender}>
-                  <option defaultValue="" hidden>
-                    Choose gender
-                  </option>
-                  <option defaultValue="male">Male</option>
-                  <option defaultValue="female">Female</option>
-                </Select>
+                <InputField
+                  type="text"
+                  name="gender"
+                  defaultValue={gender}
+                  placeholder="male/female"
+                ></InputField>
               </InputBox>
               <InputBox>
                 <ModalLabel htmlFor="phone">Phone</ModalLabel>
@@ -352,7 +373,7 @@ function FormContacts(props) {
                   defaultValue={country}
                 ></InputField>
               </InputBox>
-              <InputBox>
+              {/*<InputBox>
                 <ModalLabel htmlFor="connection_status">
                   Connection Status
                 </ModalLabel>
@@ -371,13 +392,13 @@ function FormContacts(props) {
                   name="credential_status"
                   defaultValue={credential_status}
                 ></InputField>
-              </InputBox>
+              </InputBox>*/}
               <InputBox>
-                <ModalLabel htmlFor="id"></ModalLabel>
+                <ModalLabel htmlFor="contact_id"></ModalLabel>
                 <InputField
                   type="hidden"
-                  name="id"
-                  defaultValue={id}
+                  name="contact_id"
+                  defaultValue={contact_id}
                 ></InputField>
               </InputBox>
 

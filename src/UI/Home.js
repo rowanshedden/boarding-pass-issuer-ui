@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import styled from 'styled-components'
 
-import FormContacts from './FormContacts'
+import FormQR from './FormQR'
 import FormCredentials from './FormCredentials'
 import Notification from './Notification'
 
@@ -33,7 +33,7 @@ const ContentFlexBox = styled.div`
 
 function Home(props) {
   const [notification, setNotification] = useState(
-    'There is no notification to display'
+    'No notifications to display'
   )
   const [notificationState, setNotificationState] = useState('closed')
   const [notificationType, setNotificationType] = useState('notice')
@@ -44,21 +44,26 @@ function Home(props) {
   const closeContactModal = () => setContactModalIsOpen(false)
   const closeCredentialModal = () => setCredentialModalIsOpen(false)
 
-  // Submits the contact form and shows notification
-  function submitNewContact(e) {
-    console.log('new contact submitted')
-    e.preventDefault()
-    setNotificationState('open')
-    setNotification('Contact was successfully added!')
+  const addContact = () => {
+    setContactModalIsOpen((o) => !o)
+    props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
   }
 
+  // Submits the contact form and shows notification
+  // function submitNewContact(e) {
+  //   console.log('new contact submitted')
+  //   e.preventDefault()
+  //   setNotificationState('open')
+  //   setNotification('Contact was successfully added!')
+  // }
+
   // Submits the credential form and shows notification
-  function submitNewCredential(e) {
-    console.log('new credential submitted')
-    e.preventDefault()
-    setNotificationState('open')
-    setNotification('Credential was successfully added!')
-  }
+  // function submitNewCredential(e) {
+  //   console.log('New credential submitted')
+  //   e.preventDefault()
+  //   setNotificationState('open')
+  //   setNotification('Credential was successfully added!')
+  // }
 
   // Closes notification
   const closeNotification = (e) => {
@@ -74,25 +79,23 @@ function Home(props) {
         closeNotification={closeNotification}
       />
       <HeaderHolder>
-        <ContentFlexBox onClick={() => setCredentialModalIsOpen((o) => !o)}>
+        <ContentFlexBox onClick={addContact}>Add Contact</ContentFlexBox>
+        {/* <ContentFlexBox onClick={() => setCredentialModalIsOpen((o) => !o)}>
           Add Credential
         </ContentFlexBox>
-        <ContentFlexBox onClick={() => setContactModalIsOpen((o) => !o)}>
-          Add Contact
-        </ContentFlexBox>
-        <ContentFlexBox></ContentFlexBox>
+        <ContentFlexBox></ContentFlexBox>*/}
       </HeaderHolder>
-      <FormContacts
+      <FormQR
         contactModalIsOpen={contactModalIsOpen}
         closeContactModal={closeContactModal}
-        submitNewContact={submitNewContact}
-      ></FormContacts>
-      <FormCredentials
+        QRCodeURL={props.QRCodeURL}
+      />
+      {/*<FormCredentials
         contacts={props.contacts}
         credentialModalIsOpen={credentialModalIsOpen}
         closeCredentialModal={closeCredentialModal}
         submitNewCredential={submitNewCredential}
-      ></FormCredentials>
+      />*/}
     </>
   )
 }

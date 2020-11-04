@@ -116,7 +116,7 @@ const Form = styled.form`
 function Settings(props) {
   //Notification state
   const [notification, setNotification] = useState(
-    'There is no notification to display'
+    'No notifications to display'
   )
   const [notificationState, setNotificationState] = useState('closed')
   const [notificationType, setNotificationType] = useState('notice')
@@ -165,6 +165,7 @@ function Settings(props) {
   }
 
   function saveStyle() {
+    props.saveTheme()
     setNotificationState('open')
     setNotification('The style was successfully changed')
   }
@@ -204,21 +205,21 @@ function Settings(props) {
   }
 
   return (
-    <>
+    <div id="settings">
       <Notification
         type={notificationType}
         message={notification}
         state={notificationState}
         closeNotification={closeNotification}
-      ></Notification>
+      />
       <PageHeader title={'Settings'} />
-      <PageSection>
+      {/*<PageSection>
         <h2>Change logo</h2>
         <Form onSubmit={handleFileSubmit}>
           <FileInput type="file" onChange={fileSelectHandler}></FileInput>
           <SubmitFormBtn type="submit">Upload</SubmitFormBtn>
         </Form>
-      </PageSection>
+      </PageSection>*/}
       <PageSection>
         <Form onSubmit={handleColorSubmit}>
           <h2>Change primary color</h2>
@@ -504,7 +505,7 @@ function Settings(props) {
           <SaveStyle onClick={saveStyle}>Save all</SaveStyle>
         </Form>
       </PageSection>
-    </>
+    </div>
   )
 }
 

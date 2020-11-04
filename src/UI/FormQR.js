@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import styled from 'styled-components'
 import Popup from 'reactjs-popup'
+import QRCode from 'qrcode.react'
 
 const StyledPopup = styled(Popup)`
   &-overlay {
@@ -91,14 +92,20 @@ const SubmitBtn = styled.button`
 `
 
 function FormQR(props) {
-  const handleSubmit = (e) => {
-    props.submitNewContact(e)
-    props.closeContactModal()
-  }
-
   function closeModal() {
     props.closeContactModal()
   }
+
+  const [waitingForConnection, setWaitingForConnection] = useState(false)
+
+  useEffect(() => {
+    if (props.QRCodeURL !== '' && waitingForConnection === false) {
+      setWaitingForConnection(true)
+    } else if (props.QRCodeURL === '' && waitingForConnection === true) {
+      setWaitingForConnection(false)
+      closeModal()
+    }
+  }, [props.QRCodeURL])
 
   return (
     <StyledPopup
@@ -109,20 +116,23 @@ function FormQR(props) {
       <Modal className="modal">
         <ModalHeader>Add New Contact</ModalHeader>
         <ModalContent>
-          <form onSubmit={handleSubmit}>
-            <QRHolder>
-              <QR
-                src={window.location.origin + '/assets/uploads/testQR.jpg'}
-                alt="QR Code"
+          <QRHolder>
+            {props.QRCodeURL ? (
+              <QRCode
+                style={{
+                  display: 'block',
+                  margin: 'auto',
+                  padding: '10px',
+                  width: '300px',
+                }}
+                value={props.QRCodeURL}
+                size={256}
+                renderAs="svg"
               />
-            </QRHolder>
-            <Actions>
-              <CancelBtn type="button" onClick={closeModal}>
-                Cancel
-              </CancelBtn>
-              <SubmitBtn type="submit">Submit</SubmitBtn>
-            </Actions>
-          </form>
+            ) : (
+              <p>Loading...</p>
+            )}
+          </QRHolder>
         </ModalContent>
         <CloseBtn onClick={closeModal}>&times;</CloseBtn>
       </Modal>

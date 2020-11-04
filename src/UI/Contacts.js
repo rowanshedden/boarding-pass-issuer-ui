@@ -6,6 +6,7 @@ import QRCode from 'qrcode.react'
 
 // import FormContacts from './FormContacts'
 import FormQR from './FormQR'
+//import FormContacts from './FormQR'
 import Notification from './Notification'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
@@ -60,11 +61,6 @@ const ActionButton = styled.span`
   }
 `
 
-const FirstName = styled.span``
-const MiddleInitial = styled.span``
-const LastName = styled.span``
-const Icon = styled.span``
-
 function Contacts(props) {
   const [notification, setNotification] = useState('')
   const [notificationState, setNotificationState] = useState('closed')
@@ -74,6 +70,8 @@ function Contacts(props) {
 
   const closeContactModal = () => setContactModalIsOpen(false)
 
+  console.log(props.contacts)
+
   function openContact(history, id) {
     if (history !== undefined) {
       history.push('/contacts/' + id)
@@ -82,7 +80,6 @@ function Contacts(props) {
 
   // Submits the form and shows notification
   function submitNewContact(e) {
-    console.log('new contact submitted')
     e.preventDefault()
     setNotificationState('open')
     setNotification('Contact was successfully added!')
@@ -100,22 +97,19 @@ function Contacts(props) {
   const contactRows = contacts.map((contact) => {
     return (
       <DataRow
-        key={contact.id}
+        key={contact.contact_id}
         onClick={() => {
-          openContact(history, contact.id, contact)
+          openContact(history, contact.contact_id, contact)
         }}
       >
+        <DataCell>{contact.label}</DataCell>
         <DataCell>
-          <FirstName>{contact.demographics.first_name}</FirstName>{' '}
-          <MiddleInitial>{contact.demographics.middle_initial}</MiddleInitial>{' '}
-          <LastName>{contact.demographics.last_name}</LastName>
+          {contact.Demographic !== null && contact.Demographic !== undefined
+            ? contact.Demographic.mpid || ''
+            : ''}
         </DataCell>
-        <DataCell>{contact.mpid}</DataCell>
-        <DataCell>{contact.connection_status}</DataCell>
-        <DataCell>{contact.credential_status}</DataCell>
-        <DataCell>
-          <Icon name="delete" />
-        </DataCell>
+        <DataCell>{contact.Connections[0].state}</DataCell>
+        <DataCell>{new Date(contact.created_at).toLocaleString()}</DataCell>
       </DataRow>
     )
   })
@@ -127,7 +121,7 @@ function Contacts(props) {
         message={notification}
         state={notificationState}
         closeNotification={closeNotification}
-      ></Notification>
+      />
       <div id="contacts">
         <PageHeader title={'Contacts'} />
         <PageSection>
@@ -137,8 +131,7 @@ function Contacts(props) {
                 <DataHeader>Contact Name</DataHeader>
                 <DataHeader>MPID</DataHeader>
                 <DataHeader>Connection Status</DataHeader>
-                <DataHeader>Credential Status</DataHeader>
-                <DataHeader>Delete</DataHeader>
+                <DataHeader>Created At</DataHeader>
               </DataRow>
             </thead>
             <tbody>{contactRows}</tbody>
@@ -146,15 +139,23 @@ function Contacts(props) {
         </PageSection>
         <ActionButton
           title="Add a New Contact"
-          onClick={() => setContactModalIsOpen((o) => !o)}
+          onClick={() => {
+            setContactModalIsOpen((o) => !o)
+            props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
+          }}
         >
           +
         </ActionButton>
         <FormQR
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}
-          submitNewContact={submitNewContact}
-        ></FormQR>
+          QRCodeURL={props.QRCodeURL}
+        />
+        {/*<FormContacts
+          contactModalIsOpen={contactModalIsOpen}
+          closeContactModal={closeContactModal}
+          submitContact={submitNewContact}
+        />*/}
       </div>
     </>
   )
