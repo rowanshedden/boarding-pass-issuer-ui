@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import FormCredentials from './FormCredentials'
+import FormTrustedTraveler from './FormTrustedTraveler'
 import FormContacts from './FormContacts'
 import Notification from './Notification'
 import PageHeader from './PageHeader.js'
@@ -124,6 +125,7 @@ function Contact(props) {
 
   // Modal state
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
+  const [travelerModalIsOpen, setTravelerModalIsOpen] = useState(false)
   const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
 
   //const history = props.history
@@ -131,6 +133,7 @@ function Contact(props) {
   //const contact = props.contact
 
   const closeContactModal = () => setContactModalIsOpen(false)
+  const closeTravelerModal = () => setTravelerModalIsOpen(false)
   const closeCredentialModal = () => setCredentialModalIsOpen(false)
 
   const [selectedContact, setSelectedContact] = useState(contactSelected)
@@ -377,6 +380,12 @@ function Contact(props) {
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}
           submitContact={updateContact}
+        />
+        <FormTrustedTraveler
+          contactSelected={contactSelected}
+          travelerModalIsOpen={travelerModalIsOpen}
+          closeTravelerModal={closeTravelerModal}
+          submitCredential={submitNewCredential}
         />
         <FormCredentials
           selectedContact={contactSelected}
