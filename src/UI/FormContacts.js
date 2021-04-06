@@ -124,38 +124,39 @@ const Select = styled.select`
 `
 
 function FormContacts(props) {
+  console.log(props.contactSelected)
   // Assigning contact values from props
   const contact_id = props.contactSelected
     ? JSON.parse(JSON.stringify(props.contactSelected.contact_id))
     : ''
-  const mpid =
-    props.contactSelected && props.contactSelected.Demographic
-      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.mpid))
-      : ''
-  const first_name =
-    props.contactSelected && props.contactSelected.Demographic
-      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.first_name))
-      : ''
-  const middle_name =
-    props.contactSelected && props.contactSelected.Demographic
-      ? JSON.parse(
-          JSON.stringify(props.contactSelected.Demographic.middle_name)
-        )
-      : ''
-  const last_name =
-    props.contactSelected && props.contactSelected.Demographic
-      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.last_name))
-      : ''
-  const date_of_birth =
-    props.contactSelected && props.contactSelected.Demographic
-      ? JSON.parse(
-          JSON.stringify(props.contactSelected.Demographic.date_of_birth)
-        )
-      : ''
-  const gender =
-    props.contactSelected && props.contactSelected.Demographic
-      ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.gender))
-      : ''
+  // const mpid =
+  //   props.contactSelected && props.contactSelected.Demographic
+  //     ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.mpid))
+  //     : ''
+  // const first_name =
+  //   props.contactSelected && props.contactSelected.Demographic
+  //     ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.first_name))
+  //     : ''
+  // const middle_name =
+  //   props.contactSelected && props.contactSelected.Demographic
+  //     ? JSON.parse(
+  //         JSON.stringify(props.contactSelected.Demographic.middle_name)
+  //       )
+  //     : ''
+  // const last_name =
+  //   props.contactSelected && props.contactSelected.Demographic
+  //     ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.last_name))
+  //     : ''
+  // const date_of_birth =
+  //   props.contactSelected && props.contactSelected.Demographic
+  //     ? JSON.parse(
+  //         JSON.stringify(props.contactSelected.Demographic.date_of_birth)
+  //       )
+  //     : ''
+  // const gender =
+  //   props.contactSelected && props.contactSelected.Demographic
+  //     ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.gender))
+  //     : ''
   const phone =
     props.contactSelected && props.contactSelected.Demographic
       ? JSON.parse(JSON.stringify(props.contactSelected.Demographic.phone))
@@ -224,13 +225,13 @@ function FormContacts(props) {
     // Assembling contact JSON
     const contact = {}
     contact.contact_id = form.get('contact_id')
-    contact.mpid = form.get('mpid')
-    //contact.demographic = {}
-    contact.first_name = form.get('first_name')
-    contact.middle_name = form.get('mid_name')
-    contact.last_name = form.get('last_name')
-    contact.date_of_birth = form.get('date_of_birth')
-    contact.gender = form.get('gender')
+    // contact.mpid = form.get('mpid')
+    // //contact.demographic = {}
+    // contact.first_name = form.get('first_name')
+    // contact.middle_name = form.get('mid_name')
+    // contact.last_name = form.get('last_name')
+    // contact.date_of_birth = form.get('date_of_birth')
+    // contact.gender = form.get('gender')
     contact.phone = form.get('phone')
     contact.address = {}
     contact.address.address_1 = form.get('address_1')
@@ -262,7 +263,7 @@ function FormContacts(props) {
         <ModalContentWrapper>
           <ModalContent>
             <form id="form" onSubmit={handleSubmit} ref={contactForm}>
-              <InputBox>
+              {/* <InputBox>
                 <ModalLabel htmlFor="mpid">MPID</ModalLabel>
                 <InputField
                   type="text"
@@ -293,16 +294,16 @@ function FormContacts(props) {
                   name="last_name"
                   defaultValue={last_name}
                 ></InputField>
-              </InputBox>
-              <InputBox>
+              </InputBox> */}
+              {/* <InputBox>
                 <ModalLabel htmlFor="date_of_birth">Date Of Birth</ModalLabel>
                 <InputField
                   type="date"
                   name="date_of_birth"
                   defaultValue={date_of_birth}
                 ></InputField>
-              </InputBox>
-              <InputBox>
+              </InputBox> */}
+              {/* <InputBox>
                 <ModalLabel htmlFor="gender">Gender</ModalLabel>
                 <InputField
                   type="text"
@@ -310,7 +311,7 @@ function FormContacts(props) {
                   defaultValue={gender}
                   placeholder="male/female"
                 ></InputField>
-              </InputBox>
+              </InputBox> */}
               <InputBox>
                 <ModalLabel htmlFor="phone">Phone</ModalLabel>
                 <InputField

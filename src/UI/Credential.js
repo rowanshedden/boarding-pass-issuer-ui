@@ -73,36 +73,41 @@ function Credential(props) {
 
   // Attributes of this kind of credential
   let showAttributes = {
-    result: '',
-    normality: '',
-    result_status: '',
-    comment: '',
-    date_time_of_message: '',
-    sending_facility: '',
-    ordering_facility_name: '',
-    ordering_facility_address: '',
-    performing_lab: '',
-    visit_location: '',
-    lab_order_id: '',
-    lab_code: '',
-    lab_coding_qualifer: '',
-    lab_description: '',
-    lab_specimen_collected_date: '',
-    observation_date_time: '',
+    trusted_traveler_id: '',
+    traveler_first_name: '',
+    traveler_last_name: '',
+    traveler_date_of_birth: '',
+    traveler_date_time: '',
+    // result: '',
+    // normality: '',
+    // result_status: '',
+    // comment: '',
+    // date_time_of_message: '',
+    // sending_facility: '',
+    // ordering_facility_name: '',
+    // ordering_facility_address: '',
+    // performing_lab: '',
+    // visit_location: '',
+    // lab_order_id: '',
+    // lab_code: '',
+    // lab_coding_qualifer: '',
+    // lab_description: '',
+    // lab_specimen_collected_date: '',
+    // observation_date_time: '',
 
-    mpid: '',
-    patient_local_id: '',
-    patient_name: '',
-    patient_first_name: '',
-    patient_last_name: '',
-    patient_date_of_birth: '',
-    patient_gender_legal: '',
-    patient_phone: '',
-    patient_street_address: '',
-    patient_city: '',
-    patient_state: '',
-    patient_postalcode: '',
-    patient_country: '',
+    // mpid: '',
+    // patient_local_id: '',
+    // patient_name: '',
+    // patient_first_name: '',
+    // patient_last_name: '',
+    // patient_date_of_birth: '',
+    // patient_gender_legal: '',
+    // patient_phone: '',
+    // patient_street_address: '',
+    // patient_city: '',
+    // patient_state: '',
+    // patient_postalcode: '',
+    // patient_country: '',
   }
 
   // Now set the values if we have a credential
@@ -127,53 +132,66 @@ function Credential(props) {
       credentialSelected.credential.values !== undefined
     ) {
       const values = credentialSelected.credential.values
+      console.log(credentialSelected.credential.values, 'creds')
+      showAttributes.trusted_traveler_id = values.trusted_traveler_id.raw || ''
+      showAttributes.traveler_first_name = values.traveler_first_name.raw || ''
+      showAttributes.traveler_last_name = values.traveler_last_name.raw || ''
+      showAttributes.traveler_date_of_birth =
+        values.traveler_date_of_birth.raw || ''
+      showAttributes.trusted_date_time = values.trusted_date_time.raw || ''
 
-      showAttributes.result = values.result.raw || ''
-      showAttributes.normality = values.normality.raw || ''
-      showAttributes.result_status = values.result_status.raw || ''
-      showAttributes.comment = values.comment.raw || ''
-      showAttributes.date_time_of_message =
-        values.date_time_of_message.raw || ''
-      showAttributes.sending_facility = values.sending_facility.raw || ''
-      showAttributes.ordering_facility_name =
-        values.ordering_facility_name.raw || ''
-      showAttributes.ordering_facility_address =
-        values.ordering_facility_address.raw || ''
-      showAttributes.performing_lab = values.performing_lab.raw || ''
-      showAttributes.visit_location = values.visit_location.raw || ''
-      showAttributes.lab_order_id = values.lab_order_id.raw || ''
-      showAttributes.lab_code = values.lab_code.raw || ''
-      showAttributes.lab_coding_qualifer = values.lab_coding_qualifer.raw || ''
-      showAttributes.lab_description = values.lab_description.raw || ''
-      showAttributes.lab_specimen_collected_date =
-        values.lab_specimen_collected_date.raw || ''
-      showAttributes.observation_date_time =
-        values.observation_date_time.raw || ''
+      // showAttributes.result = values.result.raw || ''
+      // showAttributes.normality = values.normality.raw || ''
+      // showAttributes.result_status = values.result_status.raw || ''
+      // showAttributes.comment = values.comment.raw || ''
+      // showAttributes.date_time_of_message =
+      //   values.date_time_of_message.raw || ''
+      // showAttributes.sending_facility = values.sending_facility.raw || ''
+      // showAttributes.ordering_facility_name =
+      //   values.ordering_facility_name.raw || ''
+      // showAttributes.ordering_facility_address =
+      //   values.ordering_facility_address.raw || ''
+      // showAttributes.performing_lab = values.performing_lab.raw || ''
+      // showAttributes.visit_location = values.visit_location.raw || ''
+      // showAttributes.lab_order_id = values.lab_order_id.raw || ''
+      // showAttributes.lab_code = values.lab_code.raw || ''
+      // showAttributes.lab_coding_qualifer = values.lab_coding_qualifer.raw || ''
+      // showAttributes.lab_description = values.lab_description.raw || ''
+      // showAttributes.lab_specimen_collected_date =
+      //   values.lab_specimen_collected_date.raw || ''
+      // showAttributes.observation_date_time =
+      //   values.observation_date_time.raw || ''
 
-      showAttributes.mpid = values.mpid.raw || ''
-      showAttributes.patient_local_id = values.patient_local_id.raw || ''
-      showAttributes.patient_name =
-        values.patient_first_name.raw + ' ' + values.patient_last_name.raw
-      showAttributes.patient_first_name = values.patient_first_name.raw || ''
-      showAttributes.patient_last_name = values.patient_last_name.raw || ''
-      showAttributes.patient_date_of_birth =
-        values.patient_date_of_birth.raw || ''
-      showAttributes.patient_gender_legal =
-        values.patient_gender_legal.raw || ''
-      showAttributes.patient_phone = values.patient_phone.raw || ''
-      showAttributes.patient_street_address =
-        values.patient_street_address.raw || ''
-      showAttributes.patient_city = values.patient_city.raw || ''
-      showAttributes.patient_state = values.patient_state.raw || ''
-      showAttributes.patient_postalcode = values.patient_postalcode.raw || ''
-      showAttributes.patient_country = values.patient_country.raw || ''
+      // showAttributes.mpid = values.mpid.raw || ''
+      // showAttributes.patient_local_id = values.patient_local_id.raw || ''
+      // showAttributes.patient_name =
+      //   values.patient_first_name.raw + ' ' + values.patient_last_name.raw
+      // showAttributes.patient_first_name = values.patient_first_name.raw || ''
+      // showAttributes.patient_last_name = values.patient_last_name.raw || ''
+      // showAttributes.patient_date_of_birth =
+      //   values.patient_date_of_birth.raw || ''
+      // showAttributes.patient_gender_legal =
+      //   values.patient_gender_legal.raw || ''
+      // showAttributes.patient_phone = values.patient_phone.raw || ''
+      // showAttributes.patient_street_address =
+      //   values.patient_street_address.raw || ''
+      // showAttributes.patient_city = values.patient_city.raw || ''
+      // showAttributes.patient_state = values.patient_state.raw || ''
+      // showAttributes.patient_postalcode = values.patient_postalcode.raw || ''
+      // showAttributes.patient_country = values.patient_country.raw || ''
     }
   }
 
   return (
     <div id="contact">
       <PageHeader
-        title={showCredential.name + ' for ' + showAttributes.patient_name}
+        title={
+          showCredential.name +
+          ' for ' +
+          showAttributes.traveler_first_name +
+          ' ' +
+          showAttributes.traveler_last_name
+        }
       />
       <PageSection>
         <h2>General Information</h2>
@@ -201,6 +219,26 @@ function Credential(props) {
         <AttributeTable>
           <tbody>
             <AttributeRow>
+              <th>Trusted Travler ID:</th>
+              <td>{showAttributes.trusted_traveler_id}</td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>Traveler First Name:</th>
+              <td>{showAttributes.traveler_first_name}</td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>Traveler Last Name:</th>
+              <td>{showAttributes.traveler_last_name}</td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>Traveler Date of Birth:</th>
+              <td>{showAttributes.traveler_date_of_birth}</td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>Trusted Date Time:</th>
+              <td>{showAttributes.trusted_date_time}</td>
+            </AttributeRow>
+            {/* <AttributeRow>
               <th>Result:</th>
               <td>{showAttributes.result}</td>
             </AttributeRow>
@@ -317,7 +355,7 @@ function Credential(props) {
             <AttributeRow>
               <th>Country:</th>
               <td>{showAttributes.patient_country}</td>
-            </AttributeRow>
+            </AttributeRow> */}
           </tbody>
         </AttributeTable>
       </PageSection>

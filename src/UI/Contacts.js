@@ -129,7 +129,7 @@ function Contacts(props) {
             <thead>
               <DataRow>
                 <DataHeader>Contact Name</DataHeader>
-                <DataHeader>MPID</DataHeader>
+                <DataHeader></DataHeader>
                 <DataHeader>Connection Status</DataHeader>
                 <DataHeader>Created At</DataHeader>
               </DataRow>

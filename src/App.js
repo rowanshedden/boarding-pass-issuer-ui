@@ -52,7 +52,10 @@ function App() {
     //Perform operation on websocket open
     controllerSocket.current.onopen = () => {
       //console.log('Websocket Connection established, requesting data')
-      sendMessage('CONTACTS', 'GET_ALL', { additional_tables: ['Demographic'] })
+      sendMessage('CONTACTS', 'GET_ALL', {
+        additional_tables: ['Demographic', 'Passport'],
+      })
+
       sendMessage('CREDENTIALS', 'GET_ALL', {})
       sendMessage('SETTINGS', 'GET_THEME', {})
     }

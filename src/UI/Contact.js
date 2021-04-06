@@ -90,6 +90,8 @@ const IssueCredential = styled.button`
 `
 
 function Contact(props) {
+  // const setNotification = useNotification()
+
   const history = props.history
   const contactId = props.contactId
   const credentials = props.credentials
@@ -138,6 +140,16 @@ function Contact(props) {
 
   const [selectedContact, setSelectedContact] = useState(contactSelected)
 
+  let rawImage = contactSelected.Passport.photo
+  const handleImageSrc = (rawImage) => {
+    let bytes = new Uint8Array(rawImage)
+    bytes = Buffer.from(rawImage).toString('base64')
+    console.log('I ran')
+    let result = atob(bytes)
+    return result
+  }
+  let test = handleImageSrc(rawImage)
+  // console.log(test)
   function updateContact(updatedDemographic, e) {
     e.preventDefault()
     const Demographic = {
@@ -146,10 +158,15 @@ function Contact(props) {
 
     props.sendRequest('DEMOGRAPHICS', 'UPDATE_OR_CREATE', updatedDemographic)
 
-    setNotificationState('open')
-    setNotification('Contact was updated!')
+    setNotification('Contact was updated!', 'notice')
 
     setSelectedContact({ ...selectedContact, ...Demographic })
+  }
+
+  function beginIssuance() {
+    props.sendRequest('PRESENTATIONS', 'REQUEST', {
+      connectionID: contactSelected.Connections[0].connection_id,
+    })
   }
 
   // Submits the credential form and shows notification
@@ -188,15 +205,15 @@ function Contact(props) {
         )
       }
 
-      let testName = ''
-      let testResult = ''
-      if (
-        credential_record.credential !== null &&
-        credential_record.credential !== undefined
-      ) {
-        testName = credential_record.credential.values.lab_description.raw || ''
-        testResult = credential_record.credential.values.result.raw || ''
-      }
+      // let testName = ''
+      // let testResult = ''
+      // if (
+      //   credential_record.credential !== null &&
+      //   credential_record.credential !== undefined
+      // ) {
+      //   testName = credential_record.credential.values.lab_description.raw || ''
+      //   testResult = credential_record.credential.values.result.raw || ''
+      // }
 
       return (
         <DataRow
@@ -207,8 +224,8 @@ function Contact(props) {
         >
           <DataCell>{credentialName}</DataCell>
           <DataCell className="title-case">{credentialState}</DataCell>
-          <DataCell>{testName}</DataCell>
-          <DataCell className="title-case">{testResult}</DataCell>
+          {/* <DataCell>{testName}</DataCell> */}
+          {/* <DataCell className="title-case">{testResult}</DataCell> */}
           <DataCell>{dateCreated}</DataCell>
         </DataRow>
       )
@@ -239,15 +256,6 @@ function Contact(props) {
                 <td>{selectedContact.contact_id || ''}</td>
               </AttributeRow>
               <AttributeRow>
-                <th>MPID:</th>
-                <td>
-                  {selectedContact.Demographic !== null &&
-                  selectedContact.Demographic !== undefined
-                    ? selectedContact.Demographic.mpid || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
                 <th>Connection Status:</th>
                 <td>
                   {selectedContact.Connections !== undefined
@@ -261,6 +269,7 @@ function Contact(props) {
               </AttributeRow>*/}
             </tbody>
           </AttributeTable>
+
           <h2>Demographic Information</h2>
           <AttributeTable>
             <tbody>
@@ -269,20 +278,11 @@ function Contact(props) {
                 <td>{selectedContact.label || ''}</td>
               </AttributeRow>
               <AttributeRow>
-                <th>Date of Birth:</th>
+                <th>Email:</th>
                 <td>
                   {selectedContact.Demographic !== null &&
                   selectedContact.Demographic !== undefined
-                    ? selectedContact.Demographic.date_of_birth || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Gender:</th>
-                <td>
-                  {selectedContact.Demographic !== null &&
-                  selectedContact.Demographic !== undefined
-                    ? selectedContact.Demographic.gender || ''
+                    ? selectedContact.Demographic.email || ''
                     : ''}
                 </td>
               </AttributeRow>
@@ -357,18 +357,137 @@ function Contact(props) {
               </AttributeRow>
             </tbody>
           </AttributeTable>
+          <h2>Passport Information</h2>
+          <AttributeTable>
+            <tbody>
+              <AttributeRow>
+                <th>Passport Number:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.passport_number || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Surname:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.surname || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Given Name(s):</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.given_names || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Sex:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.sex || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Date of Birth:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.date_of_birth || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Place of Birth:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.place_of_birth || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Nationality:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.nationality || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Date of Issue:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.date_of_issue || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Date of Expiration:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.date_of_expiration || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Type:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.type || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Code:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.code || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Authority:</th>
+                <td>
+                  {selectedContact.Passport !== null &&
+                  selectedContact.Passport !== undefined
+                    ? selectedContact.Passport.authority || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Photo:</th>
+                <td></td>
+              </AttributeRow>
+            </tbody>
+          </AttributeTable>
+          <img src={test} alt="Error" />
         </PageSection>
         <PageSection>
-          <IssueCredential onClick={() => setCredentialModalIsOpen((o) => !o)}>
-            Issue Test Credential
+          {/* <IssueCredential onClick={() => setTravelerModalIsOpen((o) => !o)}> */}
+          <IssueCredential onClick={() => beginIssuance()}>
+            Issue Trusted Traveler Credential
           </IssueCredential>
           <DataTable>
             <thead>
               <DataRow>
                 <DataHeader>Credential</DataHeader>
                 <DataHeader>Status</DataHeader>
-                <DataHeader>Test Name</DataHeader>
-                <DataHeader>Test Results</DataHeader>
+                {/* <DataHeader>Test Name</DataHeader> */}
+                {/* <DataHeader>Test Results</DataHeader> */}
                 <DataHeader>Date Issued</DataHeader>
               </DataRow>
             </thead>
@@ -385,13 +504,6 @@ function Contact(props) {
           contactSelected={contactSelected}
           travelerModalIsOpen={travelerModalIsOpen}
           closeTravelerModal={closeTravelerModal}
-          submitCredential={submitNewCredential}
-        />
-        <FormCredentials
-          selectedContact={contactSelected}
-          contactSearch={contactSearch}
-          credentialModalIsOpen={credentialModalIsOpen}
-          closeCredentialModal={closeCredentialModal}
           submitCredential={submitNewCredential}
         />
       </div>
