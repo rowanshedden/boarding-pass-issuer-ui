@@ -13,6 +13,10 @@ See also: https://mit-license.org/
 - [React Router](https://github.com/ReactTraining/react-router)
 - [Reactjs-popup](https://github.com/yjose/reactjs-popup)
 - [Styled Components](https://github.com/styled-components/styled-components)
+- [qrcode react](https://github.com/zpao/qrcode.react)
+- [jwt-decode](https://github.com/auth0/jwt-decode)
+- [universal-cookie](https://github.com/reactivestack/cookies)
+- [react-tooltip](https://github.com/wwayne/react-tooltip)
 
 ### SIL Open Font License
 

@@ -3,8 +3,9 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import FormQR from './FormQR'
-import FormCredentials from './FormCredentials'
-import Notification from './Notification'
+// import { useNotification } from './NotificationProvider'
+
+import { CanUser } from './CanUser'
 
 const HeaderHolder = styled.div`
   display: flex;
@@ -13,16 +14,18 @@ const HeaderHolder = styled.div`
 
 const ContentFlexBox = styled.div`
   width: 32%;
+  min-width: 240px;
   height: 150px;
   margin-bottom: 30px;
-  padding: 20px 25px;
-  font-size: 2.5vw;
+  padding: 0 25px;
+  font-size: calc(12px + 1.5vw);
+  line-height: 150px;
+  vertical-align: center;
   text-transform: uppercase;
   background: ${(props) => props.theme.primary_color};
   color: ${(props) => props.theme.text_light};
   box-shadow: ${(props) => props.theme.drop_shadow};
   text-align: center;
-  line-height: 100px;
 
   :hover {
     cursor: pointer;
@@ -32,11 +35,10 @@ const ContentFlexBox = styled.div`
 `
 
 function Home(props) {
-  const [notification, setNotification] = useState(
-    'No notifications to display'
-  )
-  const [notificationState, setNotificationState] = useState('closed')
-  const [notificationType, setNotificationType] = useState('notice')
+  const localUser = props.loggedInUserState
+
+  // Accessing notification context
+  // const setNotification = useNotification()
 
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
   const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
@@ -49,53 +51,22 @@ function Home(props) {
     props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
   }
 
-  // Submits the contact form and shows notification
-  // function submitNewContact(e) {
-  //   console.log('new contact submitted')
-  //   e.preventDefault()
-  //   setNotificationState('open')
-  //   setNotification('Contact was successfully added!')
-  // }
-
-  // Submits the credential form and shows notification
-  // function submitNewCredential(e) {
-  //   console.log('New credential submitted')
-  //   e.preventDefault()
-  //   setNotificationState('open')
-  //   setNotification('Credential was successfully added!')
-  // }
-
-  // Closes notification
-  const closeNotification = (e) => {
-    setNotificationState('closed')
-  }
-
   return (
     <>
-      <Notification
-        type={notificationType}
-        message={notification}
-        state={notificationState}
-        closeNotification={closeNotification}
-      />
       <HeaderHolder>
-        <ContentFlexBox onClick={addContact}>Add Contact</ContentFlexBox>
-        {/* <ContentFlexBox onClick={() => setCredentialModalIsOpen((o) => !o)}>
-          Add Credential
-        </ContentFlexBox>
-        <ContentFlexBox></ContentFlexBox>*/}
+        <CanUser
+          user={localUser}
+          perform="contacts:create"
+          yes={() => (
+            <ContentFlexBox onClick={addContact}>Add Contact</ContentFlexBox>
+          )}
+        />
       </HeaderHolder>
       <FormQR
         contactModalIsOpen={contactModalIsOpen}
         closeContactModal={closeContactModal}
         QRCodeURL={props.QRCodeURL}
       />
-      {/*<FormCredentials
-        contacts={props.contacts}
-        credentialModalIsOpen={credentialModalIsOpen}
-        closeCredentialModal={closeCredentialModal}
-        submitNewCredential={submitNewCredential}
-      />*/}
     </>
   )
 }

@@ -1,76 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react'
-
-import styled from 'styled-components'
-
-import QRCode from 'qrcode.react'
+import React, { useState } from 'react'
 
 // import FormContacts from './FormContacts'
 import FormQR from './FormQR'
-//import FormContacts from './FormQR'
-import Notification from './Notification'
+import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
 
-const DataTable = styled.table`
-  box-sizing: content-box;
-  margin-top: -16px;
-  margin-left: -25px;
-  width: calc(100% + 50px);
-  border-collapse: collapse;
-`
+import { DataTable, DataRow, DataHeader, DataCell } from './CommonStylesTables'
 
-const DataRow = styled.tr`
-  :nth-child(2n + 2) td {
-    background: ${(props) => props.theme.background_secondary};
-  }
-  :hover td {
-    cursor: pointer;
-    background: #ffc;
-  }
-`
+import { ActionButton } from './CommonStylesForms'
 
-const DataHeader = styled.th`
-  padding: 8px 12px;
-  text-align: left;
-  border-bottom: 1px solid ${(props) => props.theme.primary_color};
-`
-
-const DataCell = styled.td`
-  padding: 8px 12px;
-  text-align: left;
-`
-
-const ActionButton = styled.span`
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  display: block;
-  height: 64px;
-  width: 64px;
-  font-size: 32px;
-  font-weight: bold;
-  text-align: center;
-  line-height: 64px;
-  color: ${(props) => props.theme.text_light};
-  border-radius: 32px;
-  box-shadow: ${(props) => props.theme.drop_shadow};
-  background: ${(props) => props.theme.primary_color};
-
-  :hover {
-    cursor: pointer;
-  }
-`
+import { CanUser } from './CanUser'
 
 function Contacts(props) {
-  const [notification, setNotification] = useState('')
-  const [notificationState, setNotificationState] = useState('closed')
-  const [notificationType, setNotificationType] = useState('notice')
+  const localUser = props.loggedInUserState
+
+  // Accessing notification context
+  // const setNotification = useNotification()
 
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
 
   const closeContactModal = () => setContactModalIsOpen(false)
-
-  console.log(props.contacts)
 
   function openContact(history, id) {
     if (history !== undefined) {
@@ -79,16 +29,10 @@ function Contacts(props) {
   }
 
   // Submits the form and shows notification
-  function submitNewContact(e) {
-    e.preventDefault()
-    setNotificationState('open')
-    setNotification('Contact was successfully added!')
-  }
-
-  // Closes notification
-  const closeNotification = (e) => {
-    setNotificationState('closed')
-  }
+  // function submitNewContact(e) {
+  //   e.preventDefault()
+  //   setNotification('Contact was successfully added!', 'notice')
+  // }
 
   const history = props.history
 
@@ -116,12 +60,6 @@ function Contacts(props) {
 
   return (
     <>
-      <Notification
-        type={notificationType}
-        message={notification}
-        state={notificationState}
-        closeNotification={closeNotification}
-      />
       <div id="contacts">
         <PageHeader title={'Contacts'} />
         <PageSection>
@@ -137,15 +75,21 @@ function Contacts(props) {
             <tbody>{contactRows}</tbody>
           </DataTable>
         </PageSection>
-        <ActionButton
-          title="Add a New Contact"
-          onClick={() => {
-            setContactModalIsOpen((o) => !o)
-            props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
-          }}
-        >
-          +
-        </ActionButton>
+        <CanUser
+          user={localUser}
+          perform="contacts:create"
+          yes={() => (
+            <ActionButton
+              title="Add a New Contact"
+              onClick={() => {
+                setContactModalIsOpen((o) => !o)
+                props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
+              }}
+            >
+              +
+            </ActionButton>
+          )}
+        />
         <FormQR
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}

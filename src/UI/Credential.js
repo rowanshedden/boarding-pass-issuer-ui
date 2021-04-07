@@ -1,52 +1,9 @@
 import React, { useEffect, useState } from 'react'
 
-import styled from 'styled-components'
-
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
 
-const AttributeTable = styled.table`
-  margin-bottom: 2em;
-  border-collapse: collapse;
-`
-
-const AttributeRow = styled.tr`
-  th {
-    padding: 0 6px;
-    width: 240px;
-    text-align: left;
-    font-weight: normal;
-  }
-`
-
-const DataTable = styled.table`
-  box-sizing: content-box;
-  margin-top: -16px;
-  margin-left: -25px;
-  width: calc(100% + 50px);
-  border-collapse: collapse;
-`
-
-const DataRow = styled.tr`
-  :nth-child(2n + 2) td {
-    background: ${(props) => props.theme.background_secondary};
-  }
-  :hover td {
-    cursor: pointer;
-    background: #ffc;
-  }
-`
-
-const DataHeader = styled.th`
-  padding: 8px 12px;
-  text-align: left;
-  border-bottom: 1px solid ${(props) => props.theme.primary_color};
-`
-
-const DataCell = styled.td`
-  padding: 8px 12px;
-  text-align: left;
-`
+import { AttributeTable, AttributeRow } from './CommonStylesTables'
 
 function Credential(props) {
   const history = props.history
@@ -61,7 +18,6 @@ function Credential(props) {
       break
     }
   }
-  //console.log(credentialSelected)
 
   // Initialize variables to blank (to prevent errors during loading)
   let showCredential = {
@@ -219,7 +175,7 @@ function Credential(props) {
         <AttributeTable>
           <tbody>
             <AttributeRow>
-              <th>Trusted Travler ID:</th>
+              <th>Trusted Traveler ID:</th>
               <td>{showAttributes.trusted_traveler_id}</td>
             </AttributeRow>
             <AttributeRow>

@@ -1,11 +1,19 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 
-import axios from 'axios'
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 
-import Notification from './Notification'
+import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
+
+import ReactTooltip from 'react-tooltip'
+
+import { IconHelp } from './CommonStylesTables'
+
+const SettingsHeader = styled.h2`
+  display: inline;
+  margin-right: 10px;
+`
 
 const PrimaryColorTest = styled.input`
   background: ${(props) => props.theme.primary_color};
@@ -95,7 +103,7 @@ const UndoStyle = styled.button`
   }
 `
 
-const SaveStyle = styled.button`
+const SaveBtn = styled.button`
   width: 80px;
   background: ${(props) => props.theme.primary_color};
   padding: 10px;
@@ -106,27 +114,44 @@ const SaveStyle = styled.button`
 `
 
 const SubmitFormBtn = styled.button``
+const SMTPInput = styled.input`
+  display: block;
+  margin-bottom: 15px;
+`
 const ColorInput = styled.input``
 const FileInput = styled.input``
+const SMTPForm = styled.form``
+const OrganizationNameForm = styled.form``
 const Form = styled.form`
   margin-bottom: 15px;
   height: 72px;
 `
 
 function Settings(props) {
-  //Notification state
-  const [notification, setNotification] = useState(
-    'No notifications to display'
-  )
-  const [notificationState, setNotificationState] = useState('closed')
-  const [notificationType, setNotificationType] = useState('notice')
+  // Accessing notification context
+  const setNotification = useNotification()
+
+  const error = props.errorMessage
+  const success = props.successMessage
+  // const messageEventCounter = props.messageEventCounter
+
+  useEffect(() => {
+    if (success) {
+      // console.log('SUCCESS RAN')
+      setNotification(success, 'notice')
+      props.clearResponseState()
+    } else if (error) {
+      // console.log('ERROR RAN')
+      setNotification(error, 'error')
+      props.clearResponseState()
+    }
+  }, [error, success, props, setNotification])
 
   // File state
   const [selectedFile, setSelectedFile] = useState('')
   const [fileName, setFileName] = useState('Choose file')
-  const [uploadedFile, setUploadedFile] = useState({})
 
-  // Input References
+  // Color input References
   const primaryColorInput = useRef(null)
   const secondaryColorInput = useRef(null)
   const neutralColorInput = useRef(null)
@@ -140,12 +165,17 @@ function Settings(props) {
   const primaryBackgroundInput = useRef(null)
   const secondaryBackgroundInput = useRef(null)
 
-  // Closes notification
-  const closeNotification = (e) => {
-    setNotificationState('closed')
-  }
+  // SMTP input references
+  const smtpForm = useRef(null)
+  const host = useRef(null)
+  const userEmail = useRef(null)
+  const userPassword = useRef(null)
 
-  const handleColorSubmit = (e) => {
+  // Organization input references
+  const organizationForm = useRef(null)
+  const organizationName = useRef(null)
+
+  const handleSubmit = (e) => {
     e.preventDefault()
     e.target.reset()
   }
@@ -164,65 +194,200 @@ function Settings(props) {
     props.removeStylesFromArray(key)
   }
 
+  // Save style settings
   function saveStyle() {
     props.saveTheme()
-    setNotificationState('open')
-    setNotification('The style was successfully changed')
+  }
+
+  // Save SMTP settings
+  const handleSMTP = (e) => {
+    e.preventDefault()
+
+    const form = new FormData(smtpForm.current)
+
+    const smtpConfigs = {
+      host: form.get('host'),
+      auth: {
+        user: form.get('email'),
+        pass: form.get('password'),
+      },
+    }
+    props.sendRequest('SETTINGS', 'SET_SMTP', smtpConfigs)
+
+    smtpForm.current.reset()
+  }
+
+  // Save organization name
+  const handleOrganizationName = (e) => {
+    e.preventDefault()
+    const form = new FormData(organizationForm.current)
+    const name = {
+      companyName: form.get('organizationName'),
+    }
+    props.sendRequest('SETTINGS', 'SET_ORGANIZATION_NAME', name)
+    organizationForm.current.reset()
   }
 
   // File upload
+
+  // Setting up file and file name
   let fileSelectHandler = (event) => {
-    setSelectedFile(event.target.files[0])
-    setFileName(event.target.files[0].name)
+    const file = event.target.files[0]
+
+    // The image is over 0.67Mb size. It will grow 33% (1mb) as it's converted to base64
+    if (file && file.size > 670000) {
+      setNotification('The image is over 1Mb.', 'error')
+      return
+    }
+
+    if (file) {
+      // Converting the image to base64
+      const reader = new FileReader()
+      reader.onloadend = function () {
+        setSelectedFile(reader.result)
+      }
+      reader.readAsDataURL(file)
+
+      setFileName(event.target.files[0].name)
+    }
   }
 
   const handleFileSubmit = async (e) => {
     e.preventDefault()
-    props.changeLogo()
-    const formData = new FormData()
-    formData.append('image', selectedFile)
-
-    try {
-      const res = await axios.post('/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      const { fileName, filePath } = res.data
-
-      setUploadedFile({ fileName, filePath })
-      // push it the public/assets folder
-
-      // console.log(uploadedFile)
-    } catch (err) {
-      if (err.response.status === 500) {
-        console.log('There was a problem with the server')
-      } else {
-        // console.log(err.response.data.msg)
-        console.log('The file is not being saved because there is not backend')
+    if (selectedFile) {
+      const image = {
+        name: fileName,
+        type: 'logo',
+        image: selectedFile,
       }
+
+      props.sendRequest('IMAGES', 'SET_LOGO', image)
+    } else {
+      setNotification('The image is not selected.', 'error')
     }
   }
 
   return (
     <div id="settings">
-      <Notification
-        type={notificationType}
-        message={notification}
-        state={notificationState}
-        closeNotification={closeNotification}
-      />
       <PageHeader title={'Settings'} />
-      {/*<PageSection>
-        <h2>Change logo</h2>
+      <PageSection>
+        <SettingsHeader>Organization name</SettingsHeader>
+        <IconHelp
+          data-tip
+          data-for="organizationTip"
+          data-delay-hide="250"
+          data-multiline="true"
+          alt="Help"
+        />
+        <ReactTooltip
+          id="organizationTip"
+          effect="solid"
+          type="info"
+          backgroundColor={useTheme().primary_color}
+        >
+          <span>
+            Organization name is used in
+            <br />
+            the UI and email messages
+          </span>
+        </ReactTooltip>
+        <OrganizationNameForm onSubmit={handleSubmit} ref={organizationForm}>
+          <SMTPInput
+            name="organizationName"
+            placeholder="organization name"
+            ref={organizationName}
+            style={{ display: 'inline-block' }}
+          />
+          <SaveBtn onClick={handleOrganizationName}>Save</SaveBtn>
+        </OrganizationNameForm>
+      </PageSection>
+      <PageSection>
+        <SettingsHeader>Change logo</SettingsHeader>
+        <IconHelp
+          data-tip
+          data-for="logoTip"
+          data-delay-hide="250"
+          data-multiline="true"
+          alt="Help"
+        />
+        <ReactTooltip
+          id="logoTip"
+          effect="solid"
+          type="info"
+          backgroundColor={useTheme().primary_color}
+        >
+          <span>
+            Organization logo is used in
+            <br />
+            the UI and email messages
+          </span>
+        </ReactTooltip>
         <Form onSubmit={handleFileSubmit}>
-          <FileInput type="file" onChange={fileSelectHandler}></FileInput>
+          <FileInput
+            type="file"
+            accept=".jpeg, .jpg, .png, .gif, .webp"
+            onChange={fileSelectHandler}
+          ></FileInput>
           <SubmitFormBtn type="submit">Upload</SubmitFormBtn>
         </Form>
-      </PageSection>*/}
+      </PageSection>
       <PageSection>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change primary color</h2>
+        <SettingsHeader>Change SMTP configurations</SettingsHeader>
+        <IconHelp
+          data-tip
+          data-for="smtpTip"
+          data-delay-hide="250"
+          data-multiline="true"
+          alt="Help"
+        />
+        <ReactTooltip
+          id="smtpTip"
+          effect="solid"
+          type="info"
+          backgroundColor={useTheme().primary_color}
+        >
+          <span>
+            The SMTP configuration is used for sending
+            <br />
+            new user and password reset emails
+          </span>
+        </ReactTooltip>
+        <SMTPForm onSubmit={handleSubmit} ref={smtpForm}>
+          <SMTPInput name="host" placeholder="host" ref={host} />
+          <SMTPInput name="email" placeholder="user email" ref={userEmail} />
+          <SMTPInput
+            type="password"
+            name="password"
+            placeholder="user password"
+            ref={userPassword}
+            style={{ display: 'inline-block' }}
+          />
+          <SaveBtn onClick={handleSMTP}>Save</SaveBtn>
+        </SMTPForm>
+      </PageSection>
+      <PageSection>
+        <SettingsHeader>Theme Settings</SettingsHeader>
+        <IconHelp
+          data-tip
+          data-for="themeTip"
+          data-delay-hide="250"
+          data-multiline="true"
+          alt="Help"
+        />
+        <ReactTooltip
+          id="themeTip"
+          effect="solid"
+          type="info"
+          backgroundColor={useTheme().primary_color}
+        >
+          <span>
+            Use these settings to
+            <br />
+            update the UI appearance
+          </span>
+        </ReactTooltip>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change primary color</h3>
           <ColorInput placeholder="hex or string" ref={primaryColorInput} />
           <SubmitFormBtn
             type="submit"
@@ -245,8 +410,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change secondary color</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change secondary color</h3>
           <ColorInput placeholder="hex or string" ref={secondaryColorInput} />
           <SubmitFormBtn
             type="submit"
@@ -269,8 +434,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change neutral color</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change neutral color</h3>
           <ColorInput placeholder="hex or string" ref={neutralColorInput} />
           <SubmitFormBtn
             type="submit"
@@ -293,8 +458,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change negative color</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change negative color</h3>
           <ColorInput placeholder="hex or string" ref={negativeColorInput} />
           <SubmitFormBtn
             type="submit"
@@ -317,8 +482,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change warning color</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change warning color</h3>
           <ColorInput placeholder="hex or string" ref={warningColorInput} />
           <SubmitFormBtn
             type="submit"
@@ -341,8 +506,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change positive color</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change positive color</h3>
           <ColorInput placeholder="hex or string" ref={positiveColorInput} />
           <SubmitFormBtn
             type="submit"
@@ -365,8 +530,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change text color</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change text color</h3>
           <ColorInput placeholder="hex or string" ref={textColorInput} />
           <SubmitFormBtn
             type="submit"
@@ -384,8 +549,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change text light</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change text light</h3>
           <ColorInput placeholder="hex or string" ref={textLightInput} />
           <SubmitFormBtn
             type="submit"
@@ -403,8 +568,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change border</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change border</h3>
           <ColorInput
             placeholder="5px solid #ff0000 or string"
             ref={borderInput}
@@ -425,8 +590,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change drop shadow</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change drop shadow</h3>
           <ColorInput
             placeholder="3px 3px 3px rgba(0, 0, 0, 0.3)"
             ref={dropShadowInput}
@@ -449,8 +614,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change primary background</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change primary background</h3>
           <ColorInput
             placeholder="hex or string"
             ref={primaryBackgroundInput}
@@ -476,8 +641,8 @@ function Settings(props) {
             Undo
           </UndoStyle>
         </Form>
-        <Form onSubmit={handleColorSubmit}>
-          <h2>Change secondary background</h2>
+        <Form onSubmit={handleSubmit}>
+          <h3>Change secondary background</h3>
           <ColorInput
             placeholder="hex or string"
             ref={secondaryBackgroundInput}
@@ -502,7 +667,7 @@ function Settings(props) {
           >
             Undo
           </UndoStyle>
-          <SaveStyle onClick={saveStyle}>Save all</SaveStyle>
+          <SaveBtn onClick={saveStyle}>Save all</SaveBtn>
         </Form>
       </PageSection>
     </div>
