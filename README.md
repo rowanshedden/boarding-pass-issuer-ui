@@ -1,6 +1,6 @@
-# SITA Health Issuer Web App
+# SITA Government Controller Web App
 
-The SITA Health Issuer Web App is a single-page app (SPA) for organizations who issue and verify self-sovereign identity (SSI) credentials via an Aries cloud agent (such as [ACA-Py](https://github.com/hyperledger/aries-cloudagent-python)). This app provides a friendly UI for end-users that can be easily deployed to a private or public cloud and accessed from any modern web browser.
+The SITA Government Controller Web App is a single-page app (SPA) for organizations who issue and verify self-sovereign identity (SSI) credentials via an Aries cloud agent (such as [ACA-Py](https://github.com/hyperledger/aries-cloudagent-python)). This app provides a friendly UI for end-users that can be easily deployed to a private or public cloud and accessed from any modern web browser.
 
 For an introduction to self-sovereign identity (SSI), please see [Phil Windley's article](https://www.windley.com/archives/2018/09/multi-source_and_self-sovereign_identity.shtml) on the topic.
 
