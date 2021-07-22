@@ -186,6 +186,7 @@ function FormTrustedTraveler(props) {
 
     props.submitCredential(newCredential, e)
     props.closeTravelerModal()
+    window.location.reload()
   }
 
   function closeModal() {

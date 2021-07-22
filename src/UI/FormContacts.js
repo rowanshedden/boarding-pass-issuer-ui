@@ -100,6 +100,7 @@ function FormContacts(props) {
     props.submitContact(contact, e)
 
     props.closeContactModal()
+    window.location.reload()
   }
 
   function closeModal() {

@@ -231,6 +231,7 @@ function FormTestResult(props) {
     }
     props.submitCredential(newCredential, e)
     props.closeTestResultModal()
+    window.location.reload()
   }
 
   function closeModal() {

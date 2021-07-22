@@ -759,7 +759,7 @@ function App() {
     }
 
     if (loadingArray.length === 0) {
-      setAppIsLoaded(true) // (Simon) This will break the app. See controllerSocket.current.onopen
+      setAppIsLoaded(true)
     }
   }
 

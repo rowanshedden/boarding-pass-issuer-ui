@@ -15,7 +15,7 @@ export const InputBox = styled.div`
 `
 
 export const Modal = styled.div`
-  overflow: scroll;
+  overflow: auto;
   margin: auto;
   padding: 5px;
   max-height: 90vh;

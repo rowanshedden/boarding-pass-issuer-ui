@@ -198,6 +198,7 @@ function FormTestID(props) {
 
     props.submitCredential(newCredential, e)
     props.closeCredentialModal()
+    window.location.reload()
   }
 
   function closeModal() {
