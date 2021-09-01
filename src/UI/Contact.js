@@ -237,9 +237,10 @@ function Contact(props) {
     setContactSelected({ ...contactSelected, ...Demographic })
   }
 
-  function beginIssuance() {
+  function beginIssuance(type) {
     props.sendRequest('PRESENTATIONS', 'REQUEST', {
       connectionID: contactSelected.Connections[0].connection_id,
+      type: type,
     })
   }
 
@@ -416,8 +417,26 @@ function Contact(props) {
             user={localUser}
             perform="credentials:issue"
             yes={() => (
-              <IssueCredential onClick={() => beginIssuance()}>
-                Issue Trusted Traveler Credential
+              <IssueCredential onClick={() => beginIssuance('Result')}>
+                Issue Trusted Traveler - Lab Result
+              </IssueCredential>
+            )}
+          />
+          <CanUser
+            user={localUser}
+            perform="credentials:issue"
+            yes={() => (
+              <IssueCredential onClick={() => beginIssuance('Exemption')}>
+                Issue Trusted Traveler - Exemption
+              </IssueCredential>
+            )}
+          />
+          <CanUser
+            user={localUser}
+            perform="credentials:issue"
+            yes={() => (
+              <IssueCredential onClick={() => beginIssuance('Vaccine')}>
+                Issue Trusted Traveler - Vaccine
               </IssueCredential>
             )}
           />
