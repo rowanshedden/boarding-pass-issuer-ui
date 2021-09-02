@@ -31,55 +31,57 @@ function FormContacts(props) {
       : ''
   const address_1 =
     props.contactSelected &&
-      props.contactSelected.Demographic &&
-      props.contactSelected.Demographic.address
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
       ? JSON.parse(
-        JSON.stringify(props.contactSelected.Demographic.address.address_1)
-      )
+          JSON.stringify(props.contactSelected.Demographic.address.address_1)
+        )
       : ''
   const address_2 =
     props.contactSelected &&
-      props.contactSelected.Demographic &&
-      props.contactSelected.Demographic.address
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
       ? JSON.parse(
-        JSON.stringify(props.contactSelected.Demographic.address.address_2)
-      )
+          JSON.stringify(props.contactSelected.Demographic.address.address_2)
+        )
       : ''
   const city =
     props.contactSelected &&
-      props.contactSelected.Demographic &&
-      props.contactSelected.Demographic.address
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
       ? JSON.parse(
-        JSON.stringify(props.contactSelected.Demographic.address.city)
-      )
+          JSON.stringify(props.contactSelected.Demographic.address.city)
+        )
       : ''
   const state =
     props.contactSelected &&
-      props.contactSelected.Demographic &&
-      props.contactSelected.Demographic.address
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
       ? JSON.parse(
-        JSON.stringify(props.contactSelected.Demographic.address.state)
-      )
+          JSON.stringify(props.contactSelected.Demographic.address.state)
+        )
       : ''
   const zip_code =
     props.contactSelected &&
-      props.contactSelected.Demographic &&
-      props.contactSelected.Demographic.address
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
       ? JSON.parse(
-        JSON.stringify(props.contactSelected.Demographic.address.zip_code)
-      )
+          JSON.stringify(props.contactSelected.Demographic.address.zip_code)
+        )
       : ''
   const country =
     props.contactSelected &&
-      props.contactSelected.Demographic &&
-      props.contactSelected.Demographic.address
+    props.contactSelected.Demographic &&
+    props.contactSelected.Demographic.address
       ? JSON.parse(
-        JSON.stringify(props.contactSelected.Demographic.address.country)
-      )
+          JSON.stringify(props.contactSelected.Demographic.address.country)
+        )
       : ''
   const passport_number =
     props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.passport_number))
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Passport.passport_number)
+        )
       : ''
   const surname =
     props.contactSelected && props.contactSelected.Passport
@@ -95,11 +97,17 @@ function FormContacts(props) {
       : ''
   const date_of_birth =
     props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.date_of_birth.split('T')[0]))
+      ? JSON.parse(
+          JSON.stringify(
+            props.contactSelected.Passport.date_of_birth.split('T')[0]
+          )
+        )
       : ''
   const place_of_birth =
     props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.place_of_birth))
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Passport.place_of_birth)
+        )
       : ''
   const nationality =
     props.contactSelected && props.contactSelected.Passport
@@ -107,11 +115,19 @@ function FormContacts(props) {
       : ''
   const date_of_issue =
     props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.date_of_issue.split('T')[0]))
+      ? JSON.parse(
+          JSON.stringify(
+            props.contactSelected.Passport.date_of_issue.split('T')[0]
+          )
+        )
       : ''
   const date_of_expiration =
     props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.date_of_expiration.split('T')[0]))
+      ? JSON.parse(
+          JSON.stringify(
+            props.contactSelected.Passport.date_of_expiration.split('T')[0]
+          )
+        )
       : ''
   const type =
     props.contactSelected && props.contactSelected.Passport
@@ -161,7 +177,7 @@ function FormContacts(props) {
     passport.type = form.get('type')
     passport.code = form.get('code')
     passport.authority = form.get('authority')
-    passport.photo = props.contactSelected.Passport.photo.data
+    passport.photo = props.contactSelected.Passport ? props.contactSelected.Passport.photo.data : ''
 
     props.submitPassport(passport, e)
 
@@ -266,7 +282,9 @@ function FormContacts(props) {
               </InputBox>
               <ModalSubHeader>Passport</ModalSubHeader>
               <InputBox>
-                <ModalLabel htmlFor="passport_number">Passport Number</ModalLabel>
+                <ModalLabel htmlFor="passport_number">
+                  Passport Number
+                </ModalLabel>
                 <InputFieldModal
                   type="text"
                   name="passport_number"
@@ -336,7 +354,9 @@ function FormContacts(props) {
                 ></InputFieldModal>
               </InputBox>
               <InputBox>
-                <ModalLabel htmlFor="date_of_expiration">Date of Expiration</ModalLabel>
+                <ModalLabel htmlFor="date_of_expiration">
+                  Date of Expiration
+                </ModalLabel>
                 <InputFieldModal
                   type="date"
                   name="date_of_expiration"
@@ -395,4 +415,3 @@ function FormContacts(props) {
 }
 
 export default FormContacts
-

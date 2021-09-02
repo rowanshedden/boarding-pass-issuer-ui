@@ -182,7 +182,8 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.date_of_expiration.split('T')[0] || ''
+                  ? contactSelected.Passport.date_of_expiration.split('T')[0] ||
+                    ''
                   : ''}
               </td>
             </AttributeRow>
@@ -237,7 +238,7 @@ function Contact(props) {
     setContactSelected({ ...contactSelected, ...Demographic })
   }
 
-    function updatePasport(updatedPassport, e) {
+  function updatePasport(updatedPassport, e) {
     e.preventDefault()
     const Passport = {
       Passport: { ...updatedPassport },
