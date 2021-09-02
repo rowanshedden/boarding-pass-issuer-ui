@@ -146,7 +146,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.date_of_birth || ''
+                  ? contactSelected.Passport.date_of_birth.split('T')[0] || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -173,7 +173,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.date_of_issue || ''
+                  ? contactSelected.Passport.date_of_issue.split('T')[0] || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -182,7 +182,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.date_of_expiration || ''
+                  ? contactSelected.Passport.date_of_expiration.split('T')[0] || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -224,7 +224,7 @@ function Contact(props) {
     )
   }
 
-  function updateContact(updatedDemographic, e) {
+  function updateDemographics(updatedDemographic, e) {
     e.preventDefault()
     const Demographic = {
       Demographic: { ...updatedDemographic },
@@ -235,6 +235,19 @@ function Contact(props) {
     setNotification('Contact was updated!', 'notice')
 
     setContactSelected({ ...contactSelected, ...Demographic })
+  }
+
+    function updatePasport(updatedPassport, e) {
+    e.preventDefault()
+    const Passport = {
+      Passport: { ...updatedPassport },
+    }
+
+    props.sendRequest('PASSPORTS', 'UPDATE_OR_CREATE', updatedPassport)
+
+    setNotification('Passport info was updated!', 'notice')
+
+    setContactSelected({ ...contactSelected, ...Passport })
   }
 
   function beginIssuance(type) {
@@ -455,7 +468,8 @@ function Contact(props) {
           contactSelected={contactSelected}
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}
-          submitContact={updateContact}
+          submitDemographics={updateDemographics}
+          submitPassport={updatePasport}
         />
         <FormTrustedTraveler
           contactSelected={contactSelected}
