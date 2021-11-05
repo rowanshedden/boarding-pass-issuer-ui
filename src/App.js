@@ -179,10 +179,10 @@ function App() {
         addLoadingProcess('THEME')
 
         if (
-          check(rules, loggedInUserState, 'contacts:read', 'demographics:read')
+          check(rules, loggedInUserState, 'contacts:read', 'travelers:read')
         ) {
           sendMessage('CONTACTS', 'GET_ALL', {
-            additional_tables: ['Demographic', 'Passport'],
+            additional_tables: ['Traveler', 'Passport'],
           })
           addLoadingProcess('CONTACTS')
         }
@@ -358,61 +358,11 @@ function App() {
           }
           break
 
-        case 'DEMOGRAPHICS':
+        case 'TRAVELERS':
           switch (type) {
-            case 'DEMOGRAPHICS_ERROR':
+            case 'TRAVELERS_ERROR':
               console.log(data.error)
-              console.log('Demographics Error')
-              setErrorMessage(data.error)
-
-              break
-
-            case 'CONTACTS_ERROR':
-              console.log(data.error)
-              console.log('CONTACTS ERROR')
-              setErrorMessage(data.error)
-
-              break
-
-            default:
-              setNotification(
-                `Error - Unrecognized Websocket Message Type: ${type}`,
-                'error'
-              )
-              break
-          }
-          break
-
-        case 'DEMOGRAPHICS':
-          switch (type) {
-            case 'DEMOGRAPHICS_ERROR':
-              console.log(data.error)
-              console.log('DEMOGRAPHICS ERROR')
-              setErrorMessage(data.error)
-
-              break
-
-            case 'CONTACTS_ERROR':
-              console.log(data.error)
-              console.log('CONTACTS ERROR')
-              setErrorMessage(data.error)
-
-              break
-
-            default:
-              setNotification(
-                `Error - Unrecognized Websocket Message Type: ${type}`,
-                'error'
-              )
-              break
-          }
-          break
-
-        case 'DEMOGRAPHICS':
-          switch (type) {
-            case 'DEMOGRAPHICS_ERROR':
-              console.log(data.error)
-              console.log('DEMOGRAPHICS ERROR')
+              console.log('TRAVELERS ERROR')
               setErrorMessage(data.error)
 
               break

@@ -82,7 +82,7 @@ function Contact(props) {
 
   const [contactSelected, setContactSelected] = useState(contactToSelect)
 
-  let demographicData = ''
+  let travelerData = ''
   let passportData = ''
 
   if (
@@ -91,17 +91,17 @@ function Contact(props) {
   ) {
     let rawImage = contactSelected.Passport.photo
 
-    const handleImageSrc = (rawImage) => {
-      let bytes = new Uint8Array(rawImage)
-      bytes = Buffer.from(rawImage).toString('base64')
-      let result = atob(bytes)
-      return result
-    }
+    // const handleImageSrc = (rawImage) => {
+    //   let bytes = new Uint8Array(rawImage)
+    //   bytes = Buffer.from(rawImage).toString('base64')
+    //   let result = atob(bytes)
+    //   return result
+    // }
 
-    let test = handleImageSrc(rawImage)
+    // let test = handleImageSrc(rawImage)
 
     passportData = (
-      <div>
+      <>
         <h2>Passport Information</h2>
         <AttributeTable>
           <tbody>
@@ -119,7 +119,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.surname || ''
+                  ? contactSelected.Passport.passport_surnames || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -128,7 +128,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.given_names || ''
+                  ? contactSelected.Passport.passport_given_names || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -137,7 +137,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.sex || ''
+                  ? contactSelected.Passport.passport_gender_legal || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -146,7 +146,9 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.date_of_birth.split('T')[0] || ''
+                  ? contactSelected.Passport.passport_date_of_birth.split(
+                      'T'
+                    )[0] || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -155,7 +157,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.place_of_birth || ''
+                  ? contactSelected.Passport.passport_place_of_birth || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -164,7 +166,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.nationality || ''
+                  ? contactSelected.Passport.passport_nationality || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -173,7 +175,9 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.date_of_issue.split('T')[0] || ''
+                  ? contactSelected.Passport.passport_date_of_issue.split(
+                      'T'
+                    )[0] || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -182,8 +186,9 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.date_of_expiration.split('T')[0] ||
-                    ''
+                  ? contactSelected.Passport.passport_date_of_expiration.split(
+                      'T'
+                    )[0] || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -192,7 +197,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.type || ''
+                  ? contactSelected.Passport.passport_type || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -201,7 +206,7 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.code || ''
+                  ? contactSelected.Passport.passport_code || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -210,32 +215,32 @@ function Contact(props) {
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.authority || ''
+                  ? contactSelected.Passport.passport_authority || ''
                   : ''}
               </td>
             </AttributeRow>
-            <AttributeRow>
+            {/* <AttributeRow>
               <th>Photo:</th>
               <td></td>
-            </AttributeRow>
+            </AttributeRow> */}
           </tbody>
         </AttributeTable>
-        <img src={test} alt="Error" />
-      </div>
+        {/* <img src={test} alt="Error" /> */}
+      </>
     )
   }
 
-  function updateDemographics(updatedDemographic, e) {
+  function updateTraveler(updatedTraveler, e) {
     e.preventDefault()
-    const Demographic = {
-      Demographic: { ...updatedDemographic },
+    const Traveler = {
+      Traveler: { ...updatedTraveler },
     }
 
-    props.sendRequest('DEMOGRAPHICS', 'UPDATE_OR_CREATE', updatedDemographic)
+    props.sendRequest('TRAVELERS', 'UPDATE_OR_CREATE', updatedTraveler)
 
     setNotification('Contact was updated!', 'notice')
 
-    setContactSelected({ ...contactSelected, ...Demographic })
+    setContactSelected({ ...contactSelected, ...Traveler })
   }
 
   function updatePasport(updatedPassport, e) {
@@ -336,7 +341,7 @@ function Contact(props) {
             </tbody>
           </AttributeTable>
 
-          <h2>Demographic Information</h2>
+          <h2>Traveler Information</h2>
           <AttributeTable>
             <tbody>
               <AttributeRow>
@@ -346,78 +351,131 @@ function Contact(props) {
               <AttributeRow>
                 <th>Email:</th>
                 <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined
-                    ? contactSelected.Demographic.email || ''
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.traveler_email || ''
                     : ''}
                 </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Phone:</th>
                 <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined
-                    ? contactSelected.Demographic.phone || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Address 1:</th>
-                <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined &&
-                  contactSelected.Demographic.address
-                    ? contactSelected.Demographic.address.address_1 || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Address 2:</th>
-                <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined &&
-                  contactSelected.Demographic.address
-                    ? contactSelected.Demographic.address.address_2 || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>City:</th>
-                <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined &&
-                  contactSelected.Demographic.address
-                    ? contactSelected.Demographic.address.city || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>State:</th>
-                <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined &&
-                  contactSelected.Demographic.address
-                    ? contactSelected.Demographic.address.state || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Zip Code:</th>
-                <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined &&
-                  contactSelected.Demographic.address
-                    ? contactSelected.Demographic.address.zip_code || ''
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.traveler_phone || ''
                     : ''}
                 </td>
               </AttributeRow>
               <AttributeRow>
                 <th>Country:</th>
                 <td>
-                  {contactSelected.Demographic !== null &&
-                  contactSelected.Demographic !== undefined &&
-                  contactSelected.Demographic.address
-                    ? contactSelected.Demographic.address.country || ''
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.traveler_country || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Country of Origing:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.traveler_country_of_origin || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Arrival Airline:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.arrival_airline || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Arrival Date:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.arrival_date.split('T')[0] || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Arrival Destination Code:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler
+                        .arrival_destination_country_code || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Arrival Destination Port Code:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.arrival_destination_port_code ||
+                      ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Arrival Flight Number:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.arrival_flight_number || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Departure Airline:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.departure_airline || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Departure Date:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.departure_date.split('T')[0] ||
+                      ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Departure Destination Code:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler
+                        .departure_destination_country_code || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Departure Destination Port Code:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler
+                        .departure_destination_port_code || ''
+                    : ''}
+                </td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Departure Flight Number:</th>
+                <td>
+                  {contactSelected.Traveler !== null &&
+                  contactSelected.Traveler !== undefined
+                    ? contactSelected.Traveler.departure_flight_number || ''
                     : ''}
                 </td>
               </AttributeRow>
@@ -469,7 +527,7 @@ function Contact(props) {
           contactSelected={contactSelected}
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}
-          submitDemographics={updateDemographics}
+          submitTraveler={updateTraveler}
           submitPassport={updatePasport}
         />
         <FormTrustedTraveler
