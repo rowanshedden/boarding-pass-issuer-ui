@@ -98,6 +98,8 @@ function App() {
   const [successMessage, setSuccessMessage] = useState(null)
   const [organizationName, setOrganizationName] = useState(null)
 
+  const [privileges, setPrivileges] = useState([])
+
   // session states
   const [session, setSession] = useState('')
   const [loggedInUserId, setLoggedInUserId] = useState('')
@@ -242,7 +244,9 @@ function App() {
 
   // Send a message to the Controller server
   function sendMessage(context, type, data = {}) {
-    controllerSocket.current.send(JSON.stringify({ context, type, data }))
+    if (websocket) {
+      controllerSocket.current.send(JSON.stringify({ context, type, data }))
+    }
   }
 
   // Handle inbound messages
@@ -526,7 +530,7 @@ function App() {
                     oldCredential !== null &&
                     newCredential !== null &&
                     oldCredential.credential_exchange_id ===
-                      newCredential.credential_exchange_id
+                    newCredential.credential_exchange_id
                   ) {
                     // (mikekebert) If you find a match, delete the old copy from the old array
                     oldCredentials.splice(index, 1)
@@ -560,18 +564,6 @@ function App() {
             case 'CREDENTIALS_ERROR':
               // console.log(data.error)
               // console.log('Credentials Error')
-              setErrorMessage(data.error)
-              break
-
-            case 'CREDENTIALS_ERROR':
-              // console.log(data.error)
-              // console.log('CREDENTIALS ERROR')
-              setErrorMessage(data.error)
-              break
-
-            case 'CREDENTIALS_ERROR':
-              // console.log(data.error)
-              // console.log('CREDENTIALS ERROR')
               setErrorMessage(data.error)
               break
 
@@ -680,6 +672,31 @@ function App() {
               )
               break
           }
+          break
+
+        case 'GOVERNANCE':
+          switch (type) {
+            case 'PRIVILEGES_ERROR':
+              console.log(data)
+              console.log('Privileges Error', data.error)
+              setErrorMessage(data.error)
+              break
+
+            case 'PRIVILEGES_SUCCESS':
+              console.log('PRIVILEGES SUCCESS')
+              console.log('these are the privileges:')
+              console.log(data.privileges)
+              setPrivileges(data.privileges)
+              break
+
+            default:
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`,
+                'error'
+              )
+              break
+          }
+
           break
 
         default:
@@ -923,6 +940,10 @@ function App() {
                           <Home
                             loggedInUserState={loggedInUserState}
                             sendRequest={sendMessage}
+                            privileges={privileges}
+                            successMessage={successMessage}
+                            errorMessage={errorMessage}
+                            clearResponseState={clearResponseState}
                             QRCodeURL={QRCodeURL}
                           />
                         </Main>
@@ -1001,6 +1022,14 @@ function App() {
                             match={match}
                             history={history}
                             handleLogout={handleLogout}
+                            sendRequest={sendMessage}
+                            privileges={privileges}
+                            successMessage={successMessage}
+                            errorMessage={errorMessage}
+                            clearResponseState={clearResponseState}
+                            contactId={match.params.contactId}
+                            contacts={contacts}
+                            credentials={credentials}
                           />
                           <Main>
                             <Contact

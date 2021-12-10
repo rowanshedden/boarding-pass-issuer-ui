@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 import styled from 'styled-components'
 
@@ -35,7 +35,6 @@ const IssueCredential = styled.button`
   border: none;
   box-shadow: ${(props) => props.theme.drop_shadow};
   background: ${(props) => props.theme.primary_color};
-
   :hover {
     cursor: pointer;
   }
@@ -49,19 +48,53 @@ function Contact(props) {
 
   const history = props.history
   const contactId = props.contactId
+  const error = props.errorMessage
+  const success = props.successMessage
+  const privileges = props.privileges
+  const credentials = props.credentials
+  const contacts = props.contacts
+
+  // console.log(credentials)
+
+  useEffect(() => {
+    if (success) {
+      setNotification(success, 'notice')
+      props.clearResponseState()
+    } else if (error) {
+      setNotification(error, 'error')
+      props.clearResponseState()
+      setIndex(index + 1)
+    }
+  }, [error, success])
+
+  const isMounted = useRef(null)
+
+  const [index, setIndex] = useState(false)
 
   let contactToSelect = ''
 
-  for (let i = 0; i < props.contacts.length; i++) {
-    if (props.contacts[i].contact_id == contactId) {
-      contactToSelect = props.contacts[i]
-      break
-    }
-  }
-
   useEffect(() => {
-    setContactSelected(contactToSelect)
-  }, [contactToSelect])
+    for (let i = 0; i < props.contacts.length; i++) {
+      if (props.contacts[i].contact_id == contactId) {
+        setContactSelected(props.contacts[i])
+        break
+      }
+    }
+  }, [contacts, credentials])
+  
+
+  // Get governance privileges
+  useEffect(() => {
+    isMounted.current = true
+    props.sendRequest('GOVERNANCE', 'GET_PRIVILEGES', {})
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  // useEffect(() => {
+  //   setContactSelected(contactToSelect)
+  // }, [contactToSelect])
 
   function openCredential(history, id) {
     if (history !== undefined) {
@@ -109,7 +142,7 @@ function Contact(props) {
               <th>Passport Number:</th>
               <td>
                 {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
+                  contactSelected.Passport !== undefined
                   ? contactSelected.Passport.passport_number || ''
                   : ''}
               </td>
@@ -261,51 +294,54 @@ function Contact(props) {
       connectionID: contactSelected.Connections[0].connection_id,
       type: type,
     })
+    // Does that sound right?
+    setNotification('Credential offer was successfully sent!', 'notice')
   }
 
   // Submits the credential form and shows notification
   function submitNewCredential(newCredential, e) {
     e.preventDefault()
-
     props.sendRequest('CREDENTIALS', 'ISSUE_USING_SCHEMA', newCredential)
-
-    setNotification('Credential was successfully added!', 'notice')
   }
 
-  const credentialRows = props.credentials.map((credential_record) => {
-    if (
-      contactSelected.Connections[0].connection_id ===
-      credential_record.connection_id
-    ) {
-      const credential_id = credential_record.credential_exchange_id
-      const credentialState = credential_record.state.replaceAll('_', ' ') || ''
-      const dateCreated =
-        new Date(credential_record.created_at).toLocaleString() || ''
+  let credentialRows = null
 
-      let credentialName = ''
+  if (credentials && contactSelected) {
+    credentialRows = credentials.map((credential_record) => {
       if (
-        credential_record.credential_proposal_dict !== null &&
-        credential_record.credential_proposal_dict !== undefined
+        contactSelected.Connections[0].connection_id ===
+        credential_record.connection_id
       ) {
-        credentialName = credential_record.credential_proposal_dict.schema_name.replaceAll(
-          '_',
-          ' '
+        const credential_id = credential_record.credential_exchange_id
+        const credentialState = credential_record.state.replaceAll('_', ' ') || ''
+        const dateCreated =
+          new Date(credential_record.created_at).toLocaleString() || ''
+  
+        let credentialName = ''
+        if (
+          credential_record.credential_proposal_dict !== null &&
+          credential_record.credential_proposal_dict !== undefined
+        ) {
+          credentialName = credential_record.credential_proposal_dict.schema_name.replaceAll(
+            '_',
+            ' '
+          )
+        }
+        return (
+          <DataRow
+            key={credential_id}
+            onClick={() => {
+              openCredential(history, credential_id)
+            }}
+          >
+            <DataCell>{credentialName}</DataCell>
+            <DataCell className="title-case">{credentialState}</DataCell>
+            <DataCell>{dateCreated}</DataCell>
+          </DataRow>
         )
       }
-      return (
-        <DataRow
-          key={credential_id}
-          onClick={() => {
-            openCredential(history, credential_id)
-          }}
-        >
-          <DataCell>{credentialName}</DataCell>
-          <DataCell className="title-case">{credentialState}</DataCell>
-          <DataCell>{dateCreated}</DataCell>
-        </DataRow>
-      )
-    }
-  })
+    })
+  }
 
   return (
     <>
@@ -484,12 +520,38 @@ function Contact(props) {
           {passportData}
         </PageSection>
         <PageSection>
-          {/* <IssueCredential onClick={() => setTravelerModalIsOpen((o) => !o)}> */}
           <CanUser
             user={localUser}
             perform="credentials:issue"
             yes={() => (
-              <IssueCredential onClick={() => beginIssuance('Result')}>
+              <IssueCredential
+                onClick={() =>
+                  privileges && privileges.includes('issue_trusted_traveler')
+                    ? beginIssuance('default')
+                    : setNotification(
+                      "Error: you don't have the right privileges",
+                      'error'
+                    )
+                }
+              >
+                Issue Trusted Traveler (governance)
+              </IssueCredential>
+            )}
+          />
+          <CanUser
+            user={localUser}
+            perform="credentials:issue"
+            yes={() => (
+              <IssueCredential
+                onClick={() =>
+                  privileges && privileges.includes('issue_trusted_traveler')
+                    ? beginIssuance('Result')
+                    : setNotification(
+                      "Error: you don't have the right privileges",
+                      'error'
+                    )
+                }
+              >
                 Issue Trusted Traveler - Lab Result
               </IssueCredential>
             )}
@@ -498,7 +560,16 @@ function Contact(props) {
             user={localUser}
             perform="credentials:issue"
             yes={() => (
-              <IssueCredential onClick={() => beginIssuance('Exemption')}>
+              <IssueCredential
+                onClick={() =>
+                  privileges && privileges.includes('issue_trusted_traveler')
+                    ? beginIssuance('Exemption')
+                    : setNotification(
+                      "Error: you don't have the right privileges",
+                      'error'
+                    )
+                }
+              >
                 Issue Trusted Traveler - Exemption
               </IssueCredential>
             )}
@@ -507,7 +578,16 @@ function Contact(props) {
             user={localUser}
             perform="credentials:issue"
             yes={() => (
-              <IssueCredential onClick={() => beginIssuance('Vaccine')}>
+              <IssueCredential
+                onClick={() =>
+                  privileges && privileges.includes('issue_trusted_traveler')
+                    ? beginIssuance('Vaccine')
+                    : setNotification(
+                      "Error: you don't have the right privileges",
+                      'error'
+                    )
+                }
+              >
                 Issue Trusted Traveler - Vaccine
               </IssueCredential>
             )}
