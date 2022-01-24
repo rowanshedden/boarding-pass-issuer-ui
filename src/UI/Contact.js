@@ -81,7 +81,6 @@ function Contact(props) {
       }
     }
   }, [contacts, credentials])
-  
 
   // Get governance privileges
   useEffect(() => {
@@ -142,7 +141,7 @@ function Contact(props) {
               <th>Passport Number:</th>
               <td>
                 {contactSelected.Passport !== null &&
-                  contactSelected.Passport !== undefined
+                contactSelected.Passport !== undefined
                   ? contactSelected.Passport.passport_number || ''
                   : ''}
               </td>
@@ -313,10 +312,11 @@ function Contact(props) {
         credential_record.connection_id
       ) {
         const credential_id = credential_record.credential_exchange_id
-        const credentialState = credential_record.state.replaceAll('_', ' ') || ''
+        const credentialState =
+          credential_record.state.replaceAll('_', ' ') || ''
         const dateCreated =
           new Date(credential_record.created_at).toLocaleString() || ''
-  
+
         let credentialName = ''
         if (
           credential_record.credential_proposal_dict !== null &&
@@ -529,9 +529,9 @@ function Contact(props) {
                   privileges && privileges.includes('issue_trusted_traveler')
                     ? beginIssuance('default')
                     : setNotification(
-                      "Error: you don't have the right privileges",
-                      'error'
-                    )
+                        "Error: you don't have the right privileges",
+                        'error'
+                      )
                 }
               >
                 Issue Trusted Traveler (governance)
@@ -547,9 +547,9 @@ function Contact(props) {
                   privileges && privileges.includes('issue_trusted_traveler')
                     ? beginIssuance('Result')
                     : setNotification(
-                      "Error: you don't have the right privileges",
-                      'error'
-                    )
+                        "Error: you don't have the right privileges",
+                        'error'
+                      )
                 }
               >
                 Issue Trusted Traveler - Lab Result
@@ -565,9 +565,9 @@ function Contact(props) {
                   privileges && privileges.includes('issue_trusted_traveler')
                     ? beginIssuance('Exemption')
                     : setNotification(
-                      "Error: you don't have the right privileges",
-                      'error'
-                    )
+                        "Error: you don't have the right privileges",
+                        'error'
+                      )
                 }
               >
                 Issue Trusted Traveler - Exemption
@@ -583,9 +583,9 @@ function Contact(props) {
                   privileges && privileges.includes('issue_trusted_traveler')
                     ? beginIssuance('Vaccine')
                     : setNotification(
-                      "Error: you don't have the right privileges",
-                      'error'
-                    )
+                        "Error: you don't have the right privileges",
+                        'error'
+                      )
                 }
               >
                 Issue Trusted Traveler - Vaccine

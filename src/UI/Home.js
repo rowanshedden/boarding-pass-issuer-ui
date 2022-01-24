@@ -56,7 +56,7 @@ function Home(props) {
   // Accessing notification context
   const setNotification = useNotification()
 
-  // Handle governance 
+  // Handle governance
   // useEffect(() => {
   //   setGovGranted(handleGovernance(privileges, actions, participants))
   // }, [privileges, actions, participants])
@@ -108,11 +108,7 @@ function Home(props) {
           user={localUser}
           perform="contacts:create"
           yes={() => (
-            <ContentFlexBox
-              onClick={addContact}
-            >
-              Add Contact
-            </ContentFlexBox>
+            <ContentFlexBox onClick={addContact}>Add Contact</ContentFlexBox>
           )}
         />
       </HeaderHolder>

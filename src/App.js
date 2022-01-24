@@ -98,6 +98,8 @@ function App() {
   const [successMessage, setSuccessMessage] = useState(null)
   const [organizationName, setOrganizationName] = useState(null)
 
+  const [siteTitle, setSiteTitle] = useState('')
+
   const [privileges, setPrivileges] = useState([])
 
   // session states
@@ -163,6 +165,11 @@ function App() {
       })
   }, [loggedIn])
 
+  // (eldersonar) Set-up site title. What about SEO? Will robots be able to read it?
+  useEffect(() => {
+    document.title = siteTitle
+  }, [siteTitle])
+
   // Define Websocket event listeners
   useEffect(() => {
     // Perform operation on websocket open
@@ -197,7 +204,7 @@ function App() {
           addLoadingProcess('ROLES')
         }
 
-        sendMessage('SETTINGS', 'GET_ORGANIZATION_NAME', {})
+        sendMessage('SETTINGS', 'GET_ORGANIZATION', {})
         addLoadingProcess('ORGANIZATION')
 
         sendMessage('IMAGES', 'GET_ALL', {})
@@ -530,7 +537,7 @@ function App() {
                     oldCredential !== null &&
                     newCredential !== null &&
                     oldCredential.credential_exchange_id ===
-                    newCredential.credential_exchange_id
+                      newCredential.credential_exchange_id
                   ) {
                     // (mikekebert) If you find a match, delete the old copy from the old array
                     oldCredentials.splice(index, 1)
@@ -614,6 +621,7 @@ function App() {
 
             case 'SETTINGS_ORGANIZATION':
               setOrganizationName(data.companyName)
+              setSiteTitle(data.title)
               removeLoadingProcess('ORGANIZATION')
               break
 
@@ -646,23 +654,6 @@ function App() {
             case 'IMAGES_ERROR':
               // console.log('Images Error:', data.error)
               setErrorMessage(data.error)
-              break
-
-            default:
-              setNotification(
-                `Error - Unrecognized Websocket Message Type: ${type}`,
-                'error'
-              )
-              break
-          }
-          break
-
-        case 'ORGANIZATION':
-          switch (type) {
-            case 'ORGANIZATION_NAME':
-              setOrganizationName(data[0].value.name)
-
-              removeLoadingProcess('ORGANIZATION')
               break
 
             default:
@@ -1022,20 +1013,16 @@ function App() {
                             match={match}
                             history={history}
                             handleLogout={handleLogout}
-                            sendRequest={sendMessage}
-                            privileges={privileges}
-                            successMessage={successMessage}
-                            errorMessage={errorMessage}
-                            clearResponseState={clearResponseState}
-                            contactId={match.params.contactId}
-                            contacts={contacts}
-                            credentials={credentials}
                           />
                           <Main>
                             <Contact
                               loggedInUserState={loggedInUserState}
                               history={history}
                               sendRequest={sendMessage}
+                              privileges={privileges}
+                              successMessage={successMessage}
+                              errorMessage={errorMessage}
+                              clearResponseState={clearResponseState}
                               contactId={match.params.contactId}
                               contacts={contacts}
                               credentials={credentials}

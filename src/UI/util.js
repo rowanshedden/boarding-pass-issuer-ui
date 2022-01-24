@@ -32,7 +32,6 @@ export function formatSeconds(secs) {
 
 // Governance approval
 export function handleGovernance(privileges, actions, participants) {
-
   console.log(privileges)
   console.log(actions)
   console.log(participants)
@@ -44,30 +43,47 @@ export function handleGovernance(privileges, actions, participants) {
   }
   // Privileges, actions and participants don't exist DONE
   else if (
-    (privileges === undefined || privileges.length == 0) && (actions === undefined || actions.length == 0) && (participants === undefined || participants.length == 0)) {
-    console.log('privileges, actions and participants don\'t exist')
+    (privileges === undefined || privileges.length == 0) &&
+    (actions === undefined || actions.length == 0) &&
+    (participants === undefined || participants.length == 0)
+  ) {
+    console.log("privileges, actions and participants don't exist")
     return true
   }
   // Privileges, actions and participants are missing DONE
-  else if (privileges.includes('ignore_privileges') && actions.includes('ignore_actions') && participants.includes('ignore_participants')) {
+  else if (
+    privileges.includes('ignore_privileges') &&
+    actions.includes('ignore_actions') &&
+    participants.includes('ignore_participants')
+  ) {
     console.log('privileges, actions and participants are missing')
     return true
   }
   // Privileges, participants are missing, but actions are set DONE
-  else if (privileges.includes('ignore_privileges') && !actions.includes('ignore_actions') && participants.includes('ignore_participants')) {
+  else if (
+    privileges.includes('ignore_privileges') &&
+    !actions.includes('ignore_actions') &&
+    participants.includes('ignore_participants')
+  ) {
     console.log('privileges and participants are missing, but actions are set')
     return true
   }
   // Privileges, actions are missing, but participants are set DONE
-  else if (privileges.includes('ignore_privileges') && actions.includes('ignore_actions') && !participants.includes('ignore_participants')) {
+  else if (
+    privileges.includes('ignore_privileges') &&
+    actions.includes('ignore_actions') &&
+    !participants.includes('ignore_participants')
+  ) {
     console.log('privileges and actions are missing, but participants are set')
     return true
   }
   // Privileges are missing, but participants and actions are set DONE
-  else if (privileges.includes('ignore_privileges') && !actions.includes('ignore_actions') && !participants.includes('ignore_participants')) {
+  else if (
+    privileges.includes('ignore_privileges') &&
+    !actions.includes('ignore_actions') &&
+    !participants.includes('ignore_participants')
+  ) {
     console.log('privileges are missing, but participants and actions are set')
     return true
-  }
-  else 
-    return false
+  } else return false
 }
