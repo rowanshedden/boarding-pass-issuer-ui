@@ -25,6 +25,8 @@ import ForgotPassword from './UI/ForgotPassword'
 import FullPageSpinner from './UI/FullPageSpinner'
 import Home from './UI/Home'
 import Login from './UI/Login'
+import Presentation from './UI/Presentation'
+import Presentations from './UI/Presentations'
 import {
   useNotification,
   NotificationProvider,
@@ -90,6 +92,7 @@ function App() {
   // Message states
   const [contacts, setContacts] = useState([])
   const [credentials, setCredentials] = useState([])
+  const [presentationReports, setPresentationReports] = useState([])
   const [image, setImage] = useState()
   const [roles, setRoles] = useState([])
   const [users, setUsers] = useState([])
@@ -197,6 +200,11 @@ function App() {
         if (check(rules, loggedInUserState, 'credentials:read')) {
           sendMessage('CREDENTIALS', 'GET_ALL', {})
           addLoadingProcess('CREDENTIALS')
+        }
+
+        if (check(rules, loggedInUserState, 'presentations:read')) {
+          sendMessage('PRESENTATIONS', 'GET_ALL', {})
+          addLoadingProcess('PRESENTATIONS')
         }
 
         if (check(rules, loggedInUserState, 'roles:read')) {
@@ -592,6 +600,54 @@ function App() {
               // (mikekebert) Set the pending vaccination connection_id (which also opens the immunization credential form)
               setPendingVaccinationConnectionID(data.connection_id)
 
+              break
+
+            case 'PRESENTATION_REPORTS':
+              let oldPresentations = presentationReports
+              let newPresentations = data.presentation_reports
+              let updatedPresentations = []
+
+              // (mikekebert) Loop through the new presentation and check them against the existing array
+              newPresentations.forEach((newPresentation) => {
+                oldPresentations.forEach((oldPresentation, index) => {
+                  if (
+                    oldPresentation !== null &&
+                    newPresentation !== null &&
+                    oldPresentation.presentation_exchange_id ===
+                      newPresentation.presentation_exchange_id
+                  ) {
+                    // (mikekebert) If you find a match, delete the old copy from the old array
+                    console.log('splice', oldPresentation)
+                    oldPresentations.splice(index, 1)
+                  }
+                })
+                updatedPresentations.push(newPresentation)
+                // (mikekebert) We also want to make sure to reset any pending connection IDs so the modal windows don't pop up automatically
+                if (
+                  newPresentation.connection_id === pendingEmployeeConnectionID
+                ) {
+                  setPendingEmployeeConnectionID('')
+                }
+                if (
+                  newPresentation.connection_id ===
+                  pendingVaccinationConnectionID
+                ) {
+                  setPendingVaccinationConnectionID('')
+                }
+              })
+              // (mikekebert) When you reach the end of the list of new presentations, simply add any remaining old presentations to the new array
+              if (oldPresentations.length > 0)
+                updatedPresentations = [
+                  ...updatedPresentations,
+                  ...oldPresentations,
+                ]
+              // (mikekebert) Sort the array by date created, newest on top
+              updatedPresentations.sort((a, b) =>
+                a.created_at < b.created_at ? 1 : -1
+              )
+
+              setPresentationReports(updatedPresentations)
+              removeLoadingProcess('PRESENTATIONS')
               break
 
             default:
@@ -1133,6 +1189,67 @@ function App() {
                       </Frame>
                     )
                   }}
+                />
+                <Route
+                  path="/presentations"
+                  exact
+                  render={({ match, history }) => {
+                    if (check(rules, loggedInUserState, 'presentations:read')) {
+                      return (
+                        <Frame id="app-frame">
+                          <AppHeader
+                            loggedInUserState={loggedInUserState}
+                            loggedInUsername={loggedInUsername}
+                            logo={image}
+                            organizationName={organizationName}
+                            match={match}
+                            history={history}
+                            handleLogout={handleLogout}
+                          />
+                          <Main>
+                            <Presentations
+                              history={history}
+                              presentationReports={presentationReports}
+                              contacts={contacts}
+                            />
+                          </Main>
+                        </Frame>
+                      )
+                    } else {
+                      return <Route render={() => <Redirect to="/" />} />
+                    }
+                  }}
+                />
+                <Route
+                  path={`/presentations/:presentationId`}
+                  render={({ match, history }) => {
+                    if (check(rules, loggedInUserState, 'presentations:read')) {
+                      return (
+                        <Frame id="app-frame">
+                          <AppHeader
+                            loggedInUserState={loggedInUserState}
+                            loggedInUsername={loggedInUsername}
+                            logo={image}
+                            organizationName={organizationName}
+                            match={match}
+                            history={history}
+                            handleLogout={handleLogout}
+                          />
+                          <Main>
+                            <Presentation
+                              history={history}
+                              presentation={match.params.presentationId}
+                              presentationReports={presentationReports}
+                              contacts={contacts}
+                            />
+                          </Main>
+                        </Frame>
+                      )
+                    } else {
+                      return <Route render={() => <Redirect to="/" />} />
+                    }
+                  }}
+                  presentationReports={presentationReports}
                 />
                 <Route
                   path="/users"
