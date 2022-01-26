@@ -248,7 +248,7 @@ function Settings(props) {
     e.preventDefault()
     const form = new FormData(organizationForm.current)
     const name = {
-      companyName: form.get('organizationName'),
+      organizationName: form.get('organizationName'),
       title: form.get('siteTitle'),
     }
     props.sendRequest('SETTINGS', 'SET_ORGANIZATION_NAME', name)
