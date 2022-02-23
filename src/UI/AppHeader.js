@@ -1,5 +1,3 @@
-import Axios from 'axios'
-import Cookies from 'universal-cookie'
 import React, { useEffect, useState } from 'react'
 import { handleImageSrc } from './util'
 
@@ -56,8 +54,6 @@ const Logout = styled.button`
 `
 
 function AppHeader(props) {
-  const cookies = new Cookies()
-
   const [src, setSrc] = useState(null)
   const logo = props.logo
   const organizationName = props.organizationName
@@ -69,14 +65,7 @@ function AppHeader(props) {
   }, [logo])
 
   const handleLogout = () => {
-    // Log out
-    // Axios({
-    //   method: 'POST',
-    //   url: '/api/user/log-out',
-    //   withCredentals: true,
-    // }).then((res) => {
     props.handleLogout(props.history)
-    // })
   }
 
   const handleUserProfile = (e) => {

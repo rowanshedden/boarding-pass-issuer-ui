@@ -85,6 +85,7 @@ function App() {
   // Check for local state copy of theme, otherwise use default hard coded here in App.js
   const localTheme = JSON.parse(localStorage.getItem('recentTheme'))
   const [theme, setTheme] = useState(localTheme ? localTheme : defaultTheme)
+  const [schemas, setSchemas] = useState({})
 
   // Styles to change array
   const [stylesArray, setStylesArray] = useState([])
@@ -187,6 +188,8 @@ function App() {
 
         sendMessage('SETTINGS', 'GET_THEME', {})
         addLoadingProcess('THEME')
+        sendMessage('SETTINGS', 'GET_SCHEMAS', {})
+        addLoadingProcess('SCHEMAS')
 
         if (
           check(rules, loggedInUserState, 'contacts:read', 'travelers:read')
@@ -545,7 +548,7 @@ function App() {
                     oldCredential !== null &&
                     newCredential !== null &&
                     oldCredential.credential_exchange_id ===
-                      newCredential.credential_exchange_id
+                    newCredential.credential_exchange_id
                   ) {
                     // (mikekebert) If you find a match, delete the old copy from the old array
                     oldCredentials.splice(index, 1)
@@ -614,7 +617,7 @@ function App() {
                     oldPresentation !== null &&
                     newPresentation !== null &&
                     oldPresentation.presentation_exchange_id ===
-                      newPresentation.presentation_exchange_id
+                    newPresentation.presentation_exchange_id
                   ) {
                     // (mikekebert) If you find a match, delete the old copy from the old array
                     console.log('splice', oldPresentation)
@@ -668,6 +671,11 @@ function App() {
               window.localStorage.setItem('recentTheme', stringMessageTheme)
               setTheme(data.value)
               removeLoadingProcess('THEME')
+              break
+
+            case 'SETTINGS_SCHEMAS':
+              setSchemas(data)
+              removeLoadingProcess('SCHEMAS')
               break
 
             case 'LOGO':
@@ -1139,6 +1147,7 @@ function App() {
                               history={history}
                               credential={match.params.credentialId}
                               credentials={credentials}
+                              schemas={schemas}
                             />
                           </Main>
                         </Frame>

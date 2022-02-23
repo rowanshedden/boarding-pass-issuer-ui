@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { CanUser } from './CanUser'
-import Cookies from 'universal-cookie'
 
 const List = styled.ul`
   margin: 0;
@@ -62,8 +61,6 @@ const StyledSubLink = styled(NavLink)`
   }
 `
 function AppMenu(props) {
-  const cookies = new Cookies()
-
   const localUser = props.loggedInUserState
 
   let pathMatch = ''
