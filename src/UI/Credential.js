@@ -50,11 +50,11 @@ function Credential(props) {
       new Date(credentialSelected.created_at).toISOString().substring(0, 10) ||
       ''
     patient_given = attributesArray.find(function(attribute, index){
-        if(attribute.name == 'patient_given_names')
+        if(attribute.name == 'traveler_given_names')
         return attribute
       })
     patient_sur = attributesArray.find(function(attribute, index){
-        if(attribute.name == 'patient_surnames')
+        if(attribute.name == 'traveler_surnames')
         return attribute
       })
     patient_name = patient_given.value + ' ' + patient_sur.value
