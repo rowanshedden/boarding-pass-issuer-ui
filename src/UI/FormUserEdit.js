@@ -63,10 +63,10 @@ function FormUserEdit(props) {
     )
   }
 
-  // Set the roles on modal initialization
-  useEffect(() => {
-    setOptions(selectedRoles)
-  }, [listUser])
+  // // Set the roles on modal initialization
+  // useEffect(() => {
+  //   setOptions(selectedRoles)
+  // }, [listUser])
 
   // Disable button on submit
   const onBtnClick = (e) => {
