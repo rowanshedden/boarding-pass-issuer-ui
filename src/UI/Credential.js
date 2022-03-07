@@ -78,13 +78,7 @@ function Credential(props) {
   return (
     <div id="contact">
       <PageHeader
-        title={
-          showCredential.name +
-          ' for ' +
-          showAttributes.traveler_given_names +
-          ' ' +
-          showAttributes.traveler_surnames
-        }
+        title={showCredential.name + ' for ' + patient_name}
       />
       <PageSection>
         <h2>General Information</h2>
