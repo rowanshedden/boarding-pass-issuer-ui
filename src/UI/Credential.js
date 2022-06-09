@@ -17,7 +17,9 @@ function Credential(props) {
   for (let i = 0; i < credentials.length; i++) {
     if (credentials[i].credential_exchange_id == credential) {
       credentialSelected = credentials[i]
-      attributesArray = credentialSelected.credential_proposal_dict.credential_proposal.attributes
+      attributesArray =
+        credentialSelected.credential_proposal_dict.credential_proposal
+          .attributes
       break
     }
   }
@@ -30,11 +32,11 @@ function Credential(props) {
     date_created: '',
   }
 
-   //New mapped Attributes
-   let mappedAttributes =  ''
-   let patient_given = ''
-   let patient_sur = ''
-   let patient_name = ''
+  //New mapped Attributes
+  let mappedAttributes = ''
+  let patient_given = ''
+  let patient_sur = ''
+  let patient_name = ''
 
   // Now set the values if we have a credential
   if (credentialSelected !== '') {
@@ -49,14 +51,12 @@ function Credential(props) {
     showCredential.created_at =
       new Date(credentialSelected.created_at).toISOString().substring(0, 10) ||
       ''
-    patient_given = attributesArray.find(function(attribute, index){
-        if(attribute.name == 'traveler_given_names')
-        return attribute
-      })
-    patient_sur = attributesArray.find(function(attribute, index){
-        if(attribute.name == 'traveler_surnames')
-        return attribute
-      })
+    patient_given = attributesArray.find(function (attribute, index) {
+      if (attribute.name == 'traveler_given_names') return attribute
+    })
+    patient_sur = attributesArray.find(function (attribute, index) {
+      if (attribute.name == 'traveler_surnames') return attribute
+    })
     patient_name = patient_given.value + ' ' + patient_sur.value
     // Values that depend on the credential being issued
     if (
@@ -65,7 +65,7 @@ function Credential(props) {
       attributesArray !== undefined
     ) {
       mappedAttributes = attributesArray.map((attribute, index) => {
-        return(
+        return (
           <AttributeRow atttribute={attribute} key={attribute.name}>
             <th>{attribute.name}</th>
             <td>{attribute.value}</td>
@@ -77,9 +77,7 @@ function Credential(props) {
 
   return (
     <div id="contact">
-      <PageHeader
-        title={showCredential.name + ' for ' + patient_name}
-      />
+      <PageHeader title={showCredential.name + ' for ' + patient_name} />
       <PageSection>
         <h2>General Information</h2>
         <AttributeTable>
@@ -104,9 +102,7 @@ function Credential(props) {
         </AttributeTable>
         <h2>Attributes</h2>
         <AttributeTable>
-          <tbody>
-            {mappedAttributes}
-          </tbody>
+          <tbody>{mappedAttributes}</tbody>
         </AttributeTable>
       </PageSection>
     </div>

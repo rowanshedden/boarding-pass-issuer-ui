@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 
 import styled from 'styled-components'
 
-import { handleGovernance } from './util'
-
 import FormQR from './FormQR'
 import { useNotification } from './NotificationProvider'
 
@@ -42,16 +40,10 @@ function Home(props) {
   const warning = props.warningMessage
   const localUser = props.loggedInUserState
   const privileges = props.privileges
-  // const actions = props.actions
-  // const participants = props.participants
-
-  const [govGranted, setGovGranted] = useState(undefined)
 
   const [index, setIndex] = useState(false)
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
   const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
-
-  const isMounted = useRef(null)
 
   // Accessing notification context
   const setNotification = useNotification()
@@ -60,8 +52,6 @@ function Home(props) {
   // useEffect(() => {
   //   setGovGranted(handleGovernance(privileges, actions, participants))
   // }, [privileges, actions, participants])
-
-  console.log(privileges)
 
   useEffect(() => {
     if (success) {
@@ -77,17 +67,6 @@ function Home(props) {
       setIndex(index + 1)
     } else return
   }, [error, success, warning])
-
-  // Get governance privileges
-  useEffect(() => {
-    isMounted.current = true
-    props.sendRequest('GOVERNANCE', 'GET_PRIVILEGES', {})
-    // props.sendRequest('GOVERNANCE', 'GET_PARTICIPANTS', {})
-    // props.sendRequest('GOVERNANCE', 'GET_ACTIONS', {})
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const closeContactModal = () => setContactModalIsOpen(false)
   const closeCredentialModal = () => setCredentialModalIsOpen(false)
