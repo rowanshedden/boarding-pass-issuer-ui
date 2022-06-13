@@ -228,23 +228,35 @@ function Settings(props) {
 
     const form = new FormData(smtpForm.current)
 
-    const smtpConfigs = {
-      host: form.get('host'),
-      port: form.get('port'),
-      mailer: form.get('mailer'),
-      mailFromName: form.get('mailFromName'),
-      encryption: form.get('encryption'),
-      auth: {
-        email: form.get('email'),
-        pass: form.get('password'),
-        mailUsername: form.get('mailUsername'),
-      },
+    if (
+      !form.get('host') ||
+      !form.get('mailUsername') ||
+      !form.get('email') ||
+      !form.get('password')
+    ) {
+      setNotification(
+        'Host, Mail Username, User Email and Password are required fields. See the tooltip for more info',
+        'error'
+      )
+    } else {
+      const smtpConfigs = {
+        host: form.get('host'),
+        port: form.get('port'),
+        mailer: form.get('mailer'),
+        mailFromName: form.get('mailFromName'),
+        encryption: form.get('encryption'),
+        auth: {
+          email: form.get('email'),
+          pass: form.get('password'),
+          mailUsername: form.get('mailUsername'),
+        },
+      }
+
+      props.sendRequest('SETTINGS', 'SET_SMTP', smtpConfigs)
+
+      // (eldersonar) Wait for 2 seconds to update the SMTP object
+      setTimeout(() => props.sendRequest('SETTINGS', 'GET_SMTP'), 2000)
     }
-
-    props.sendRequest('SETTINGS', 'SET_SMTP', smtpConfigs)
-
-    // (eldersonar) Wait for 2 seconds to update the SMTP object
-    setTimeout(() => props.sendRequest('SETTINGS', 'GET_SMTP'), 2000)
   }
 
   // Save manifest settings
