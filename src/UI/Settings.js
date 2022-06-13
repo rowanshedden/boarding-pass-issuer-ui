@@ -698,9 +698,11 @@ function Settings(props) {
             new user and password reset emails.
             <br />
             <br />
-            Default gmail SMTP configuration uses only
+            Default gmail SMTP configuration only uses
             <br />
-            host, user email and user password.
+            host, mail username, user email and user password.
+            <br />
+            Please, put user email into the mail username box.
             <br />
             <br />
             For another provider, please refer to
@@ -714,6 +716,7 @@ function Settings(props) {
             name="host"
             ref={host}
             defaultValue={smtpConf ? (smtpConf.host ? smtpConf.host : '') : ''}
+            required
           />
           <H3>Mail Username</H3>
           <BlockInput
@@ -723,6 +726,7 @@ function Settings(props) {
             defaultValue={
               smtpConf ? (smtpConf.auth ? smtpConf.auth.mailUsername : '') : ''
             }
+            required
           />
           <H3>User email</H3>
           <BlockInput
@@ -731,6 +735,7 @@ function Settings(props) {
             defaultValue={
               smtpConf ? (smtpConf.auth ? smtpConf.auth.email : '') : ''
             }
+            required
           />
           <H3>User password</H3>
           <BlockInput
@@ -740,6 +745,7 @@ function Settings(props) {
             defaultValue={
               smtpConf ? (smtpConf.auth ? smtpConf.auth.pass : '') : ''
             }
+            required
           />
           <H3>Port</H3>
           <BlockInput
