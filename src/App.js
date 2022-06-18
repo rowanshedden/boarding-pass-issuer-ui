@@ -402,6 +402,29 @@ function App() {
           }
           break
 
+        case 'OUT_OF_BAND':
+          switch (type) {
+            case 'INVITATION':
+              setQRCodeURL(data.invitation_record)
+
+              break
+
+            case 'INVITATIONS_ERROR':
+              console.log(data.error)
+              console.log('Invitations Error')
+              setErrorMessage(data.error)
+
+              break
+
+            default:
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`,
+                'error'
+              )
+              break
+          }
+          break
+
         case 'ROLES':
           switch (type) {
             case 'ROLES':
