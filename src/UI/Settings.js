@@ -360,7 +360,7 @@ function Settings(props) {
       console.log(selectedFavicon)
       const image = {
         name: faviconFileName,
-        type: 'favicon',
+        type: 'icon',
         image: selectedFavicon,
       }
 
@@ -398,7 +398,7 @@ function Settings(props) {
     if (selectedLogo192) {
       const image = {
         name: logo192FileName,
-        type: 'logo',
+        type: 'icon',
         image: selectedLogo192,
       }
 
@@ -436,7 +436,7 @@ function Settings(props) {
     if (selectedLogo512) {
       const image = {
         name: logo512FileName,
-        type: 'logo',
+        type: 'icon',
         image: selectedLogo512,
       }
 
