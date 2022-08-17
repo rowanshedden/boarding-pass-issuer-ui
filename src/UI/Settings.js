@@ -1,12 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react'
-
+import { useSelector } from 'react-redux'
+import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
 import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
-
-import ReactTooltip from 'react-tooltip'
 
 import { IconHelp } from './CommonStylesTables'
 
@@ -133,19 +132,17 @@ const Form = styled.form`
 function Settings(props) {
   // Accessing notification context
   const setNotification = useNotification()
-
-  const error = props.errorMessage
-  const success = props.successMessage
-  let smtpConf = props.smtp
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
+  const settingsState = useSelector((state) => state.settings)
+  let smtpConf = settingsState.smtp
   // const messageEventCounter = props.messageEventCounter
 
   useEffect(() => {
     if (success) {
-      // console.log('SUCCESS RAN')
       setNotification(success, 'notice')
       props.clearResponseState()
     } else if (error) {
-      // console.log('ERROR RAN')
       setNotification(error, 'error')
       props.clearResponseState()
     }
@@ -481,13 +478,19 @@ function Settings(props) {
           <BlockInput
             name="organizationName"
             placeholder="Organization Name"
-            defaultValue={props.organizationName ? props.organizationName : ''}
+            defaultValue={
+              settingsState.organizationName
+                ? settingsState.organizationName
+                : ''
+            }
             ref={organizationName}
           />
           <BlockInput
             name="siteTitle"
             placeholder="Website Title"
-            defaultValue={props.siteTitle ? props.siteTitle : ''}
+            defaultValue={
+              settingsState.siteTitle ? settingsState.siteTitle : ''
+            }
             ref={siteTitle}
           />
           <SaveBtn onClick={handleOrganizationDetails}>Save</SaveBtn>

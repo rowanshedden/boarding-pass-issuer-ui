@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
-
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
+import { CanUser } from './CanUser'
 import FormContacts from './FormContacts'
 import FormTrustedTraveler from './FormTrustedTraveler'
 import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
-
-import { CanUser } from './CanUser'
 
 import {
   DataTable,
@@ -41,20 +40,17 @@ const IssueCredential = styled.button`
 `
 
 function Contact(props) {
-  const localUser = props.loggedInUserState
-
   // Accessing notification context
   const setNotification = useNotification()
 
+  const localUser = useSelector((state) => state.login.loggedInUserState)
   const history = props.history
   const contactId = props.contactId
-  const error = props.errorMessage
-  const success = props.successMessage
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
   const privileges = props.privileges
-  const credentials = props.credentials
-  const contacts = props.contacts
-
-  // console.log(credentials)
+  const credentials = useSelector((state) => state.credentials.credentials)
+  const contacts = useSelector((state) => state.contacts.contacts)
 
   useEffect(() => {
     if (success) {
@@ -74,9 +70,9 @@ function Contact(props) {
   let contactToSelect = ''
 
   useEffect(() => {
-    for (let i = 0; i < props.contacts.length; i++) {
-      if (props.contacts[i].contact_id == contactId) {
-        setContactSelected(props.contacts[i])
+    for (let i = 0; i < contacts.length; i++) {
+      if (contacts[i].contact_id == contactId) {
+        setContactSelected(contacts[i])
         break
       }
     }
@@ -122,15 +118,6 @@ function Contact(props) {
     contactSelected.Passport !== undefined
   ) {
     let rawImage = contactSelected.Passport.photo
-
-    // const handleImageSrc = (rawImage) => {
-    //   let bytes = new Uint8Array(rawImage)
-    //   bytes = Buffer.from(rawImage).toString('base64')
-    //   let result = atob(bytes)
-    //   return result
-    // }
-
-    // let test = handleImageSrc(rawImage)
 
     passportData = (
       <>
@@ -251,13 +238,8 @@ function Contact(props) {
                   : ''}
               </td>
             </AttributeRow>
-            {/* <AttributeRow>
-              <th>Photo:</th>
-              <td></td>
-            </AttributeRow> */}
           </tbody>
         </AttributeTable>
-        {/* <img src={test} alt="Error" /> */}
       </>
     )
   }
@@ -293,7 +275,6 @@ function Contact(props) {
       connectionID: contactSelected.Connections[0].connection_id,
       type: type,
     })
-    // Does that sound right?
     setNotification('Credential offer was successfully sent!', 'notice')
   }
 

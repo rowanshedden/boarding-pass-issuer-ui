@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import {
   StyledPopup,
@@ -14,9 +15,7 @@ import {
 
 function FormUserDelete(props) {
   const userID = props.userId
-  const success = props.successMessage
-
-  const error = props.error
+  const error = useSelector((state) => state.notifications.errorMessage)
 
   const submitBtn = useRef()
 

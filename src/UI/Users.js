@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import { CanUser } from './CanUser'
-
 import FormUsers from './FormUsers'
 import FormUsersDelete from './FormUserDelete'
 import FormUserEdit from './FormUserEdit'
@@ -25,8 +25,8 @@ import {
 import { ActionButton } from './CommonStylesForms'
 
 function Users(props) {
-  const error = props.errorMessage
-  const success = props.successMessage
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
 
   const [index, setIndex] = useState(false)
 
@@ -57,10 +57,11 @@ function Users(props) {
 
   const [buttonDisabled, setButtonDisabled] = useState(false)
 
-  const loggedInUserState = props.loggedInUserState
+  const loggedInUserState = useSelector(
+    (state) => state.login.loggedInUserState
+  )
 
-  const roles = props.roles
-  const users = props.users
+  const users = useSelector((state) => state.users.users)
 
   const closeUserModal = () => setUserModalIsOpen(false)
   const closeUserEditModal = () => setUserEditModalIsOpen(false)
@@ -229,17 +230,13 @@ function Users(props) {
         <FormUsers
           sendRequest={props.sendRequest}
           error={index}
-          roles={roles}
           userModalIsOpen={userModalIsOpen}
           closeUserModal={closeUserModal}
         />
         <FormUserEdit
           sendRequest={props.sendRequest}
           error={index}
-          roles={roles}
           userEmail={userEmail}
-          users={users}
-          loggedInUserState={loggedInUserState}
           userEditModalIsOpen={userEditModalIsOpen}
           closeUserEditModal={closeUserEditModal}
         />

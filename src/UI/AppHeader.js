@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { handleImageSrc } from './util'
-
+import Axios from 'axios'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { Logo, LogoHolder } from './CommonStylesForms'
 
 import AppMenu from './AppMenu.js'
+
+import { Logo, LogoHolder } from './CommonStylesForms'
 
 const Header = styled.header`
   flex: 3;
@@ -54,18 +55,21 @@ const Logout = styled.button`
 `
 
 function AppHeader(props) {
-  const [src, setSrc] = useState(null)
-  const logo = props.logo
-  const organizationName = props.organizationName
+  const loginState = useSelector((state) => state.login)
+  const organizationName = useSelector(
+    (state) => state.settings.organizationName
+  )
+  const logo = useSelector((state) => state.settings.logo)
 
-  useEffect(() => {
-    if (logo && logo.image) {
-      setSrc(handleImageSrc(logo.image.data))
-    }
-  }, [logo])
-
-  const handleLogout = () => {
-    props.handleLogout(props.history)
+  const handleLogout = (history) => {
+    Axios({
+      method: 'POST',
+      url: '/api/user/log-out',
+      withCredentals: true,
+    }).then((res) => {
+      console.log('the thing', window.location)
+      window.location.assign('/admin/login')
+    })
   }
 
   const handleUserProfile = (e) => {
@@ -75,19 +79,16 @@ function AppHeader(props) {
   return (
     <Header id="app-header">
       <LogoHolder>
-        <Logo src={src} alt="Logo" />
+        <Logo src={logo} alt="Logo" />
       </LogoHolder>
       <OrganizationName>{organizationName}</OrganizationName>
       <LogoutWrapper>
         <UserName onClick={handleUserProfile}>
-          {props.loggedInUsername}
+          {loginState.loggedInUsername}
         </UserName>
         <Logout onClick={handleLogout}>Log Out</Logout>
       </LogoutWrapper>
-      <AppMenu
-        match={props.match}
-        loggedInUserState={props.loggedInUserState}
-      />
+      <AppMenu match={props.match} />
     </Header>
   )
 }

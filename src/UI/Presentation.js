@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react'
+import React from 'react'
+import { useSelector } from 'react-redux'
 
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
@@ -8,9 +9,11 @@ import { AttributeTable, AttributeRow } from './CommonStylesTables'
 import { DateTime } from 'luxon'
 
 function Presentation(props) {
-  const contacts = props.contacts
+  const contacts = useSelector((state) => state.contacts.contacts)
   const presentationId = props.presentation
-  const presentationReports = props.presentationReports
+  const presentationReports = useSelector(
+    (state) => state.presentations.presentationReports
+  )
 
   let presentationSelected = ''
 

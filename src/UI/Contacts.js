@@ -1,25 +1,20 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 
-// import FormContacts from './FormContacts'
+import { CanUser } from './CanUser'
 import FormQR from './FormQR'
-import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
 
+import { ActionButton } from './CommonStylesForms'
 import { DataTable, DataRow, DataHeader, DataCell } from './CommonStylesTables'
 
-import { ActionButton } from './CommonStylesForms'
-
-import { CanUser } from './CanUser'
-
 function Contacts(props) {
-  const localUser = props.loggedInUserState
-
-  // Accessing notification context
-  // const setNotification = useNotification()
+  const localUser = useSelector((state) => state.login.loggedInUserState)
+  const contacts = useSelector((state) => state.contacts.contacts)
+  const history = props.history
 
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
-
   const closeContactModal = () => setContactModalIsOpen(false)
 
   function openContact(history, id) {
@@ -27,16 +22,6 @@ function Contacts(props) {
       history.push('/contacts/' + id)
     }
   }
-
-  // Submits the form and shows notification
-  // function submitNewContact(e) {
-  //   e.preventDefault()
-  //   setNotification('Contact was successfully added!', 'notice')
-  // }
-
-  const history = props.history
-
-  const contacts = props.contacts
 
   const contactRows = contacts.map((contact) => {
     return (
@@ -95,11 +80,6 @@ function Contacts(props) {
           closeContactModal={closeContactModal}
           QRCodeURL={props.QRCodeURL}
         />
-        {/*<FormContacts
-          contactModalIsOpen={contactModalIsOpen}
-          closeContactModal={closeContactModal}
-          submitContact={submitNewContact}
-        />*/}
       </div>
     </>
   )

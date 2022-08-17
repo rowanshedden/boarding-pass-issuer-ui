@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react'
-
+import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import FormQR from './FormQR'
-import FormInvitationAccept from './FormInvitationAccept'
-import { useNotification } from './NotificationProvider'
-
 import { CanUser } from './CanUser'
+import FormInvitationAccept from './FormInvitationAccept'
+import FormQR from './FormQR'
+import { useNotification } from './NotificationProvider'
 
 const DashboardRow = styled.div`
   display: flex;
@@ -37,10 +36,10 @@ const DashboardButton = styled.div`
 `
 
 function Home(props) {
-  const error = props.errorMessage
-  const success = props.successMessage
-  const warning = props.warningMessage
-  const localUser = props.loggedInUserState
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
+  const warning = useSelector((state) => state.notifications.warningMessage)
+  const localUser = useSelector((state) => state.login.loggedInUserState)
   const privileges = props.privileges
 
   const [oob, setOOB] = useState(false)
