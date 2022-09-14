@@ -153,12 +153,6 @@ function FormContacts(props) {
           )
         )
       : ''
-  const place_of_birth =
-    props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(
-          JSON.stringify(props.contactSelected.Passport.passport_place_of_birth)
-        )
-      : ''
   const nationality =
     props.contactSelected && props.contactSelected.Passport
       ? JSON.parse(
@@ -183,18 +177,32 @@ function FormContacts(props) {
           )
         )
       : ''
-  const type =
-    props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.passport_type))
-      : ''
-  const code =
-    props.contactSelected && props.contactSelected.Passport
-      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.passport_code))
-      : ''
   const authority =
     props.contactSelected && props.contactSelected.Passport
       ? JSON.parse(
           JSON.stringify(props.contactSelected.Passport.passport_authority)
+        )
+      : ''
+  const issuing_state =
+    props.contactSelected && props.contactSelected.Passport
+      ? JSON.parse(
+          JSON.stringify(props.contactSelected.Passport.passport_issuing_state)
+        )
+      : ''
+  const dtc =
+    props.contactSelected && props.contactSelected.Passport
+      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.passport_dtc))
+      : ''
+  const upk =
+    props.contactSelected && props.contactSelected.Passport
+      ? JSON.parse(JSON.stringify(props.contactSelected.Passport.passport_upk))
+      : ''
+  const created_date =
+    props.contactSelected && props.contactSelected.Passport
+      ? JSON.parse(
+          JSON.stringify(
+            props.contactSelected.Passport.passport_created_date.split('T')[0]
+          )
         )
       : ''
 
@@ -207,10 +215,10 @@ function FormContacts(props) {
     // Assembling traveler JSON
     const traveler = {}
     traveler.contact_id = props.contactSelected.contact_id
-    traveler.email = form.get('email')
-    traveler.phone = form.get('phone')
+    traveler.traveler_email = form.get('email')
+    traveler.traveler_phone = form.get('phone')
     // traveler.address = {}
-    traveler.country = form.get('country')
+    traveler.traveler_country = form.get('country')
     traveler.traveler_country_of_origin = form.get('traveler_country_of_origin')
     traveler.arrival_airline = form.get('arrival_airline')
     traveler.arrival_date = form.get('arrival_date')
@@ -241,19 +249,20 @@ function FormContacts(props) {
     passport.passport_given_names = form.get('given_names')
     passport.passport_gender_legal = form.get('sex')
     passport.passport_date_of_birth = form.get('date_of_birth')
-    passport.passport_place_of_birth = form.get('place_of_birth')
     passport.passport_nationality = form.get('nationality')
     passport.passport_date_of_issue = form.get('date_of_issue')
     passport.passport_date_of_expiration = form.get('date_of_expiration')
-    passport.passport_type = form.get('type')
-    passport.passport_code = form.get('code')
     passport.passport_authority = form.get('authority')
+    passport.passport_issuing_state = form.get('issuing_state')
+    passport.passport_dtc = form.get('dtc')
+    passport.passport_upk = form.get('upk')
+    passport.passport_created_date = form.get('created_date')
     // passport.photo = props.contactSelected.Passport ? props.contactSelected.Passport.photo.data : ''
 
     props.submitPassport(passport, e)
 
     props.closeContactModal()
-    window.location.reload()
+    // window.location.reload()
   }
 
   function closeModal() {
@@ -470,15 +479,6 @@ function FormContacts(props) {
                 ></InputFieldModal>
               </InputBox>
               <InputBox>
-                <ModalLabel htmlFor="place_of_birth">Place of Birth</ModalLabel>
-                <InputFieldModal
-                  type="text"
-                  name="place_of_birth"
-                  defaultValue={place_of_birth}
-                  placeholder="San Diego"
-                ></InputFieldModal>
-              </InputBox>
-              <InputBox>
                 <ModalLabel htmlFor="nationality">Nationality</ModalLabel>
                 <InputFieldModal
                   type="text"
@@ -506,30 +506,48 @@ function FormContacts(props) {
                 ></InputFieldModal>
               </InputBox>
               <InputBox>
-                <ModalLabel htmlFor="type">Type</ModalLabel>
-                <InputFieldModal
-                  type="text"
-                  name="type"
-                  defaultValue={type}
-                  placeholder="P"
-                ></InputFieldModal>
-              </InputBox>
-              <InputBox>
-                <ModalLabel htmlFor="code">Code</ModalLabel>
-                <InputFieldModal
-                  type="text"
-                  name="code"
-                  defaultValue={code}
-                  placeholder="USA"
-                ></InputFieldModal>
-              </InputBox>
-              <InputBox>
                 <ModalLabel htmlFor="authority">Authority</ModalLabel>
                 <InputFieldModal
                   type="text"
                   name="authority"
                   defaultValue={authority}
                   placeholder="United States Department of State"
+                ></InputFieldModal>
+              </InputBox>
+              <InputBox>
+                <ModalLabel htmlFor="issuing_state">Issuing State</ModalLabel>
+                <InputFieldModal
+                  type="text"
+                  name="issuing_state"
+                  defaultValue={issuing_state}
+                  placeholder=""
+                ></InputFieldModal>
+              </InputBox>
+              <InputBox>
+                <ModalLabel htmlFor="dtc">DTC</ModalLabel>
+                <InputFieldModal
+                  type="text"
+                  name="dtc"
+                  defaultValue={dtc}
+                  placeholder=""
+                ></InputFieldModal>
+              </InputBox>
+              <InputBox>
+                <ModalLabel htmlFor="upk">UPK</ModalLabel>
+                <InputFieldModal
+                  type="text"
+                  name="upk"
+                  defaultValue={upk}
+                  placeholder=""
+                ></InputFieldModal>
+              </InputBox>
+              <InputBox>
+                <ModalLabel htmlFor="created_date">Created Date</ModalLabel>
+                <InputFieldModal
+                  type="date"
+                  name="created_date"
+                  defaultValue={created_date}
+                  placeholder=""
                 ></InputFieldModal>
               </InputBox>
               <InputBox>

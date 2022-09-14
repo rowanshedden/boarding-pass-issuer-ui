@@ -185,15 +185,6 @@ function Contact(props) {
               </td>
             </AttributeRow>
             <AttributeRow>
-              <th>Place of Birth:</th>
-              <td>
-                {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.passport_place_of_birth || ''
-                  : ''}
-              </td>
-            </AttributeRow>
-            <AttributeRow>
               <th>Nationality:</th>
               <td>
                 {contactSelected.Passport !== null &&
@@ -225,29 +216,49 @@ function Contact(props) {
               </td>
             </AttributeRow>
             <AttributeRow>
-              <th>Type:</th>
-              <td>
-                {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.passport_type || ''
-                  : ''}
-              </td>
-            </AttributeRow>
-            <AttributeRow>
-              <th>Code:</th>
-              <td>
-                {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
-                  ? contactSelected.Passport.passport_code || ''
-                  : ''}
-              </td>
-            </AttributeRow>
-            <AttributeRow>
               <th>Authority:</th>
               <td>
                 {contactSelected.Passport !== null &&
                 contactSelected.Passport !== undefined
                   ? contactSelected.Passport.passport_authority || ''
+                  : ''}
+              </td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>Issuing State:</th>
+              <td>
+                {contactSelected.Passport !== null &&
+                contactSelected.Passport !== undefined
+                  ? contactSelected.Passport.passport_issuing_state || ''
+                  : ''}
+              </td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>DTC:</th>
+              <td>
+                {contactSelected.Passport !== null &&
+                contactSelected.Passport !== undefined
+                  ? contactSelected.Passport.passport_dtc || ''
+                  : ''}
+              </td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>UPK:</th>
+              <td>
+                {contactSelected.Passport !== null &&
+                contactSelected.Passport !== undefined
+                  ? contactSelected.Passport.passport_upk || ''
+                  : ''}
+              </td>
+            </AttributeRow>
+            <AttributeRow>
+              <th>Created Date:</th>
+              <td>
+                {contactSelected.Passport !== null &&
+                contactSelected.Passport !== undefined
+                  ? contactSelected.Passport.passport_created_date.split(
+                      'T'
+                    )[0] || ''
                   : ''}
               </td>
             </AttributeRow>
@@ -412,7 +423,7 @@ function Contact(props) {
                 </td>
               </AttributeRow>
               <AttributeRow>
-                <th>Country of Origing:</th>
+                <th>Country of Origin:</th>
                 <td>
                   {contactSelected.Traveler !== null &&
                   contactSelected.Traveler !== undefined
