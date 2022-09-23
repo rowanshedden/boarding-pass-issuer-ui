@@ -92,8 +92,9 @@ function App() {
   const [stylesArray, setStylesArray] = useState([])
 
   // Message states
-  const [contacts, setContacts] = useState([])
+  const [contacts, setContacts] = useState({})
   const [credentials, setCredentials] = useState([])
+  const [pendingConnections, setPendingConnections] = useState({})
   const [presentationReports, setPresentationReports] = useState([])
   const [image, setImage] = useState()
   const [roles, setRoles] = useState([])
@@ -220,6 +221,10 @@ function App() {
 
       if (check(rules, loggedInUserState, 'contacts:read', 'travelers:read')) {
         sendMessage('CONTACTS', 'GET_ALL', {
+          params: {
+            sort: [['updated_at', 'DESC']],
+            pageSize: '10',
+          }, // (mikekebert) Mostly empty params, please just give us all the defaults
           additional_tables: ['Traveler', 'Passport'],
         })
         addLoadingProcess('CONTACTS')
@@ -355,18 +360,19 @@ function App() {
               //   })
               //   updatedContacts.push(newContact)
               // })
-              let updatedContacts = data.contacts
+
+              // let updatedContacts = data.contacts
 
               // (mikekebert) When you reach the end of the list of new contacts, simply add any remaining old contacts to the new array
               // if (oldContacts.length > 0)
               //   updatedContacts = [...updatedContacts, ...oldContacts]
 
               // (mikekebert) Sort the array by data created, newest on top
-              updatedContacts.sort((a, b) =>
-                a.created_at < b.created_at ? 1 : -1
-              )
+              // updatedContacts.sort((a, b) =>
+              //   a.created_at < b.created_at ? 1 : -1
+              // )
 
-              setContacts(updatedContacts)
+              setContacts(data.contacts)
               removeLoadingProcess('CONTACTS')
               break
 
@@ -374,6 +380,23 @@ function App() {
               // console.log(data.error)
               // console.log('Contacts Error')
               setErrorMessage(data.error)
+              break
+
+            default:
+              setNotification(
+                `Error - Unrecognized Websocket Message Type: ${type}`,
+                'error'
+              )
+              break
+          }
+          break
+
+        case 'CONNECTIONS':
+          switch (type) {
+            case 'PENDING_CONNECTIONS':
+              setPendingConnections(data.pendingConnections)
+
+              clearLoadingProcess('PENDING_CONNECTIONS')
               break
 
             default:
@@ -1119,6 +1142,7 @@ function App() {
                               history={history}
                               sendRequest={sendMessage}
                               contacts={contacts}
+                              pendingConnections={pendingConnections}
                               QRCodeURL={QRCodeURL}
                             />
                           </Main>
