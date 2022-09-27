@@ -6,23 +6,21 @@ import { CanUser } from './CanUser'
 
 // import FormContacts from './FormContacts'
 import FormQR from './FormQR'
-import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
 
 import { DataTable, DataRow, DataHeader, DataCell } from './CommonStylesTables'
-import {
-  ActionButton,
-  SubmitBtn,
-  Button,
-  contactsSortSelected,
-} from './CommonStylesForms'
+import { ActionButton, SubmitBtn, Button } from './CommonStylesForms'
 
 const JumpToPage = styled.input`
   margin: auto 10px auto 0;
   width: 60px;
   font-size: 1em;
   color: ${(props) => props.theme.primary_color};
+`
+const PaginationFormWrapper = styled.div`
+  overflow: hidden;
+  bottom-padding: 3px;
 `
 
 function Contacts(props) {
@@ -71,27 +69,27 @@ function Contacts(props) {
 
   // Pending Connections pagination
   const [connectionsPageSize, setConnectionsPageSize] = useState(
-    contactsPagination.pageSize
+    connectionsPagination.pageSize
   )
   const [connectionsCurrentPage, setConnectionsCurrentPage] = useState(
-    contactsPagination.currentPage ? contactsPagination.currentPage : 1
+    connectionsPagination.currentPage ? connectionsPagination.currentPage : 1
   )
   const [connectionsPageCount, setConnectionsPageCount] = useState(
-    contactsPagination.pageCount
+    connectionsPagination.pageCount
   )
   const [connectionsItemCount, setConnectionsItemCount] = useState(
-    contactsPagination.itemCount
+    connectionsPagination.itemCount
   )
 
   const [connectionsJumpPage, setConnectionsJumpPage] = useState(
-    contactsPagination.currentPage ? contactsPagination.currentPage : 1
+    connectionsPagination.currentPage ? connectionsPagination.currentPage : 1
   )
 
   const [connectionsSortSelected, setConnectionsSortSelected] = useState([
     ['updated_at', 'DESC'],
   ])
   const [connectionsPaginationSort, setConnectionsPaginationSort] = useState(
-    contactsSortSelected
+    connectionsSortSelected
   )
 
   useEffect(() => {
@@ -105,7 +103,7 @@ function Contacts(props) {
   }, [props.contacts])
 
   useEffect(() => {
-    setConnectionsSortSelected(connectionsSortSelected)
+    setConnectionsPaginationSort(connectionsSortSelected)
     setConnectionsPageSize(connectionsPagination.pageSize)
     setConnectionsCurrentPage(connectionsPagination.currentPage)
     setConnectionsPageCount(connectionsPagination.pageCount)
@@ -165,17 +163,17 @@ function Contacts(props) {
 
       let nextPage = Math.min(
         parseInt(connectionsCurrentPage) + 1,
-        connectionsCurrentPage
+        connectionsPageCount
       )
 
       setConnectionsCurrentPage(nextPage)
       setConnectionsJumpPage(nextPage)
 
-      props.sendRequest('CONNECTIONS', 'GET_ALL_PAGINATION', {
+      props.sendRequest('CONNECTIONS', 'PENDING_CONNECTIONS', {
         params: {
           sort: connectionsPaginationSort,
           pageSize: connectionsPageSize,
-          currentPage: prevPage,
+          currentPage: nextPage,
           pageCount: Math.ceil(pendingConnections.count / connectionsPageSize),
           itemCount: connectionsItemCount,
         },
@@ -184,6 +182,7 @@ function Contacts(props) {
       setNotification('Failed to change page!', 'error')
     }
   }
+
   function prevPage(paginationType) {
     if (paginationType === 'CONTACTS') {
       // const paginationForm = new FormData(contactsPaginationRef.current)
@@ -211,7 +210,7 @@ function Contacts(props) {
       setConnectionsCurrentPage(prevPage)
       setConnectionsJumpPage(prevPage)
 
-      props.sendRequest('CONNECTIONS', 'GET_ALL_PAGINATION', {
+      props.sendRequest('CONNECTIONS', 'PENDING_CONNECTIONS', {
         params: {
           sort: connectionsPaginationSort,
           pageSize: connectionsPageSize,
@@ -260,7 +259,7 @@ function Contacts(props) {
       setConnectionsCurrentPage(jumpToPage)
       setConnectionsJumpPage(jumpToPage)
 
-      props.sendRequest('CONNECTIONS', 'GET_ALL_PAGINATION', {
+      props.sendRequest('CONNECTIONS', 'PENDING_CONNECTIONS', {
         params: {
           sort: connectionsPaginationSort,
           pageSize: connectionsPageSize,
@@ -274,8 +273,11 @@ function Contacts(props) {
     }
   }
 
-  const handleJumpPageChange = (e) => {
+  const handleContactsJumpPage = (e) => {
     setContactsJumpPage(e.target.value)
+  }
+  const handleConnectionsJumpPage = (e) => {
+    setConnectionsJumpPage(e.target.value)
   }
 
   const contactRows = contacts.map((contact) => {
@@ -308,15 +310,15 @@ function Contacts(props) {
     )
   })
 
-  let paginationUI = (
-    <div style={{ overflow: 'hidden', paddingBottom: '3px' }}>
+  let contactsPaginationUI = (
+    <PaginationFormWrapper>
       <form
-        onSubmit={jumpToPage}
+        onSubmit={() => jumpToPage('CONTACTS')}
         ref={contactsPaginationRef}
         style={{ float: 'right' }}
       >
         <JumpToPage
-          onChange={handleJumpPageChange}
+          onChange={handleContactsJumpPage}
           type="text"
           name="jumpPage"
           value={contactsJumpPage}
@@ -332,7 +334,7 @@ function Contacts(props) {
               ? { marginRight: '10px' }
               : { visibility: 'hidden', marginRight: '10px' }
           }
-          onClick={prevPage}
+          onClick={() => prevPage('CONTACTS')}
         >
           Prev
         </Button>
@@ -343,15 +345,59 @@ function Contacts(props) {
               ? { marginRight: '10px' }
               : { visibility: 'hidden', marginRight: '10px' }
           }
-          onClick={nextPage}
+          onClick={() => nextPage('CONTACTS')}
         >
           Next
         </Button>
       </div>
-    </div>
+    </PaginationFormWrapper>
+  )
+  let connectionsPaginationUI = (
+    <PaginationFormWrapper>
+      <form
+        onSubmit={() => jumpToPage('CONNECTIONS')}
+        ref={connectionsPaginationRef}
+        style={{ float: 'right' }}
+      >
+        <JumpToPage
+          onChange={handleConnectionsJumpPage}
+          type="text"
+          name="jumpPage"
+          value={connectionsJumpPage}
+        />
+        / {connectionsPageCount} pages
+        <SubmitBtn style={{ marginLeft: '10px' }}>GO</SubmitBtn>
+      </form>
+      <div style={{ float: 'right', paddingTop: '15px' }}>
+        <Button
+          disabled={connectionsCurrentPage > 1 ? false : true}
+          style={
+            connectionsCurrentPage > 1
+              ? { marginRight: '10px' }
+              : { visibility: 'hidden', marginRight: '10px' }
+          }
+          onClick={() => prevPage('CONNECTIONS')}
+        >
+          Prev
+        </Button>
+        <Button
+          disabled={
+            connectionsCurrentPage < connectionsPageCount ? false : true
+          }
+          style={
+            connectionsCurrentPage < connectionsPageCount
+              ? { marginRight: '10px' }
+              : { visibility: 'hidden', marginRight: '10px' }
+          }
+          onClick={() => nextPage('CONNECTIONS')}
+        >
+          Next
+        </Button>
+      </div>
+    </PaginationFormWrapper>
   )
 
-  let handleSortChoice = async (e) => {
+  let handleContactsSortChoice = async (e) => {
     e.preventDefault()
     let sortChoices = [
       ['updated_at', 'DESC'],
@@ -376,11 +422,50 @@ function Contacts(props) {
     })
   }
 
-  let sortSelect = (
+  let contactsSortSelect = (
     <span style={{ float: 'right' }}>
       <contactsSortSelected
         name="contactsSortSelected"
-        onChange={handleSortChoice}
+        onChange={handleContactsSortChoice}
+        style={{}}
+      >
+        <option value={0}>Newest to Oldest</option>
+        <option value={1}>Oldest to Newest</option>
+        <option value={2}>Contact: A - Z</option>
+        <option value={3}>Contact: Z - A</option>
+      </contactsSortSelected>
+    </span>
+  )
+
+  let handleConnectionsSortChoice = async (e) => {
+    e.preventDefault()
+    let sortChoices = [
+      ['updated_at', 'DESC'],
+      ['updated_at', 'ASC'],
+      ['label', 'ASC'],
+      ['label', 'DESC'],
+    ]
+    let sorted = sortChoices[e.target.value]
+    await setConnectionsSortSelected([sortChoices[e.target.value]])
+
+    const paginationForm = new FormData(connectionsPaginationRef.current)
+
+    props.sendRequest('CONNECTIONS', 'PENDING_CONNECTIONS', {
+      params: {
+        sort: [sorted],
+        pageSize: connectionsPageSize,
+        currentPage: 1,
+        pageCount: Math.ceil(pendingConnections.count / connectionsPageSize),
+        itemCount: connectionsItemCount,
+      },
+    })
+  }
+
+  let connectionsSortSelect = (
+    <span style={{ float: 'right' }}>
+      <contactsSortSelected
+        name="contactsSortSelected"
+        onChange={handleContactsSortChoice}
         style={{}}
       >
         <option value={0}>Newest to Oldest</option>
@@ -407,9 +492,9 @@ function Contacts(props) {
             </thead>
             <tbody>{contactRows}</tbody>
           </DataTable>
-          {paginationUI}
+          {contactsPaginationUI}
         </PageSection>
-        {/* <PageSection>
+        <PageSection>
           <DataTable>
             <thead>
               <DataRow>
@@ -421,7 +506,8 @@ function Contacts(props) {
             </thead>
             <tbody>{connectionRows}</tbody>
           </DataTable>
-        </PageSection> */}
+          {connectionsPaginationUI}
+        </PageSection>
         <CanUser
           user={localUser}
           perform="contacts:create"

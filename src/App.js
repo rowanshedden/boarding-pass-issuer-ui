@@ -223,11 +223,21 @@ function App() {
         sendMessage('CONTACTS', 'GET_ALL', {
           params: {
             sort: [['updated_at', 'DESC']],
-            pageSize: '10',
+            pageSize: '6',
           }, // (mikekebert) Mostly empty params, please just give us all the defaults
           additional_tables: ['Traveler', 'Passport'],
         })
         addLoadingProcess('CONTACTS')
+      }
+
+      if (check(rules, loggedInUserState, 'contacts:read')) {
+        sendMessage('CONNECTIONS', 'PENDING_CONNECTIONS', {
+          params: {
+            sort: [['updated_at', 'DESC']],
+            pageSize: '6',
+          },
+        })
+        addLoadingProcess('PENDING_CONNECTIONS')
       }
 
       if (check(rules, loggedInUserState, 'credentials:read')) {
@@ -396,7 +406,7 @@ function App() {
             case 'PENDING_CONNECTIONS':
               setPendingConnections(data.pendingConnections)
 
-              clearLoadingProcess('PENDING_CONNECTIONS')
+              removeLoadingProcess('PENDING_CONNECTIONS')
               break
 
             default:
