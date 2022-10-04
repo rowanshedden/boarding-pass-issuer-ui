@@ -70,6 +70,14 @@ function Home(props) {
     } else return
   }, [error, success, warning])
 
+  useEffect(() => {
+    if (props.connectionReuse) {
+      const message = `Connection reused for ${props.connectionReuse.connection_id}`
+      setNotification(message, 'notice')
+      props.clearConnectionReuse()
+    }
+  }, [props.connectionReuse])
+
   const scanInvite = (type) => {
     type === 'oob' ? setOOB(true) : setOOB(false)
 
@@ -79,7 +87,14 @@ function Home(props) {
   const presentOutOfBand = () => {
     if (privileges && privileges.includes('verify_identity')) {
       setDisplayModalIsOpen((o) => !o)
-      props.sendRequest('OUT_OF_BAND', 'CREATE_INVITATION', {})
+      props.sendRequest('OUT_OF_BAND', 'CREATE_INVITATION', {
+        alias: 'OOB Invitation',
+        invitationMode: 'once',
+        accept: 'auto',
+        public: true,
+        invitationStatus: 'active',
+        invitationDescription: 'Invited from Government Home Page',
+      })
     } else {
       setNotification("Error: you don't have the right privileges", 'error')
     }
@@ -88,7 +103,14 @@ function Home(props) {
   const presentInvitation = () => {
     if (privileges && privileges.includes('verify_identity')) {
       setDisplayModalIsOpen((o) => !o)
-      props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
+      props.sendRequest('INVITATIONS', 'CREATE', {
+        alias: 'Invitation',
+        invitationMode: 'once',
+        accept: 'auto',
+        public: false,
+        invitationStatus: 'active',
+        invitationDescription: 'Invited from Government Home Page',
+      })
     } else {
       setNotification("Error: you don't have the right privileges", 'error')
     }
@@ -143,7 +165,7 @@ function Home(props) {
       <FormQR
         contactModalIsOpen={displayModalIsOpen}
         closeContactModal={closeDisplayModal}
-        QRCodeURL={props.QRCodeURL}
+        invitationURL={props.invitationURL}
         sendRequest={props.sendRequest}
       />
     </>

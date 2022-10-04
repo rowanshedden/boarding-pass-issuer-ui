@@ -24,6 +24,8 @@ import Credentials from './UI/Credentials'
 import ForgotPassword from './UI/ForgotPassword'
 import FullPageSpinner from './UI/FullPageSpinner'
 import Home from './UI/Home'
+import Invitation from './UI/Invitation'
+import Invitations from './UI/Invitations'
 import Login from './UI/Login'
 import Presentation from './UI/Presentation'
 import Presentations from './UI/Presentations'
@@ -94,6 +96,8 @@ function App() {
   // Message states
   const [contacts, setContacts] = useState({})
   const [credentials, setCredentials] = useState([])
+  const [invitations, setInvitations] = useState({})
+  const [invitationURL, setInvitationURL] = useState('')
   const [pendingConnections, setPendingConnections] = useState({})
   const [presentationReports, setPresentationReports] = useState([])
   const [image, setImage] = useState()
@@ -102,6 +106,7 @@ function App() {
   const [user, setUser] = useState({})
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
+  const [connectionReuse, setConnectionReuse] = useState(null)
   const [organizationName, setOrganizationName] = useState(null)
   const [smtp, setSmtp] = useState(null)
 
@@ -118,7 +123,6 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [sessionTimer, setSessionTimer] = useState(60)
 
-  const [QRCodeURL, setQRCodeURL] = useState('')
   const [
     pendingEmployeeConnectionID,
     setPendingEmployeeConnectionID,
@@ -219,6 +223,15 @@ function App() {
       sendMessage('GOVERNANCE', 'GET_PRIVILEGES', {})
       addLoadingProcess('GOVERNANCE')
 
+      if (check(rules, loggedInUserState, 'invitations:read')) {
+        sendMessage('INVITATIONS', 'GET_ALL', {
+          params: {
+            sort: [['updated_at', 'DESC']],
+            pageSize: '10',
+          },
+        })
+        addLoadingProcess('INVITATIONS')
+      }
       if (check(rules, loggedInUserState, 'contacts:read', 'travelers:read')) {
         sendMessage('CONTACTS', 'GET_ALL', {
           params: {
@@ -314,25 +327,45 @@ function App() {
         case 'INVITATIONS':
           switch (type) {
             case 'INVITATION':
-              setQRCodeURL(data.invitation_record.invitation_url)
+              setInvitationURL(data.invitation_url)
+              break
+
+            case 'INVITATIONS':
+              setInvitations(data)
+
+              removeLoadingProcess('INVITATIONS')
               break
 
             case 'SINGLE_USE_USED':
               if (data.workflow === 'client_employee') {
                 // (mikekebert) Reset the QR code URL (which also closes the QR code modal)
-                setQRCodeURL('')
+                setInvitationURL('')
                 // (mikekebert) Set the pending employee connection_id (which also opens the employee credential form)
                 setPendingEmployeeConnectionID(data.connection_id)
               }
               if (data.workflow === 'client_immunization') {
                 // (mikekebert) Reset the QR code URL (which also closes the QR code modal)
-                setQRCodeURL('')
+                setInvitationURL('')
                 // (mikekebert) Open the pending verification notice
                 setPendingVerificationNotice(true)
               } else {
                 // (mikekebert) Reset the QR code URL (which also closes the QR code modal)
-                setQRCodeURL('')
+                setInvitationURL('')
               }
+              break
+
+            case 'INVITATION_DELETED':
+              console.log(data)
+              setInvitations((prevState) => {
+                const index = prevState.findIndex(
+                  (v) => v.invitation_id === data
+                )
+                let alteredInvitations = [...prevState.invitations]
+                alteredInvitations.splice(index, 1)
+
+                return alteredInvitations
+              })
+
               break
 
             case 'INVITATIONS_ERROR':
@@ -438,14 +471,21 @@ function App() {
         case 'OUT_OF_BAND':
           switch (type) {
             case 'INVITATION':
-              setQRCodeURL(data.invitation_record)
+              setInvitationURL(data.invitation_url)
+
+              break
+
+            case 'CONNECTION_REUSE':
+              console.log(data.comment)
+
+              setConnectionReuse(data)
 
               break
 
             case 'INVITATIONS_ERROR':
               console.log(data.error)
               console.log('Invitations Error')
-              setErrorMessage(data.error)
+              setNotification(data.error, 'error')
 
               break
 
@@ -938,6 +978,10 @@ function App() {
     setSuccessMessage(null)
   }
 
+  const clearConnectionReuse = () => {
+    setConnectionReuse(null)
+  }
+
   // Logout and redirect
   const handleLogout = (history) => {
     Axios({
@@ -1098,7 +1142,9 @@ function App() {
                             successMessage={successMessage}
                             errorMessage={errorMessage}
                             clearResponseState={clearResponseState}
-                            QRCodeURL={QRCodeURL}
+                            connectionReuse={connectionReuse}
+                            clearConnectionReuse={clearConnectionReuse}
+                            invitationURL={invitationURL}
                           />
                         </Main>
                       </Frame>
@@ -1106,6 +1152,7 @@ function App() {
                   }}
                 />
                 <Route
+                  exact
                   path="/invitations"
                   render={({ match, history }) => {
                     if (check(rules, loggedInUserState, 'invitations:read')) {
@@ -1121,13 +1168,54 @@ function App() {
                             handleLogout={handleLogout}
                           />
                           <Main>
-                            <p>Invitations</p>
+                            <Invitations
+                              connectionReuse={connectionReuse}
+                              clearConnectionReuse={clearConnectionReuse}
+                              loggedInUserState={loggedInUserState}
+                              history={history}
+                              invitations={invitations}
+                              invitationURL={invitationURL}
+                              successMessage={successMessage}
+                              errorMessage={errorMessage}
+                              clearResponseState={clearResponseState}
+                              sendRequest={sendMessage}
+                            />
                           </Main>
                         </Frame>
                       )
                     } else {
                       return <Route render={() => <Redirect to="/" />} />
                     }
+                  }}
+                />
+                <Route
+                  path={`/invitations/:invitationId`}
+                  render={({ match, history }) => {
+                    return (
+                      <Frame id="app-frame">
+                        <AppHeader
+                          loggedInUserState={loggedInUserState}
+                          loggedInUsername={loggedInUsername}
+                          logo={image}
+                          organizationName={organizationName}
+                          match={match}
+                          history={history}
+                          handleLogout={handleLogout}
+                        />
+                        <Main>
+                          <Invitation
+                            connectionReuse={connectionReuse}
+                            clearConnectionReuse={clearConnectionReuse}
+                            loggedInUserState={loggedInUserState}
+                            history={history}
+                            sendRequest={sendMessage}
+                            invitationId={match.params.invitationId}
+                            invitations={invitations}
+                            credentials={credentials}
+                          />
+                        </Main>
+                      </Frame>
+                    )
                   }}
                 />
                 <Route
@@ -1152,8 +1240,10 @@ function App() {
                               history={history}
                               sendRequest={sendMessage}
                               contacts={contacts}
+                              connectionReuse={connectionReuse}
+                              clearConnectionReuse={clearConnectionReuse}
                               pendingConnections={pendingConnections}
-                              QRCodeURL={QRCodeURL}
+                              invitationURL={invitationURL}
                             />
                           </Main>
                         </Frame>
@@ -1187,6 +1277,8 @@ function App() {
                               successMessage={successMessage}
                               errorMessage={errorMessage}
                               clearResponseState={clearResponseState}
+                              connectionReuse={connectionReuse}
+                              clearConnectionReuse={clearConnectionReuse}
                               contactId={match.params.contactId}
                               contacts={contacts}
                               credentials={credentials}

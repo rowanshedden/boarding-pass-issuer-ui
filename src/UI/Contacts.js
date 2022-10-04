@@ -122,6 +122,14 @@ function Contacts(props) {
     }
   }
 
+  useEffect(() => {
+    if (props.connectionReuse) {
+      const message = `Connection reused for ${props.connectionReuse.connection_id}`
+      setNotification(message, 'notice')
+      props.clearConnectionReuse()
+    }
+  }, [props.connectionReuse])
+
   const history = props.history
 
   const contacts = props.contacts
@@ -526,7 +534,7 @@ function Contacts(props) {
         <FormQR
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}
-          QRCodeURL={props.QRCodeURL}
+          invitationURL={props.invitationURL}
         />
         {/*<FormContacts
           contactModalIsOpen={contactModalIsOpen}

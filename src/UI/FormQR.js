@@ -28,13 +28,13 @@ function FormQR(props) {
   const [waitingForConnection, setWaitingForConnection] = useState(false)
 
   useEffect(() => {
-    if (props.QRCodeURL !== '' && waitingForConnection === false) {
+    if (props.invitationURL !== '' && waitingForConnection === false) {
       setWaitingForConnection(true)
-    } else if (props.QRCodeURL === '' && waitingForConnection === true) {
+    } else if (props.invitationURL === '' && waitingForConnection === true) {
       setWaitingForConnection(false)
       closeModal()
     }
-  }, [props.QRCodeURL, closeModal, waitingForConnection])
+  }, [props.invitationURL, closeModal, waitingForConnection])
 
   return (
     <StyledPopup
@@ -46,8 +46,8 @@ function FormQR(props) {
         <ModalHeader>Add New Contact</ModalHeader>
         <QRModalContent>
           <QRHolder>
-            {props.QRCodeURL ? (
-              <QR value={props.QRCodeURL} size={256} renderAs="svg" />
+            {props.invitationURL ? (
+              <QR value={props.invitationURL} size={256} renderAs="svg" />
             ) : (
               <p>Loading...</p>
             )}

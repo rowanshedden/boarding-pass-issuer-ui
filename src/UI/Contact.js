@@ -67,6 +67,14 @@ function Contact(props) {
     }
   }, [error, success])
 
+  useEffect(() => {
+    if (props.connectionReuse) {
+      const message = `Connection reused for ${props.connectionReuse.connection_id}`
+      setNotification(message, 'notice')
+      props.clearConnectionReuse()
+    }
+  }, [props.connectionReuse])
+
   const isMounted = useRef(null)
 
   const [index, setIndex] = useState(false)
@@ -74,9 +82,9 @@ function Contact(props) {
   let contactToSelect = ''
 
   useEffect(() => {
-    for (let i = 0; i < props.contacts.length; i++) {
-      if (props.contacts[i].contact_id == contactId) {
-        setContactSelected(props.contacts[i])
+    for (let i = 0; i < props.contacts.rows.length; i++) {
+      if (props.contacts.rows[i].contact_id == contactId) {
+        setContactSelected(props.contacts.rows[i])
         break
       }
     }

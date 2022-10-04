@@ -76,11 +76,17 @@ function AppMenu(props) {
               Home
             </StyledLink>
           </Item>
-          {/*<Item className={pathMatch === '/invitations' ? 'active' : undefined}>
-            <StyledLink to="/invitations">
-              Invitations
-            </StyledLink>
-          </Item>*/}
+          <CanUser
+            user={localUser}
+            perform="invitations:read"
+            yes={() => (
+              <Item
+                className={pathMatch === '/invitations' ? 'active' : undefined}
+              >
+                <StyledLink to="/invitations">Invitations</StyledLink>
+              </Item>
+            )}
+          />
           <CanUser
             user={localUser}
             perform="contacts:read"
