@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 import { CanUser } from './CanUser'
-
-import styled from 'styled-components'
 
 import FormInvitationDelete from './FormInvitationDelete'
 import PageHeader from './PageHeader.js'
@@ -22,9 +22,10 @@ const QR = styled(QRCode)`
 `
 
 function Invitation(props) {
-  const localUser = props.loggedInUserState
-  const error = props.errorMessage
-  const success = props.successMessage
+  const invitationsState = useSelector((state) => state.invitations)
+  const localUser = useSelector((state) => state.login.loggedInUserState)
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
 
   const [index] = useState(false)
   const [invitationSelected, setInvitationSelected] = useState({})
@@ -44,26 +45,19 @@ function Invitation(props) {
   const setNotification = useNotification()
 
   useEffect(() => {
-    if (props.connectionReuse) {
-      const message = `Connection reused for ${props.connectionReuse.connection_id}`
-      setNotification(message, 'notice')
-      props.clearConnectionReuse()
-    }
-  }, [props.connectionReuse])
-
-  useEffect(() => {
-    if (props.invitations) {
-      for (let i = 0; i < props.invitations.rows.length; i++) {
+    if (invitationsState.invitations) {
+      for (let i = 0; i < invitationsState.invitations.rows.length; i++) {
         if (
-          props.invitations.rows[i].invitation_id === parseInt(invitationId)
+          invitationsState.invitations.rows[i].invitation_id ===
+          parseInt(invitationId)
         ) {
           console.log('Invitation accepted!')
-          setInvitationSelected(props.invitations.rows[i])
+          setInvitationSelected(invitationsState.invitations.rows[i])
           break
         }
       }
     }
-  }, [props.invitations, invitationId])
+  }, [invitationsState.invitations, invitationId])
 
   useEffect(() => {
     if (success) {

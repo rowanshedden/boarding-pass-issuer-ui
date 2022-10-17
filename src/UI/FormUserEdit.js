@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import {
   Actions,
@@ -21,10 +22,12 @@ import { useNotification } from './NotificationProvider'
 
 function FormUserEdit(props) {
   const email = props.userEmail
-  const roles = props.roles
-  const users = props.users
-  const loggedInUserState = props.loggedInUserState
-  const error = props.error
+  const roles = useSelector((state) => state.users.roles)
+  const users = useSelector((state) => state.users.users)
+  const loggedInUserState = useSelector(
+    (state) => state.login.loggedInUserState
+  )
+  const error = useSelector((state) => state.notifications.errorMessage)
 
   // Get the selected user
   useEffect(() => {
@@ -62,11 +65,6 @@ function FormUserEdit(props) {
       selectedRoles.push(JSON.stringify(element.role_id))
     )
   }
-
-  // // Set the roles on modal initialization
-  // useEffect(() => {
-  //   setOptions(selectedRoles)
-  // }, [listUser])
 
   // Disable button on submit
   const onBtnClick = (e) => {

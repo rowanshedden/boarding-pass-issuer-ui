@@ -1,32 +1,54 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import { useNotification } from './NotificationProvider'
-import { CanUser } from './CanUser'
 
-// import FormContacts from './FormContacts'
+import { CanUser } from './CanUser'
 import FormQR from './FormQR'
 import PageHeader from './PageHeader'
 import PaginationSection from './PaginationSection'
 
 import { ActionButton } from './CommonStylesForms'
+import { DataRow, DataCell } from './CommonStylesTables'
 
 function Contacts(props) {
-  const localUser = props.loggedInUserState
-
-  // Accessing notification context
   const setNotification = useNotification()
 
-  const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
+  const contactsState = useSelector((state) => state.contacts)
+  const localUser = useSelector((state) => state.login.loggedInUserState)
+  const notificationsState = useSelector((state) => state.notifications)
 
+  const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
   const closeContactModal = () => setContactModalIsOpen(false)
 
   useEffect(() => {
-    if (props.connectionReuse) {
-      const message = `Connection reused for ${props.connectionReuse.connection_id}`
-      setNotification(message, 'notice')
-      props.clearConnectionReuse()
+    if (notificationsState.successMessage) {
+      setNotification(notificationsState.successMessage, 'notice')
+      props.clearResponseState()
     }
-  }, [props.connectionReuse])
+  }, [notificationsState.successMessage])
+
+  // const contactRows = contacts.map((contact) => {
+  //   return (
+  //     <DataRow
+  //       key={contact.contact_id}
+  //       onClick={() => {
+  //         openContact(history, contact.contact_id, contact)
+  //       }}
+  //     >
+  //       <DataCell>{contact.label}</DataCell>
+  //       <DataCell>
+  //         {contact.Demographic !== null && contact.Demographic !== undefined
+  //           ? contact.Demographic.mpid || ''
+  //           : ''}
+  //       </DataCell>
+  //       <DataCell>{contact.Connections[0].state}</DataCell>
+  //       <DataCell>{new Date(contact.created_at).toLocaleString()}</DataCell>
+  //     </DataRow>
+  //   )
+  // })
+
+  console.log('contacts', contactsState.contacts)
 
   return (
     <>
@@ -35,13 +57,13 @@ function Contacts(props) {
         <PaginationSection
           history={props.history}
           sendRequest={props.sendRequest}
-          paginationData={props.contacts}
+          paginationData={contactsState.contacts}
           paginationFocus={'CONTACTS'}
         />
         <PaginationSection
           history={props.history}
           sendRequest={props.sendRequest}
-          paginationData={props.pendingConnections}
+          paginationData={contactsState.pendingConnections}
           paginationFocus={'PENDING_CONNECTIONS'}
         />
         <CanUser
@@ -62,13 +84,7 @@ function Contacts(props) {
         <FormQR
           contactModalIsOpen={contactModalIsOpen}
           closeContactModal={closeContactModal}
-          invitationURL={props.invitationURL}
         />
-        {/*<FormContacts
-          contactModalIsOpen={contactModalIsOpen}
-          closeContactModal={closeContactModal}
-          submitContact={submitNewContact}
-        />*/}
       </div>
     </>
   )

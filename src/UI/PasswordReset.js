@@ -1,9 +1,9 @@
 import Axios from 'axios'
 import jwt_decode from 'jwt-decode'
 import React, { useRef, useLayoutEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 import { useNotification } from './NotificationProvider'
-import { handleImageSrc } from './util'
 
 import {
   FormContainer,
@@ -18,12 +18,12 @@ import {
 
 function PasswordReset(props) {
   const token = window.location.hash.substring(1)
+  const logo = useSelector((state) => state.settings.logo)
 
   const [id, setId] = useState(undefined)
 
   useLayoutEffect(() => {
     let isMounted = true
-    // Kick the user off this page if trying to access without a token
     if (!token) {
       props.history.push('/login')
       return
@@ -56,28 +56,6 @@ function PasswordReset(props) {
         props.history.push('/')
       }
     })
-  }, [])
-
-  const [logo, setLogo] = useState(null)
-
-  useLayoutEffect(() => {
-    let isMounted = true
-    // Fetching the logo
-    Axios({
-      method: 'GET',
-      url: '/api/logo',
-    }).then((res) => {
-      if (res.data.error) {
-        setNotification(res.data.error, 'error')
-      } else {
-        if (isMounted) {
-          setLogo(handleImageSrc(res.data[0].image.data))
-        }
-      }
-    })
-    return () => {
-      isMounted = false
-    } // Cleanup
   }, [])
 
   // Accessing notification context

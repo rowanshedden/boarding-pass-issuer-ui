@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react'
-
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
+import { CanUser } from './CanUser'
 import FormContacts from './FormContacts'
 import FormTrustedTraveler from './FormTrustedTraveler'
 import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
-
-import { CanUser } from './CanUser'
+import PaginationSection from './PaginationSection'
 
 import {
   DataTable,
@@ -41,20 +41,25 @@ const IssueCredential = styled.button`
 `
 
 function Contact(props) {
-  const localUser = props.loggedInUserState
-
   // Accessing notification context
   const setNotification = useNotification()
 
+  const localUser = useSelector((state) => state.login.loggedInUserState)
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
+  const privileges = props.privileges
+  const credentials = useSelector((state) => state.credentials.credentials)
+  const contacts = useSelector((state) => state.contacts.contacts)
+
+  const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
+  const [travelerModalIsOpen, setTravelerModalIsOpen] = useState(false)
+  const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
+
+  const closeContactModal = () => setContactModalIsOpen(false)
+  const closeTravelerModal = () => setTravelerModalIsOpen(false)
+
   const history = props.history
   const contactId = props.contactId
-  const error = props.errorMessage
-  const success = props.successMessage
-  const privileges = props.privileges
-  const credentials = props.credentials
-  const contacts = props.contacts
-
-  // console.log(credentials)
 
   useEffect(() => {
     if (success) {
@@ -67,24 +72,17 @@ function Contact(props) {
     }
   }, [error, success])
 
-  useEffect(() => {
-    if (props.connectionReuse) {
-      const message = `Connection reused for ${props.connectionReuse.connection_id}`
-      setNotification(message, 'notice')
-      props.clearConnectionReuse()
-    }
-  }, [props.connectionReuse])
-
   const isMounted = useRef(null)
 
   const [index, setIndex] = useState(false)
 
   let contactToSelect = ''
+  const [contactSelected, setContactSelected] = useState(contactToSelect)
 
   useEffect(() => {
-    for (let i = 0; i < props.contacts.rows.length; i++) {
-      if (props.contacts.rows[i].contact_id == contactId) {
-        setContactSelected(props.contacts.rows[i])
+    for (let i = 0; i < contacts.rows.length; i++) {
+      if (contacts.rows[i].contact_id == contactId) {
+        setContactSelected(contacts.rows[i])
         break
       }
     }
@@ -99,10 +97,6 @@ function Contact(props) {
     }
   }, [])
 
-  // useEffect(() => {
-  //   setContactSelected(contactToSelect)
-  // }, [contactToSelect])
-
   function openCredential(history, id) {
     if (history !== undefined) {
       history.push('/credentials/' + id)
@@ -111,17 +105,6 @@ function Contact(props) {
 
   // Contact form customization (no contact search dropdown)
   // const [contactSearch, setContactSearch] = useState(false)
-
-  // Modal state
-  const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
-  const [travelerModalIsOpen, setTravelerModalIsOpen] = useState(false)
-  const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
-
-  const closeContactModal = () => setContactModalIsOpen(false)
-  const closeTravelerModal = () => setTravelerModalIsOpen(false)
-
-  const [contactSelected, setContactSelected] = useState(contactToSelect)
-
   let travelerData = ''
   let passportData = ''
 
@@ -130,15 +113,6 @@ function Contact(props) {
     contactSelected.Passport !== undefined
   ) {
     let rawImage = contactSelected.Passport.photo
-
-    // const handleImageSrc = (rawImage) => {
-    //   let bytes = new Uint8Array(rawImage)
-    //   bytes = Buffer.from(rawImage).toString('base64')
-    //   let result = atob(bytes)
-    //   return result
-    // }
-
-    // let test = handleImageSrc(rawImage)
 
     passportData = (
       <>
@@ -276,7 +250,6 @@ function Contact(props) {
             </AttributeRow> */}
           </tbody>
         </AttributeTable>
-        {/* <img src={test} alt="Error" /> */}
       </>
     )
   }
@@ -312,7 +285,6 @@ function Contact(props) {
       connectionID: contactSelected.Connections[0].connection_id,
       type: type,
     })
-    // Does that sound right?
     setNotification('Credential offer was successfully sent!', 'notice')
   }
 
@@ -361,6 +333,20 @@ function Contact(props) {
       }
     })
   }
+
+  let connectionRows = []
+  useEffect(() => {
+    if (contactSelected)
+      connectionRows = contactSelected.Connections.map((connection) => {
+        return (
+          <DataRow key={connection.connection_id}>
+            <DataCell>{connection.connection_id}</DataCell>
+            <DataCell className="title-case">{connection.state}</DataCell>
+            <DataCell>{connection.created_at}</DataCell>
+          </DataRow>
+        )
+      })
+  }, [contactSelected])
 
   return (
     <>
@@ -615,6 +601,18 @@ function Contact(props) {
             <thead>
               <DataRow>
                 <DataHeader>Credential</DataHeader>
+                <DataHeader>Status</DataHeader>
+                <DataHeader>Date Issued</DataHeader>
+              </DataRow>
+            </thead>
+            <tbody>{connectionRows}</tbody>
+          </DataTable>
+        </PageSection>
+        <PageSection>
+          <DataTable>
+            <thead>
+              <DataRow>
+                <DataHeader>Connection</DataHeader>
                 <DataHeader>Status</DataHeader>
                 <DataHeader>Date Issued</DataHeader>
               </DataRow>

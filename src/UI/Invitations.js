@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 import FormInvitation from './FormInvitation'
 import PageHeader from './PageHeader'
@@ -19,23 +20,15 @@ export const JumpToPage = styled.input`
 `
 
 function Invitations(props) {
-  const error = props.errorMessage
-  const success = props.successMessage
-
-  const localUser = props.loggedInUserState
+  const localUser = useSelector((state) => state.login.loggedInUserState)
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
+  const invitationsState = useSelector((state) => state.invitations)
 
   const [createInvModalIsOpen, setCreateInvModalIsOpen] = useState(false)
   const closeCreateInvModal = () => setCreateInvModalIsOpen(false)
 
   const setNotification = useNotification()
-
-  useEffect(() => {
-    if (props.connectionReuse) {
-      const message = `Connection reused for ${props.connectionReuse.connection_id}`
-      setNotification(message, 'notice')
-      props.clearConnectionReuse()
-    }
-  }, [props.connectionReuse])
 
   useEffect(() => {
     if (success) {
@@ -54,7 +47,7 @@ function Invitations(props) {
         <PaginationSection
           history={props.history}
           sendRequest={props.sendRequest}
-          paginationData={props.invitations}
+          paginationData={invitationsState.invitations}
           paginationFocus={'INVITATIONS'}
         />
         <CanUser
@@ -71,7 +64,6 @@ function Invitations(props) {
             </ActionButton>
           )}
         />
-
         <FormInvitation
           createInvModalIsOpen={createInvModalIsOpen}
           closeCreateInvModal={closeCreateInvModal}

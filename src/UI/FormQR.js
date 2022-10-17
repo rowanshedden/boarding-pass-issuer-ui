@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import QRCode from 'qrcode.react'
 
@@ -25,16 +25,17 @@ function FormQR(props) {
     closeContactModal()
   }, [closeContactModal])
 
+  const invitationURL = useSelector((state) => state.invitations.invitationURL)
   const [waitingForConnection, setWaitingForConnection] = useState(false)
 
   useEffect(() => {
-    if (props.invitationURL !== '' && waitingForConnection === false) {
+    if (invitationURL !== '' && waitingForConnection === false) {
       setWaitingForConnection(true)
-    } else if (props.invitationURL === '' && waitingForConnection === true) {
+    } else if (invitationURL === '' && waitingForConnection === true) {
       setWaitingForConnection(false)
       closeModal()
     }
-  }, [props.invitationURL, closeModal, waitingForConnection])
+  }, [invitationURL, closeModal, waitingForConnection])
 
   return (
     <StyledPopup
@@ -46,8 +47,8 @@ function FormQR(props) {
         <ModalHeader>Add New Contact</ModalHeader>
         <QRModalContent>
           <QRHolder>
-            {props.invitationURL ? (
-              <QR value={props.invitationURL} size={256} renderAs="svg" />
+            {invitationURL ? (
+              <QR value={invitationURL} size={256} renderAs="svg" />
             ) : (
               <p>Loading...</p>
             )}
