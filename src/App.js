@@ -414,7 +414,63 @@ function App() {
         case 'CONTACTS':
           switch (type) {
             case 'CONTACTS':
-              dispatch(setContacts(data.contacts))
+              if (!data.contacts.rows) {
+                let currentContacts = currentState.contacts.contacts
+                let updatedRows = []
+                let sortedRows = []
+
+                const newContact = data.contacts
+                const [
+                  sortByAttribute,
+                  sortMethod,
+                ] = currentContacts.params.sort[0]
+                const currentPageSize = parseInt(
+                  currentContacts.params.pageSize
+                )
+
+                //(AmmonBurgi) Loop through the current Contacts to find a Contact that matches with the incoming Contact. If a match is found, remove it.
+                currentContacts.rows.forEach((contact, index) => {
+                  if (
+                    contact !== null &&
+                    newContact !== null &&
+                    contact.contact_id === newContact.contact_id
+                  ) {
+                    currentContacts.rows.splice(index, 1)
+                  }
+                })
+
+                updatedRows = [...currentContacts.rows, newContact]
+
+                //(AmmonBurgi) Sort the updated rows by using the current sort state.
+                if (sortMethod === 'DESC') {
+                  //Descending order
+                  sortedRows = updatedRows.sort((a, b) =>
+                    a[sortByAttribute] > b[sortByAttribute] ? -1 : 1
+                  )
+                } else {
+                  //Ascending order
+                  sortedRows = updatedRows.sort((a, b) =>
+                    a[sortByAttribute] < b[sortByAttribute] ? -1 : 1
+                  )
+                }
+
+                //(AmmonBurgi) Trim the updated rows down to the current page size
+                if (updatedRows.length > currentPageSize) {
+                  console.log('deleted', updatedRows[6])
+                  updatedRows.splice(currentPageSize, 1)
+                }
+
+                const updatedContacts = {
+                  params: currentContacts.params,
+                  rows: sortedRows,
+                  count: currentContacts.count + 1,
+                }
+
+                dispatch(setContacts(updatedContacts))
+              } else {
+                dispatch(setContacts(data.contacts))
+              }
+
               removeLoadingProcess('CONTACTS')
               break
 

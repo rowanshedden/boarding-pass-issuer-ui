@@ -8,7 +8,6 @@ import FormTrustedTraveler from './FormTrustedTraveler'
 import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
-import PaginationSection from './PaginationSection'
 
 import {
   DataTable,
@@ -76,13 +75,16 @@ function Contact(props) {
 
   const [index, setIndex] = useState(false)
 
-  let contactToSelect = ''
-  const [contactSelected, setContactSelected] = useState(contactToSelect)
+  const [contactSelected, setContactSelected] = useState('')
+  const [connections, setConnections] = useState([])
 
   useEffect(() => {
     for (let i = 0; i < contacts.rows.length; i++) {
       if (contacts.rows[i].contact_id == contactId) {
+        console.log(contacts.rows[i])
         setContactSelected(contacts.rows[i])
+        setConnections(contacts.rows[i].Connections)
+
         break
       }
     }
@@ -159,7 +161,8 @@ function Contact(props) {
               <th>Date of Birth:</th>
               <td>
                 {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
+                contactSelected.Passport !== undefined &&
+                contactSelected.Passport.passport_date_of_birth
                   ? contactSelected.Passport.passport_date_of_birth.split(
                       'T'
                     )[0] || ''
@@ -179,7 +182,8 @@ function Contact(props) {
               <th>Date of Issue:</th>
               <td>
                 {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
+                contactSelected.Passport !== undefined &&
+                contactSelected.Passport.passport_date_of_issue
                   ? contactSelected.Passport.passport_date_of_issue.split(
                       'T'
                     )[0] || ''
@@ -190,7 +194,8 @@ function Contact(props) {
               <th>Date of Expiration:</th>
               <td>
                 {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
+                contactSelected.Passport !== undefined &&
+                contactSelected.Passport.passport_date_of_expiration
                   ? contactSelected.Passport.passport_date_of_expiration.split(
                       'T'
                     )[0] || ''
@@ -237,7 +242,8 @@ function Contact(props) {
               <th>Created Date:</th>
               <td>
                 {contactSelected.Passport !== null &&
-                contactSelected.Passport !== undefined
+                contactSelected.Passport !== undefined &&
+                contactSelected.Passport.passport_created_date
                   ? contactSelected.Passport.passport_created_date.split(
                       'T'
                     )[0] || ''
@@ -334,19 +340,15 @@ function Contact(props) {
     })
   }
 
-  let connectionRows = []
-  useEffect(() => {
-    if (contactSelected)
-      connectionRows = contactSelected.Connections.map((connection) => {
-        return (
-          <DataRow key={connection.connection_id}>
-            <DataCell>{connection.connection_id}</DataCell>
-            <DataCell className="title-case">{connection.state}</DataCell>
-            <DataCell>{connection.created_at}</DataCell>
-          </DataRow>
-        )
-      })
-  }, [contactSelected])
+  const connectionRows = connections.map((connection) => {
+    return (
+      <DataRow key={connection.connection_id}>
+        <DataCell>{connection.connection_id}</DataCell>
+        <DataCell className="title-case">{connection.state}</DataCell>
+        <DataCell>{new Date(connection.created_at).toLocaleString()}</DataCell>
+      </DataRow>
+    )
+  })
 
   return (
     <>
@@ -438,7 +440,8 @@ function Contact(props) {
                 <th>Arrival Date:</th>
                 <td>
                   {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
+                  contactSelected.Traveler !== undefined &&
+                  contactSelected.Traveler.arrival_date
                     ? contactSelected.Traveler.arrival_date.split('T')[0] || ''
                     : ''}
                 </td>
@@ -485,7 +488,8 @@ function Contact(props) {
                 <th>Departure Date:</th>
                 <td>
                   {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
+                  contactSelected.Traveler !== undefined &&
+                  contactSelected.Traveler.departure_date
                     ? contactSelected.Traveler.departure_date.split('T')[0] ||
                       ''
                     : ''}
@@ -605,7 +609,7 @@ function Contact(props) {
                 <DataHeader>Date Issued</DataHeader>
               </DataRow>
             </thead>
-            <tbody>{connectionRows}</tbody>
+            <tbody>{credentialRows}</tbody>
           </DataTable>
         </PageSection>
         <PageSection>
@@ -617,7 +621,7 @@ function Contact(props) {
                 <DataHeader>Date Issued</DataHeader>
               </DataRow>
             </thead>
-            <tbody>{credentialRows}</tbody>
+            <tbody>{connectionRows}</tbody>
           </DataTable>
         </PageSection>
         <FormContacts

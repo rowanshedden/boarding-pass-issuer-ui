@@ -54,7 +54,9 @@ function FormContacts(props) {
         )
       : ''
   const arrival_date =
-    props.contactSelected && props.contactSelected.Traveler
+    props.contactSelected &&
+    props.contactSelected.Traveler &&
+    props.contactSelected.Traveler.arrival_date
       ? JSON.parse(
           JSON.stringify(
             props.contactSelected.Traveler.arrival_date.split('T')[0]
@@ -91,7 +93,9 @@ function FormContacts(props) {
         )
       : ''
   const departure_date =
-    props.contactSelected && props.contactSelected.Traveler
+    props.contactSelected &&
+    props.contactSelected.Traveler &&
+    props.contactSelected.Traveler.departure_date
       ? JSON.parse(
           JSON.stringify(
             props.contactSelected.Traveler.departure_date.split('T')[0]
@@ -146,7 +150,9 @@ function FormContacts(props) {
         )
       : ''
   const date_of_birth =
-    props.contactSelected && props.contactSelected.Passport
+    props.contactSelected &&
+    props.contactSelected.Passport &&
+    props.contactSelected.Passport.passport_date_of_birth
       ? JSON.parse(
           JSON.stringify(
             props.contactSelected.Passport.passport_date_of_birth.split('T')[0]
@@ -160,7 +166,9 @@ function FormContacts(props) {
         )
       : ''
   const date_of_issue =
-    props.contactSelected && props.contactSelected.Passport
+    props.contactSelected &&
+    props.contactSelected.Passport &&
+    props.contactSelected.Passport.passport_date_of_issue
       ? JSON.parse(
           JSON.stringify(
             props.contactSelected.Passport.passport_date_of_issue.split('T')[0]
@@ -168,7 +176,9 @@ function FormContacts(props) {
         )
       : ''
   const date_of_expiration =
-    props.contactSelected && props.contactSelected.Passport
+    props.contactSelected &&
+    props.contactSelected.Passport &&
+    props.contactSelected.Passport.passport_date_of_expiration
       ? JSON.parse(
           JSON.stringify(
             props.contactSelected.Passport.passport_date_of_expiration.split(
@@ -198,7 +208,9 @@ function FormContacts(props) {
       ? JSON.parse(JSON.stringify(props.contactSelected.Passport.passport_upk))
       : ''
   const created_date =
-    props.contactSelected && props.contactSelected.Passport
+    props.contactSelected &&
+    props.contactSelected.Passport &&
+    props.contactSelected.Passport.passport_created_date
       ? JSON.parse(
           JSON.stringify(
             props.contactSelected.Passport.passport_created_date.split('T')[0]
