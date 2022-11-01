@@ -39,9 +39,10 @@ import Users from './UI/Users'
 import store from './store'
 import {
   setContacts,
+  setContact,
   setPendingConnections,
-  setContactConnections,
   clearContactsState,
+  setContactSelected,
 } from './redux/contactsReducer'
 import {
   clearCredentialsState,
@@ -143,6 +144,12 @@ function App() {
     pendingVaccinationConnectionID,
     setPendingVaccinationConnectionID,
   ] = useState('')
+
+  const [waitingForContacts, setWaitingForContacts] = useState(false)
+  const [
+    waitingForPendingConnections,
+    setWaitingForPendingConnections,
+  ] = useState(false)
 
   // (JamesKEbert) Note: We may want to abstract the websockets out into a high-order component for better abstraction, especially potentially with authentication/authorization
 
@@ -251,27 +258,6 @@ function App() {
           },
         })
         addLoadingProcess('INVITATIONS')
-      }
-
-      if (check('contacts:read', 'travelers:read')) {
-        sendMessage('CONTACTS', 'GET_ALL', {
-          params: {
-            sort: [['updated_at', 'DESC']],
-            pageSize: '6',
-          }, // (mikekebert) Mostly empty params, please just give us all the defaults
-          additional_tables: ['Traveler', 'Passport'],
-        })
-        addLoadingProcess('CONTACTS')
-      }
-
-      if (check('contacts:read')) {
-        sendMessage('CONNECTIONS', 'PENDING_CONNECTIONS', {
-          params: {
-            sort: [['updated_at', 'DESC']],
-            pageSize: '6',
-          },
-        })
-        addLoadingProcess('PENDING_CONNECTIONS')
       }
 
       if (check('credentials:read')) {
@@ -414,64 +400,14 @@ function App() {
         case 'CONTACTS':
           switch (type) {
             case 'CONTACTS':
-              if (!data.contacts.rows) {
-                let currentContacts = currentState.contacts.contacts
-                let updatedRows = []
-                let sortedRows = []
+              dispatch(setContacts(data.contacts))
+              setWaitingForContacts(false)
 
-                const newContact = data.contacts
-                const [
-                  sortByAttribute,
-                  sortMethod,
-                ] = currentContacts.params.sort[0]
-                const currentPageSize = parseInt(
-                  currentContacts.params.pageSize
-                )
+              break
 
-                //(AmmonBurgi) Loop through the current Contacts to find a Contact that matches with the incoming Contact. If a match is found, remove it.
-                currentContacts.rows.forEach((contact, index) => {
-                  if (
-                    contact !== null &&
-                    newContact !== null &&
-                    contact.contact_id === newContact.contact_id
-                  ) {
-                    currentContacts.rows.splice(index, 1)
-                  }
-                })
+            case 'CONTACT':
+              dispatch(setContactSelected(data.contact))
 
-                updatedRows = [...currentContacts.rows, newContact]
-
-                //(AmmonBurgi) Sort the updated rows by using the current sort state.
-                if (sortMethod === 'DESC') {
-                  //Descending order
-                  sortedRows = updatedRows.sort((a, b) =>
-                    a[sortByAttribute] > b[sortByAttribute] ? -1 : 1
-                  )
-                } else {
-                  //Ascending order
-                  sortedRows = updatedRows.sort((a, b) =>
-                    a[sortByAttribute] < b[sortByAttribute] ? -1 : 1
-                  )
-                }
-
-                //(AmmonBurgi) Trim the updated rows down to the current page size
-                if (updatedRows.length > currentPageSize) {
-                  console.log('deleted', updatedRows[6])
-                  updatedRows.splice(currentPageSize, 1)
-                }
-
-                const updatedContacts = {
-                  params: currentContacts.params,
-                  rows: sortedRows,
-                  count: currentContacts.count + 1,
-                }
-
-                dispatch(setContacts(updatedContacts))
-              } else {
-                dispatch(setContacts(data.contacts))
-              }
-
-              removeLoadingProcess('CONTACTS')
               break
 
             case 'CONTACTS_ERROR':
@@ -491,8 +427,8 @@ function App() {
           switch (type) {
             case 'PENDING_CONNECTIONS':
               dispatch(setPendingConnections(data.pendingConnections))
+              setWaitingForPendingConnections(false)
 
-              removeLoadingProcess('PENDING_CONNECTIONS')
               break
 
             default:
@@ -522,7 +458,7 @@ function App() {
         case 'OUT_OF_BAND':
           switch (type) {
             case 'INVITATION':
-              setInvitationURL(data.invitation_url)
+              dispatch(setInvitationURL(data.invitation_url))
 
               break
 
@@ -1223,6 +1159,14 @@ function App() {
                               history={history}
                               sendRequest={sendMessage}
                               clearResponseState={clearResponseState}
+                              setWaitingForContacts={setWaitingForContacts}
+                              setWaitingForPendingConnections={
+                                setWaitingForPendingConnections
+                              }
+                              waitingForContacts={waitingForContacts}
+                              waitingForPendingConnections={
+                                waitingForPendingConnections
+                              }
                             />
                           </Main>
                         </Frame>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 
 import PageHeader from './PageHeader.js'
@@ -24,16 +24,20 @@ function Presentation(props) {
     }
   }
 
-  // (AmmonBurgi) Find connection and give the selected presentation a contact_label.
-  for (let i = 0; i < contacts.length; i++) {
-    if (
-      contacts[i].Connections[0].connection_id ===
-      presentationSelected.connection_id
-    ) {
-      presentationSelected.contact_label = contacts[i].label
-      break
+  useEffect(() => {
+    // (AmmonBurgi) Find connection and give the selected presentation a contact_label.
+    if (presentationSelected && contacts.rows) {
+      for (let i = 0; i < contacts.rows.length; i++) {
+        if (
+          contacts.rows[i].Connections[0].connection_id ===
+          presentationSelected.connection_id
+        ) {
+          presentationSelected.contact_label = contacts.rows[i].label
+          break
+        }
+      }
     }
-  }
+  }, [contacts, presentationSelected])
 
   if (presentationSelected !== '') {
     let displayAttributes = ''

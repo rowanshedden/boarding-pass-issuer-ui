@@ -1,15 +1,56 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
+import { CanUser, check } from './CanUser'
 import { useNotification } from './NotificationProvider'
-
-import { CanUser } from './CanUser'
 import FormQR from './FormQR'
 import PageHeader from './PageHeader'
 import PaginationSection from './PaginationSection'
 
 import { ActionButton } from './CommonStylesForms'
-import { DataRow, DataCell } from './CommonStylesTables'
+const Spinner = styled.div`
+  width: 60px;
+  height: 60px;
+  margin: 0;
+  background: transparent;
+  border-top: 3px solid
+    ${(props) => (props ? props.theme.primary_color : 'green')};
+  border-right: 3px solid transparent;
+  border-radius: 50%;
+  -webkit-animation: 1s spin linear infinite;
+  animation: 1s spin linear infinite;
+  @-webkit-keyframes spin {
+    from {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes spin {
+    from {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+`
+const LoadingHolder = styled.div`
+  font-size: 1.5em;
+  color: ${(props) => props.theme.text_color};
+  height: 200px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
 
 function Contacts(props) {
   const setNotification = useNotification()
@@ -28,65 +69,75 @@ function Contacts(props) {
     }
   }, [notificationsState.successMessage])
 
-  // const contactRows = contacts.map((contact) => {
-  //   return (
-  //     <DataRow
-  //       key={contact.contact_id}
-  //       onClick={() => {
-  //         openContact(history, contact.contact_id, contact)
-  //       }}
-  //     >
-  //       <DataCell>{contact.label}</DataCell>
-  //       <DataCell>
-  //         {contact.Demographic !== null && contact.Demographic !== undefined
-  //           ? contact.Demographic.mpid || ''
-  //           : ''}
-  //       </DataCell>
-  //       <DataCell>{contact.Connections[0].state}</DataCell>
-  //       <DataCell>{new Date(contact.created_at).toLocaleString()}</DataCell>
-  //     </DataRow>
-  //   )
-  // })
+  useEffect(() => {
+    if (check('contacts:read', 'travelers:read')) {
+      props.sendRequest('CONTACTS', 'GET_ALL', {
+        params: {
+          sort: [['updated_at', 'DESC']],
+          pageSize: '6',
+        },
+        additional_tables: ['Traveler', 'Passport'],
+      })
 
-  console.log('contacts', contactsState.contacts)
+      props.setWaitingForContacts(true)
+    }
+
+    if (check('contacts:read')) {
+      props.sendRequest('CONNECTIONS', 'PENDING_CONNECTIONS', {
+        params: {
+          sort: [['updated_at', 'DESC']],
+          pageSize: '6',
+        },
+      })
+
+      props.setWaitingForPendingConnections(true)
+    }
+  }, [])
 
   return (
-    <>
-      <div id="contacts">
-        <PageHeader title={'Contacts'} />
-        <PaginationSection
-          history={props.history}
-          sendRequest={props.sendRequest}
-          paginationData={contactsState.contacts}
-          paginationFocus={'CONTACTS'}
-        />
-        <PaginationSection
-          history={props.history}
-          sendRequest={props.sendRequest}
-          paginationData={contactsState.pendingConnections}
-          paginationFocus={'PENDING_CONNECTIONS'}
-        />
-        <CanUser
-          user={localUser}
-          perform="contacts:create"
-          yes={() => (
-            <ActionButton
-              title="Add a New Contact"
-              onClick={() => {
-                setContactModalIsOpen((o) => !o)
-                props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
-              }}
-            >
-              +
-            </ActionButton>
-          )}
-        />
-        <FormQR
-          contactModalIsOpen={contactModalIsOpen}
-          closeContactModal={closeContactModal}
-        />
-      </div>
-    </>
+    <div id="contacts">
+      {!props.waitingForContacts && !props.waitingForPendingConnections ? (
+        <div>
+          <PageHeader title={'Contacts'} />
+          <PaginationSection
+            history={props.history}
+            sendRequest={props.sendRequest}
+            paginationData={contactsState.contacts}
+            paginationFocus={'CONTACTS'}
+          />
+          <PaginationSection
+            history={props.history}
+            sendRequest={props.sendRequest}
+            paginationData={contactsState.pendingConnections}
+            paginationFocus={'PENDING_CONNECTIONS'}
+          />
+          <CanUser
+            user={localUser}
+            perform="contacts:create"
+            yes={() => (
+              <ActionButton
+                title="Add a New Contact"
+                onClick={() => {
+                  setContactModalIsOpen((o) => !o)
+                  props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
+                }}
+              >
+                +
+              </ActionButton>
+            )}
+          />
+          <FormQR
+            contactModalIsOpen={contactModalIsOpen}
+            closeContactModal={closeContactModal}
+          />
+        </div>
+      ) : (
+        <LoadingHolder>
+          <p>Fetching contacts, please wait...</p>
+          <Spinner />
+        </LoadingHolder>
+      )}
+    </div>
   )
 }
 

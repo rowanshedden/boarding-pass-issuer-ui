@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 
 import PageHeader from './PageHeader'
@@ -12,18 +12,22 @@ function Presentations(props) {
   )
   const contacts = useSelector((state) => state.contacts.contacts)
 
-  // (AmmonBurgi) Match up the connection_id's and give each presentation a contact_label. Used for-loop for speed.
-  for (let i = 0; i < presentations.length; i++) {
-    for (let j = 0; j < contacts.length; j++) {
-      if (
-        presentations[i].connection_id ===
-        contacts[j].Connections[0].connection_id
-      ) {
-        presentations[i].contact_label = contacts[j].label
-        break
+  useEffect(() => {
+    // (AmmonBurgi) Match up the connection_id's and give each presentation a contact_label. Used for-loop for speed.
+    if (contacts.rows && presentations.length !== 0) {
+      for (let i = 0; i < presentations.length; i++) {
+        for (let j = 0; j < contacts.rows.length; j++) {
+          if (
+            presentations[i].connection_id ===
+            contacts.rows[j].Connections[0].connection_id
+          ) {
+            presentations[i].contact_label = contacts.rows[j].label
+            break
+          }
+        }
       }
     }
-  }
+  }, [contacts, presentations])
 
   function openPresentation(history, id) {
     if (history !== undefined) {

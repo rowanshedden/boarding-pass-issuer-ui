@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { CanUser } from './CanUser'
@@ -8,6 +8,8 @@ import FormTrustedTraveler from './FormTrustedTraveler'
 import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
+
+import { setContactSelected } from '../redux/contactsReducer'
 
 import {
   DataTable,
@@ -39,26 +41,87 @@ const IssueCredential = styled.button`
   }
 `
 
+const Spinner = styled.div`
+  width: 60px;
+  height: 60px;
+  margin: 0;
+  background: transparent;
+  border-top: 3px solid
+    ${(props) => (props ? props.theme.primary_color : 'green')};
+  border-right: 3px solid transparent;
+  border-radius: 50%;
+  -webkit-animation: 1s spin linear infinite;
+  animation: 1s spin linear infinite;
+  @-webkit-keyframes spin {
+    from {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes spin {
+    from {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+`
+const LoadingHolder = styled.div`
+  font-size: 1.5em;
+  color: ${(props) => props.theme.text_color};
+  height: 200px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
+
 function Contact(props) {
   // Accessing notification context
   const setNotification = useNotification()
+  const dispatch = useDispatch()
 
   const localUser = useSelector((state) => state.login.loggedInUserState)
   const error = useSelector((state) => state.notifications.errorMessage)
   const success = useSelector((state) => state.notifications.successMessage)
-  const privileges = props.privileges
   const credentials = useSelector((state) => state.credentials.credentials)
-  const contacts = useSelector((state) => state.contacts.contacts)
+  const contactsState = useSelector((state) => state.contacts)
+  const contactSelected = contactsState.contactSelected
 
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
   const [travelerModalIsOpen, setTravelerModalIsOpen] = useState(false)
-  const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
+  // const [credentialModalIsOpen, setCredentialModalIsOpen] = useState(false)
 
   const closeContactModal = () => setContactModalIsOpen(false)
   const closeTravelerModal = () => setTravelerModalIsOpen(false)
 
+  const privileges = props.privileges
   const history = props.history
   const contactId = props.contactId
+
+  const governanceMounted = useRef(null)
+
+  const [index, setIndex] = useState(false)
+
+  const [connections, setConnections] = useState([])
+  const [waitingForContact, setWaitingForContact] = useState(false)
+
+  // Get governance privileges
+  useEffect(() => {
+    governanceMounted.current = true
+    props.sendRequest('GOVERNANCE', 'GET_PRIVILEGES', {})
+    return () => {
+      governanceMounted.current = false
+    }
+  }, [])
 
   useEffect(() => {
     if (success) {
@@ -71,33 +134,45 @@ function Contact(props) {
     }
   }, [error, success])
 
-  const isMounted = useRef(null)
-
-  const [index, setIndex] = useState(false)
-
-  const [contactSelected, setContactSelected] = useState('')
-  const [connections, setConnections] = useState([])
-
   useEffect(() => {
-    for (let i = 0; i < contacts.rows.length; i++) {
-      if (contacts.rows[i].contact_id == contactId) {
-        console.log(contacts.rows[i])
-        setContactSelected(contacts.rows[i])
-        setConnections(contacts.rows[i].Connections)
+    //(AmmonBurgi) Pull the selected contact from the contacts state rows or the contact state. If neither of those states contain the needed contact, fetch the contact.
+    if (contactsState.contacts.rows) {
+      const contactToSelect = contactsState.contacts.rows.find((contact) => {
+        return contact.contact_id === contactId
+      })
 
-        break
+      if (contactToSelect) {
+        setWaitingForContact(false)
+        dispatch(setContactSelected(contactToSelect))
+        setConnections(contactToSelect.Connections)
+      } else {
+        setWaitingForContact(true)
+        props.sendRequest('CONTACTS', 'GET', {
+          contact_id: contactId,
+          additional_tables: ['Traveler', 'Passport'],
+        })
+      }
+    } else {
+      if (
+        contactsState.contactSelected &&
+        contactsState.contactSelected.contact_id === contactId
+      ) {
+        setWaitingForContact(false)
+        setConnections(contactsState.contactSelected.Connections)
+      } else {
+        setWaitingForContact(true)
+        props.sendRequest('CONTACTS', 'GET', {
+          contact_id: contactId,
+          additional_tables: ['Traveler', 'Passport'],
+        })
       }
     }
-  }, [contacts, credentials])
-
-  // Get governance privileges
-  useEffect(() => {
-    isMounted.current = true
-    props.sendRequest('GOVERNANCE', 'GET_PRIVILEGES', {})
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
+  }, [
+    contactsState.contacts,
+    contactsState.contactSelected,
+    credentials,
+    contactId,
+  ])
 
   function openCredential(history, id) {
     if (history !== undefined) {
@@ -266,6 +341,7 @@ function Contact(props) {
       Traveler: { ...updatedTraveler },
     }
 
+    setWaitingForContact(true)
     props.sendRequest('TRAVELERS', 'UPDATE_OR_CREATE', updatedTraveler)
 
     setNotification('Contact was updated!', 'notice')
@@ -273,12 +349,13 @@ function Contact(props) {
     setContactSelected({ ...contactSelected, ...Traveler })
   }
 
-  function updatePasport(updatedPassport, e) {
+  function updatePassport(updatedPassport, e) {
     e.preventDefault()
     const Passport = {
       Passport: { ...updatedPassport },
     }
 
+    setWaitingForContact(true)
     props.sendRequest('PASSPORTS', 'UPDATE_OR_CREATE', updatedPassport)
 
     setNotification('Passport info was updated!', 'notice')
@@ -353,290 +430,306 @@ function Contact(props) {
   return (
     <>
       <div id="contact">
-        <PageHeader
-          title={'Contact Details: ' + (contactSelected.label || '')}
-        />
-        <PageSection>
-          <CanUser
-            user={localUser}
-            perform="contacts:update"
-            yes={() => (
-              <EditContact onClick={() => setContactModalIsOpen((o) => !o)}>
-                Edit
-              </EditContact>
-            )}
-          />
-          <h2>General Information</h2>
-          <AttributeTable>
-            <tbody>
-              <AttributeRow>
-                <th>Contact ID:</th>
-                <td>{contactSelected.contact_id || ''}</td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Connection Status:</th>
-                <td>
-                  {contactSelected.Connections !== undefined
-                    ? contactSelected.Connections[0].state || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-            </tbody>
-          </AttributeTable>
+        {!waitingForContact ? (
+          <>
+            <PageHeader
+              title={'Contact Details: ' + (contactSelected.label || '')}
+            />
+            <PageSection>
+              <CanUser
+                user={localUser}
+                perform="contacts:update"
+                yes={() => (
+                  <EditContact onClick={() => setContactModalIsOpen((o) => !o)}>
+                    Edit
+                  </EditContact>
+                )}
+              />
+              <h2>General Information</h2>
+              <AttributeTable>
+                <tbody>
+                  <AttributeRow>
+                    <th>Contact ID:</th>
+                    <td>{contactSelected.contact_id || ''}</td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Connection Status:</th>
+                    <td>
+                      {contactSelected.Connections !== undefined
+                        ? contactSelected.Connections[0].state || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                </tbody>
+              </AttributeTable>
 
-          <h2>Traveler Information</h2>
-          <AttributeTable>
-            <tbody>
-              <AttributeRow>
-                <th>Name:</th>
-                <td>{contactSelected.label || ''}</td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Email:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.traveler_email || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Phone:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.traveler_phone || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Country:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.traveler_country || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Country of Origin:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.traveler_country_of_origin || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Arrival Airline:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.arrival_airline || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Arrival Date:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined &&
-                  contactSelected.Traveler.arrival_date
-                    ? contactSelected.Traveler.arrival_date.split('T')[0] || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Arrival Destination Code:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler
-                        .arrival_destination_country_code || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Arrival Destination Port Code:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.arrival_destination_port_code ||
-                      ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Arrival Flight Number:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.arrival_flight_number || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Departure Airline:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.departure_airline || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Departure Date:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined &&
-                  contactSelected.Traveler.departure_date
-                    ? contactSelected.Traveler.departure_date.split('T')[0] ||
-                      ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Departure Destination Code:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler
-                        .departure_destination_country_code || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Departure Destination Port Code:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler
-                        .departure_destination_port_code || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-              <AttributeRow>
-                <th>Departure Flight Number:</th>
-                <td>
-                  {contactSelected.Traveler !== null &&
-                  contactSelected.Traveler !== undefined
-                    ? contactSelected.Traveler.departure_flight_number || ''
-                    : ''}
-                </td>
-              </AttributeRow>
-            </tbody>
-          </AttributeTable>
-          {passportData}
-        </PageSection>
-        <PageSection>
-          <CanUser
-            user={localUser}
-            perform="credentials:issue"
-            yes={() => (
-              <IssueCredential
-                onClick={() =>
-                  privileges && privileges.includes('issue_trusted_traveler')
-                    ? beginIssuance('default')
-                    : setNotification(
-                        "Error: you don't have the right privileges",
-                        'error'
-                      )
-                }
-              >
-                Issue Trusted Traveler (governance)
-              </IssueCredential>
-            )}
-          />
-          <CanUser
-            user={localUser}
-            perform="credentials:issue"
-            yes={() => (
-              <IssueCredential
-                onClick={() =>
-                  privileges && privileges.includes('issue_trusted_traveler')
-                    ? beginIssuance('Result')
-                    : setNotification(
-                        "Error: you don't have the right privileges",
-                        'error'
-                      )
-                }
-              >
-                Issue Trusted Traveler - Lab Result
-              </IssueCredential>
-            )}
-          />
-          <CanUser
-            user={localUser}
-            perform="credentials:issue"
-            yes={() => (
-              <IssueCredential
-                onClick={() =>
-                  privileges && privileges.includes('issue_trusted_traveler')
-                    ? beginIssuance('Exemption')
-                    : setNotification(
-                        "Error: you don't have the right privileges",
-                        'error'
-                      )
-                }
-              >
-                Issue Trusted Traveler - Exemption
-              </IssueCredential>
-            )}
-          />
-          <CanUser
-            user={localUser}
-            perform="credentials:issue"
-            yes={() => (
-              <IssueCredential
-                onClick={() =>
-                  privileges && privileges.includes('issue_trusted_traveler')
-                    ? beginIssuance('Vaccine')
-                    : setNotification(
-                        "Error: you don't have the right privileges",
-                        'error'
-                      )
-                }
-              >
-                Issue Trusted Traveler - Vaccine
-              </IssueCredential>
-            )}
-          />
-          <DataTable>
-            <thead>
-              <DataRow>
-                <DataHeader>Credential</DataHeader>
-                <DataHeader>Status</DataHeader>
-                <DataHeader>Date Issued</DataHeader>
-              </DataRow>
-            </thead>
-            <tbody>{credentialRows}</tbody>
-          </DataTable>
-        </PageSection>
-        <PageSection>
-          <DataTable>
-            <thead>
-              <DataRow>
-                <DataHeader>Connection</DataHeader>
-                <DataHeader>Status</DataHeader>
-                <DataHeader>Date Issued</DataHeader>
-              </DataRow>
-            </thead>
-            <tbody>{connectionRows}</tbody>
-          </DataTable>
-        </PageSection>
-        <FormContacts
-          contactSelected={contactSelected}
-          contactModalIsOpen={contactModalIsOpen}
-          closeContactModal={closeContactModal}
-          submitTraveler={updateTraveler}
-          submitPassport={updatePasport}
-        />
-        <FormTrustedTraveler
-          contactSelected={contactSelected}
-          travelerModalIsOpen={travelerModalIsOpen}
-          closeCredentialModal={closeTravelerModal}
-          submitCredential={submitNewCredential}
-        />
+              <h2>Traveler Information</h2>
+              <AttributeTable>
+                <tbody>
+                  <AttributeRow>
+                    <th>Name:</th>
+                    <td>{contactSelected.label || ''}</td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Email:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.traveler_email || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Phone:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.traveler_phone || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Country:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.traveler_country || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Country of Origin:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.traveler_country_of_origin ||
+                          ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Arrival Airline:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.arrival_airline || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Arrival Date:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined &&
+                      contactSelected.Traveler.arrival_date
+                        ? contactSelected.Traveler.arrival_date.split('T')[0] ||
+                          ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Arrival Destination Code:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler
+                            .arrival_destination_country_code || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Arrival Destination Port Code:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler
+                            .arrival_destination_port_code || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Arrival Flight Number:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.arrival_flight_number || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Departure Airline:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.departure_airline || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Departure Date:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined &&
+                      contactSelected.Traveler.departure_date
+                        ? contactSelected.Traveler.departure_date.split(
+                            'T'
+                          )[0] || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Departure Destination Code:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler
+                            .departure_destination_country_code || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Departure Destination Port Code:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler
+                            .departure_destination_port_code || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                  <AttributeRow>
+                    <th>Departure Flight Number:</th>
+                    <td>
+                      {contactSelected.Traveler !== null &&
+                      contactSelected.Traveler !== undefined
+                        ? contactSelected.Traveler.departure_flight_number || ''
+                        : ''}
+                    </td>
+                  </AttributeRow>
+                </tbody>
+              </AttributeTable>
+              {passportData}
+            </PageSection>
+            <PageSection>
+              <CanUser
+                user={localUser}
+                perform="credentials:issue"
+                yes={() => (
+                  <IssueCredential
+                    onClick={() =>
+                      privileges &&
+                      privileges.includes('issue_trusted_traveler')
+                        ? beginIssuance('default')
+                        : setNotification(
+                            "Error: you don't have the right privileges",
+                            'error'
+                          )
+                    }
+                  >
+                    Issue Trusted Traveler (governance)
+                  </IssueCredential>
+                )}
+              />
+              <CanUser
+                user={localUser}
+                perform="credentials:issue"
+                yes={() => (
+                  <IssueCredential
+                    onClick={() =>
+                      privileges &&
+                      privileges.includes('issue_trusted_traveler')
+                        ? beginIssuance('Result')
+                        : setNotification(
+                            "Error: you don't have the right privileges",
+                            'error'
+                          )
+                    }
+                  >
+                    Issue Trusted Traveler - Lab Result
+                  </IssueCredential>
+                )}
+              />
+              <CanUser
+                user={localUser}
+                perform="credentials:issue"
+                yes={() => (
+                  <IssueCredential
+                    onClick={() =>
+                      privileges &&
+                      privileges.includes('issue_trusted_traveler')
+                        ? beginIssuance('Exemption')
+                        : setNotification(
+                            "Error: you don't have the right privileges",
+                            'error'
+                          )
+                    }
+                  >
+                    Issue Trusted Traveler - Exemption
+                  </IssueCredential>
+                )}
+              />
+              <CanUser
+                user={localUser}
+                perform="credentials:issue"
+                yes={() => (
+                  <IssueCredential
+                    onClick={() =>
+                      privileges &&
+                      privileges.includes('issue_trusted_traveler')
+                        ? beginIssuance('Vaccine')
+                        : setNotification(
+                            "Error: you don't have the right privileges",
+                            'error'
+                          )
+                    }
+                  >
+                    Issue Trusted Traveler - Vaccine
+                  </IssueCredential>
+                )}
+              />
+              <DataTable>
+                <thead>
+                  <DataRow>
+                    <DataHeader>Credential</DataHeader>
+                    <DataHeader>Status</DataHeader>
+                    <DataHeader>Date Issued</DataHeader>
+                  </DataRow>
+                </thead>
+                <tbody>{credentialRows}</tbody>
+              </DataTable>
+            </PageSection>
+            <PageSection>
+              <DataTable>
+                <thead>
+                  <DataRow>
+                    <DataHeader>Connection</DataHeader>
+                    <DataHeader>Status</DataHeader>
+                    <DataHeader>Created At</DataHeader>
+                  </DataRow>
+                </thead>
+                <tbody>{connectionRows}</tbody>
+              </DataTable>
+            </PageSection>
+            <FormContacts
+              contactSelected={contactSelected}
+              contactModalIsOpen={contactModalIsOpen}
+              closeContactModal={closeContactModal}
+              submitTraveler={updateTraveler}
+              submitPassport={updatePassport}
+            />
+            <FormTrustedTraveler
+              contactSelected={contactSelected}
+              travelerModalIsOpen={travelerModalIsOpen}
+              closeCredentialModal={closeTravelerModal}
+              submitCredential={submitNewCredential}
+            />
+          </>
+        ) : (
+          <LoadingHolder>
+            <p>Fetching contacts, please wait...</p>
+            <Spinner />
+          </LoadingHolder>
+        )}
       </div>
     </>
   )

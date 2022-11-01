@@ -1,14 +1,10 @@
 const initialState = {
   contacts: {},
-  contact: {},
-  contactConnections: {},
   pendingConnections: {},
   contactSelected: '',
 }
 
 const SET_CONTACTS = 'SET_CONTACTS'
-const SET_CONTACT = 'SET_CONTACT'
-const SET_CONTACT_CONNECTIONS = 'SET_CONTACT_CONNECTIONS'
 const SET_PENDING_CONNECTIONS = 'SET_PENDING_CONNECTIONS'
 const SET_CONTACT_SELECTED = 'SET_CONTACT_SELECTED'
 const CLEAR_CONTACTS_STATE = 'CLEAR_CONTACTS_STATE'
@@ -17,20 +13,6 @@ export function setContacts(contacts) {
   return {
     type: SET_CONTACTS,
     payload: contacts,
-  }
-}
-
-export function setContact(contact) {
-  return {
-    type: SET_CONTACT,
-    payload: contact,
-  }
-}
-
-export function setContactConnections(connection) {
-  return {
-    type: SET_CONTACT_CONNECTIONS,
-    payload: connection,
   }
 }
 
@@ -59,9 +41,6 @@ export default function (state = initialState, action) {
   switch (action.type) {
     case SET_CONTACTS:
       return { ...state, contacts: action.payload }
-
-    case SET_CONTACT:
-      return { ...state, contact: action.payload }
 
     case SET_PENDING_CONNECTIONS:
       return { ...state, pendingConnections: action.payload }

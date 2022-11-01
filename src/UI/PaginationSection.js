@@ -92,7 +92,7 @@ function PaginationSection(props) {
       case 'CONTACTS':
         props.sendRequest('CONTACTS', 'GET_ALL', {
           params: requestParams,
-          additional_tables: ['Demographic', 'Passport'],
+          additional_tables: ['Traveler', 'Passport'],
         })
 
         break
