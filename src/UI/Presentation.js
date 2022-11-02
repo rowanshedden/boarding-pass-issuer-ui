@@ -9,7 +9,6 @@ import { AttributeTable, AttributeRow } from './CommonStylesTables'
 import { DateTime } from 'luxon'
 
 function Presentation(props) {
-  const contacts = useSelector((state) => state.contacts.contacts)
   const presentationId = props.presentation
   const presentationReports = useSelector(
     (state) => state.presentations.presentationReports
@@ -23,21 +22,6 @@ function Presentation(props) {
       break
     }
   }
-
-  useEffect(() => {
-    // (AmmonBurgi) Find connection and give the selected presentation a contact_label.
-    if (presentationSelected && contacts.rows) {
-      for (let i = 0; i < contacts.rows.length; i++) {
-        if (
-          contacts.rows[i].Connections[0].connection_id ===
-          presentationSelected.connection_id
-        ) {
-          presentationSelected.contact_label = contacts.rows[i].label
-          break
-        }
-      }
-    }
-  }, [contacts, presentationSelected])
 
   if (presentationSelected !== '') {
     let displayAttributes = ''
@@ -442,6 +426,10 @@ function Presentation(props) {
               <AttributeRow>
                 <th>Contact Label:</th>
                 <td>{presentationSelected.contact_label || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Contact ID:</th>
+                <td>{presentationSelected.contact_id || ''}</td>
               </AttributeRow>
               <AttributeRow>
                 <th>Connection ID:</th>
