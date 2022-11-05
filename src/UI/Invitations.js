@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import styled from 'styled-components'
+
+import { CanUser } from './CanUser'
+import { useNotification } from './NotificationProvider'
 
 import FormInvitation from './FormInvitation'
 import PageHeader from './PageHeader'
 import PaginationSection from './PaginationSection'
 
+import { clearNotificationsState } from '../redux/notificationsReducer'
+
 import { ActionButton } from './CommonStylesForms'
-
-import { CanUser } from './CanUser'
-import { useNotification } from './NotificationProvider'
-
-import styled from 'styled-components'
-
 export const JumpToPage = styled.input`
   margin: auto 10px auto 0;
   width: 60px;
@@ -20,6 +20,7 @@ export const JumpToPage = styled.input`
 `
 
 function Invitations(props) {
+  const dispatch = useDispatch()
   const localUser = useSelector((state) => state.login.loggedInUserState)
   const error = useSelector((state) => state.notifications.errorMessage)
   const success = useSelector((state) => state.notifications.successMessage)
@@ -33,10 +34,10 @@ function Invitations(props) {
   useEffect(() => {
     if (success) {
       setNotification(success, 'notice')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     } else if (error) {
       setNotification(error, 'error')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     }
   }, [error, success, setNotification, props])
 

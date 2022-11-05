@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { CanUser } from './CanUser'
+import { useNotification } from './NotificationProvider'
+
 import FormUsers from './FormUsers'
 import FormUsersDelete from './FormUserDelete'
 import FormUserEdit from './FormUserEdit'
-import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
 
-import { TextAlignCenter } from './CommonStyles'
+import { clearNotificationsState } from '../redux/notificationsReducer'
 
+import { TextAlignCenter } from './CommonStyles'
 import {
   DataTable,
   DataRow,
@@ -21,10 +23,10 @@ import {
   IconEdit,
   IconEmail,
 } from './CommonStylesTables'
-
 import { ActionButton } from './CommonStylesForms'
 
 function Users(props) {
+  const dispatch = useDispatch()
   const error = useSelector((state) => state.notifications.errorMessage)
   const success = useSelector((state) => state.notifications.successMessage)
 
@@ -36,7 +38,7 @@ function Users(props) {
   useEffect(() => {
     if (success) {
       setNotification(success, 'notice')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
 
       // (Simon): Temporary solution. Closing all/any modals on success
       closeUserModal()
@@ -44,7 +46,7 @@ function Users(props) {
       closeDeleteModal()
     } else if (error) {
       setNotification(error, 'error')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
       setIndex(index + 1)
     }
   }, [error, success, setNotification, props])

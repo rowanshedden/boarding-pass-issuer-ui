@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
 import { CanUser } from './CanUser'
+import { useNotification } from './NotificationProvider'
 
 import FormInvitationDelete from './FormInvitationDelete'
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
 import ReactDOMServer from 'react-dom/server'
 import QRCode from 'qrcode.react'
-import { useNotification } from './NotificationProvider'
+
+import { clearNotificationsState } from '../redux/notificationsReducer'
 
 import { Button } from './CommonStylesForms'
 import { QRHolder, SubmitBtn } from './CommonStylesForms'
@@ -22,6 +24,7 @@ const QR = styled(QRCode)`
 `
 
 function Invitation(props) {
+  const dispatch = useDispatch()
   const invitationsState = useSelector((state) => state.invitations)
   const localUser = useSelector((state) => state.login.loggedInUserState)
   const error = useSelector((state) => state.notifications.errorMessage)
@@ -63,10 +66,10 @@ function Invitation(props) {
     if (success) {
       setNotification(success, 'notice')
       closeDeleteModal()
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     } else if (error) {
       setNotification(error, 'error')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     }
   }, [error, success, setNotification])
 

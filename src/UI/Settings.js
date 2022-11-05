@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
@@ -7,8 +7,9 @@ import { useNotification } from './NotificationProvider'
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
 
-import { IconHelp } from './CommonStylesTables'
+import { clearNotificationsState } from '../redux/notificationsReducer'
 
+import { IconHelp } from './CommonStylesTables'
 const H3 = styled.h3`
   margin: 5px 0;
 `
@@ -138,6 +139,8 @@ const Form = styled.form`
 function Settings(props) {
   // Accessing notification context
   const setNotification = useNotification()
+  const dispatch = useDispatch()
+
   const error = useSelector((state) => state.notifications.errorMessage)
   const success = useSelector((state) => state.notifications.successMessage)
   const settingsState = useSelector((state) => state.settings)
@@ -147,10 +150,10 @@ function Settings(props) {
   useEffect(() => {
     if (success) {
       setNotification(success, 'notice')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     } else if (error) {
       setNotification(error, 'error')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     }
   }, [error, success, props, setNotification])
 

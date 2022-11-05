@@ -92,7 +92,7 @@ function PaginationSection(props) {
       case 'CONTACTS':
         props.sendRequest('CONTACTS', 'GET_ALL', {
           params: requestParams,
-          additional_tables: ['Traveler', 'Passport'],
+          additional_tables: ['Demographics'],
         })
 
         break
@@ -155,28 +155,96 @@ function PaginationSection(props) {
 
   const handleSortChoice = (e) => {
     e.preventDefault()
-    let sortChoices = [
-      ['updated_at', 'DESC'],
-      ['updated_at', 'ASC'],
-      ['label', 'ASC'],
-      ['label', 'DESC'],
-    ]
+    let sortChoices
+
+    switch (paginationFocus) {
+      case 'CONTACTS':
+        sortChoices = [
+          ['updated_at', 'DESC'],
+          ['updated_at', 'ASC'],
+          ['label', 'ASC'],
+          ['label', 'DESC'],
+        ]
+
+        break
+
+      case 'INVITATIONS':
+        sortChoices = [
+          ['updated_at', 'DESC'],
+          ['updated_at', 'ASC'],
+          ['alias', 'ASC'],
+          ['alias', 'DESC'],
+        ]
+
+        break
+
+      case 'PENDING_CONNECTIONS':
+        sortChoices = [
+          ['updated_at', 'DESC'],
+          ['updated_at', 'ASC'],
+        ]
+
+        break
+
+      default:
+        console.log('WARNING: Pagination focus is not being handled!')
+        return
+    }
     let sorted = sortChoices[e.target.value]
     setPaginationSortSelected([sortChoices[e.target.value]])
 
     handlePaginationRequest(1, [sorted])
   }
 
-  let displaySortSelect = (
-    <span style={{ float: 'right' }}>
-      <SortSelected name="sortSelected" onChange={handleSortChoice}>
-        <option value={0}>Newest to Oldest</option>
-        <option value={1}>Oldest to Newest</option>
-        <option value={2}>Contact: A - Z</option>
-        <option value={3}>Contact: Z - A</option>
-      </SortSelected>
-    </span>
-  )
+  const displaySortSelect = () => {
+    switch (paginationFocus) {
+      case 'CONTACTS':
+        return (
+          <span style={{ float: 'right' }}>
+            <SortSelected name="sortSelected" onChange={handleSortChoice}>
+              <option value={0}>Newest to Oldest</option>
+              <option value={1}>Oldest to Newest</option>
+              <option value={2}>Contact: A - Z</option>
+              <option value={3}>Contact: Z - A</option>
+            </SortSelected>
+          </span>
+        )
+
+      case 'INVITATIONS':
+        return (
+          <span style={{ float: 'right' }}>
+            <SortSelected name="sortSelected" onChange={handleSortChoice}>
+              <option value={0}>Newest to Oldest</option>
+              <option value={1}>Oldest to Newest</option>
+              <option value={2}>Contact: A - Z</option>
+              <option value={3}>Contact: Z - A</option>
+            </SortSelected>
+          </span>
+        )
+
+      case 'PENDING_CONNECTIONS':
+        return (
+          <span style={{ float: 'right' }}>
+            <SortSelected name="sortSelected" onChange={handleSortChoice}>
+              <option value={0}>Newest to Oldest</option>
+              <option value={1}>Oldest to Newest</option>
+            </SortSelected>
+          </span>
+        )
+
+      default:
+        console.log('WARNING: Pagination focus is not being handled!')
+
+        return (
+          <span style={{ float: 'right' }}>
+            <SortSelected
+              name="sortSelected"
+              onChange={handleSortChoice}
+            ></SortSelected>
+          </span>
+        )
+    }
+  }
 
   const displayFocusRows = paginationRows.map((row) => {
     switch (paginationFocus) {
@@ -247,7 +315,7 @@ function PaginationSection(props) {
                 <DataHeader>Contact Name</DataHeader>
                 <DataHeader></DataHeader>
                 <DataHeader>Connection Status</DataHeader>
-                <DataHeader>Created At{displaySortSelect}</DataHeader>
+                <DataHeader>Created At{displaySortSelect()}</DataHeader>
               </DataRow>
             </thead>
             <tbody>{displayFocusRows}</tbody>
@@ -262,7 +330,7 @@ function PaginationSection(props) {
                 <DataHeader>Alias</DataHeader>
                 <DataHeader>Connection ID</DataHeader>
                 <DataHeader>Type</DataHeader>
-                <DataHeader>Created At</DataHeader>
+                <DataHeader>Created At{displaySortSelect()}</DataHeader>
               </DataRow>
             </thead>
             <tbody>{displayFocusRows}</tbody>
@@ -276,7 +344,7 @@ function PaginationSection(props) {
               <DataRow>
                 <DataHeader>Pending Connection</DataHeader>
                 <DataHeader>Connection Status</DataHeader>
-                <DataHeader>Created At{displaySortSelect}</DataHeader>
+                <DataHeader>Created At{displaySortSelect()}</DataHeader>
               </DataRow>
             </thead>
             <tbody>{displayFocusRows}</tbody>

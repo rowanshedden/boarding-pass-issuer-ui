@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
 import { CanUser, check } from './CanUser'
 import { useNotification } from './NotificationProvider'
+
 import FormQR from './FormQR'
 import PageHeader from './PageHeader'
 import PaginationSection from './PaginationSection'
+
+import { clearNotificationsState } from '../redux/notificationsReducer'
 
 import { ActionButton } from './CommonStylesForms'
 const Spinner = styled.div`
@@ -53,11 +56,15 @@ const LoadingHolder = styled.div`
 `
 
 function Contacts(props) {
+  const dispatch = useDispatch()
   const setNotification = useNotification()
 
   const contactsState = useSelector((state) => state.contacts)
   const localUser = useSelector((state) => state.login.loggedInUserState)
   const notificationsState = useSelector((state) => state.notifications)
+
+  const success = notificationsState.successMessage
+  const error = notificationsState.errorMessage
 
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false)
   const closeContactModal = () => setContactModalIsOpen(false)
@@ -65,7 +72,7 @@ function Contacts(props) {
   useEffect(() => {
     if (notificationsState.successMessage) {
       setNotification(notificationsState.successMessage, 'notice')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     }
   }, [notificationsState.successMessage])
 
@@ -93,6 +100,16 @@ function Contacts(props) {
       props.setWaitingForPendingConnections(true)
     }
   }, [])
+
+  useEffect(() => {
+    if (success) {
+      setNotification(success, 'notice')
+      dispatch(clearNotificationsState())
+    } else if (error) {
+      setNotification(error, 'error')
+      dispatch(clearNotificationsState())
+    }
+  }, [error, success])
 
   return (
     <div id="contacts">

@@ -937,12 +937,6 @@ function App() {
     }
   }
 
-  // Resetting state of error and success messages
-  const clearResponseState = () => {
-    dispatch(setErrorMessage(null))
-    dispatch(setSuccessMessage(null))
-  }
-
   // Logout and redirect
   const handleLogout = (history) => {
     Axios({
@@ -1088,7 +1082,6 @@ function App() {
                           <Home
                             sendRequest={sendMessage}
                             privileges={privileges}
-                            clearResponseState={clearResponseState}
                           />
                         </Main>
                       </Frame>
@@ -1110,7 +1103,6 @@ function App() {
                           <Main>
                             <Invitations
                               history={history}
-                              clearResponseState={clearResponseState}
                               sendRequest={sendMessage}
                             />
                           </Main>
@@ -1158,7 +1150,6 @@ function App() {
                             <Contacts
                               history={history}
                               sendRequest={sendMessage}
-                              clearResponseState={clearResponseState}
                               setWaitingForContacts={setWaitingForContacts}
                               setWaitingForPendingConnections={
                                 setWaitingForPendingConnections
@@ -1192,7 +1183,6 @@ function App() {
                               history={history}
                               sendRequest={sendMessage}
                               privileges={privileges}
-                              clearResponseState={clearResponseState}
                               contactId={match.params.contactId}
                             />
                           </Main>
@@ -1337,10 +1327,7 @@ function App() {
                             handleLogout={handleLogout}
                           />
                           <Main>
-                            <Users
-                              clearResponseState={clearResponseState}
-                              sendRequest={sendMessage}
-                            />
+                            <Users sendRequest={sendMessage} />
                           </Main>
                         </Frame>
                       )
@@ -1378,7 +1365,6 @@ function App() {
                               updateTheme={updateTheme}
                               saveTheme={saveTheme}
                               undoStyle={undoStyle}
-                              clearResponseState={clearResponseState}
                               stylesArray={stylesArray}
                               addStylesToArray={addStylesToArray}
                               removeStylesFromArray={removeStylesFromArray}

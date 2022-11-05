@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
+import { useNotification } from './NotificationProvider'
 import { CanUser } from './CanUser'
+
 import FormInvitationAccept from './FormInvitationAccept'
 import FormQR from './FormQR'
-import { useNotification } from './NotificationProvider'
+
+import { clearNotificationsState } from '../redux/notificationsReducer'
 
 const DashboardRow = styled.div`
   display: flex;
@@ -36,6 +39,7 @@ const DashboardButton = styled.div`
 `
 
 function Home(props) {
+  const dispatch = useDispatch()
   const error = useSelector((state) => state.notifications.errorMessage)
   const success = useSelector((state) => state.notifications.successMessage)
   const warning = useSelector((state) => state.notifications.warningMessage)
@@ -57,14 +61,14 @@ function Home(props) {
   useEffect(() => {
     if (success) {
       setNotification(success, 'notice')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     } else if (error) {
       setNotification(error, 'error')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
       setIndex(index + 1)
     } else if (warning) {
       setNotification(warning, 'warning')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
       setIndex(index + 1)
     } else return
   }, [error, success, warning])

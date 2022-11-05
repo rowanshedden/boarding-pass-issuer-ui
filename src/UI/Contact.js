@@ -10,6 +10,7 @@ import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
 
 import { setContactSelected } from '../redux/contactsReducer'
+import { clearNotificationsState } from '../redux/notificationsReducer'
 
 import {
   DataTable,
@@ -126,53 +127,27 @@ function Contact(props) {
   useEffect(() => {
     if (success) {
       setNotification(success, 'notice')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     } else if (error) {
       setNotification(error, 'error')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
       setIndex(index + 1)
     }
   }, [error, success])
 
   useEffect(() => {
-    //(AmmonBurgi) Pull the selected contact from the contacts state rows or the contact state. If neither of those states contain the needed contact, fetch the contact.
-    if (contactsState.contacts.rows) {
-      const contactToSelect = contactsState.contacts.rows.find((contact) => {
-        return contact.contact_id === contactId
-      })
-
-      if (contactToSelect) {
-        setWaitingForContact(false)
-        dispatch(setContactSelected(contactToSelect))
-        setConnections(contactToSelect.Connections)
-      } else {
-        setWaitingForContact(true)
-        props.sendRequest('CONTACTS', 'GET', {
-          contact_id: contactId,
-          additional_tables: ['Traveler', 'Passport'],
-        })
-      }
+    //(AmmonBurgi) Stop waiting for contactSelected if the contact_id matches the target ID. If no match is found, fetch the needed contact.
+    if (contactSelected && contactSelected.contact_id === contactId) {
+      setWaitingForContact(false)
+      setConnections(contactSelected.Connections)
     } else {
-      if (
-        contactsState.contactSelected &&
-        contactsState.contactSelected.contact_id === contactId
-      ) {
-        setWaitingForContact(false)
-        setConnections(contactsState.contactSelected.Connections)
-      } else {
-        setWaitingForContact(true)
-        props.sendRequest('CONTACTS', 'GET', {
-          contact_id: contactId,
-          additional_tables: ['Traveler', 'Passport'],
-        })
-      }
+      setWaitingForContact(true)
+      props.sendRequest('CONTACTS', 'GET', {
+        contact_id: contactId,
+        additional_tables: ['Demographics'],
+      })
     }
-  }, [
-    contactsState.contacts,
-    contactsState.contactSelected,
-    credentials,
-    contactId,
-  ])
+  }, [contactSelected, credentials, contactId])
 
   function openCredential(history, id) {
     if (history !== undefined) {
@@ -611,7 +586,7 @@ function Contact(props) {
               {passportData}
             </PageSection>
             <PageSection>
-              <CanUser
+              {/* <CanUser
                 user={localUser}
                 perform="credentials:issue"
                 yes={() => (
@@ -686,7 +661,7 @@ function Contact(props) {
                     Issue Trusted Traveler - Vaccine
                   </IssueCredential>
                 )}
-              />
+              /> */}
               <DataTable>
                 <thead>
                   <DataRow>

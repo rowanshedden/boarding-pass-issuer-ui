@@ -30,7 +30,7 @@ export function setWarningMessage(warningMessage) {
   }
 }
 
-export function clearNotificationState() {
+export function clearNotificationsState() {
   return {
     type: CLEAR_NOTIFICATION_STATE,
     payload: null,
