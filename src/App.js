@@ -440,21 +440,6 @@ function App() {
           }
           break
 
-        case 'TRAVELERS':
-          switch (type) {
-            case 'TRAVELERS_ERROR':
-              dispatch(setErrorMessage(data.error))
-              break
-
-            default:
-              setNotification(
-                `Error - Unrecognized Websocket Message Type: ${type}`,
-                'error'
-              )
-              break
-          }
-          break
-
         case 'OUT_OF_BAND':
           switch (type) {
             case 'INVITATION':

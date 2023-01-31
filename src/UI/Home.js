@@ -88,7 +88,7 @@ function Home(props) {
         accept: 'auto',
         public: true,
         invitationStatus: 'active',
-        invitationDescription: 'Invited from Government Home Page',
+        invitationDescription: 'Invited from Boarding Pass Home Page',
       })
     } else {
       setNotification("Error: you don't have the right privileges", 'error')
@@ -104,7 +104,7 @@ function Home(props) {
         accept: 'auto',
         public: false,
         invitationStatus: 'active',
-        invitationDescription: 'Invited from Government Home Page',
+        invitationDescription: 'Invited from Boarding Pass Home Page',
       })
     } else {
       setNotification("Error: you don't have the right privileges", 'error')

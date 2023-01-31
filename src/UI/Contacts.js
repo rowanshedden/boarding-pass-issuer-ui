@@ -77,13 +77,13 @@ function Contacts(props) {
   }, [notificationsState.successMessage])
 
   useEffect(() => {
-    if (check('contacts:read', 'travelers:read')) {
+    if (check('contacts:read')) {
       props.sendRequest('CONTACTS', 'GET_ALL', {
         params: {
           sort: [['updated_at', 'DESC']],
           pageSize: '6',
         },
-        additional_tables: ['Traveler', 'Passport'],
+        additional_tables: [],
       })
 
       props.setWaitingForContacts(true)
@@ -136,7 +136,14 @@ function Contacts(props) {
                 title="Add a New Contact"
                 onClick={() => {
                   setContactModalIsOpen((o) => !o)
-                  props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
+                  props.sendRequest('INVITATIONS', 'CREATE', {
+                    alias: 'Invitation',
+                    invitationMode: 'once',
+                    accept: 'auto',
+                    public: false,
+                    invitationStatus: 'active',
+                    invitationDescription: 'Invited from DTC Issuer',
+                  })
                 }}
               >
                 +

@@ -50,14 +50,6 @@ function Credential(props) {
     showCredential.created_at =
       new Date(credentialSelected.created_at).toISOString().substring(0, 10) ||
       ''
-    patient_given = attributesArray.find(function (attribute, index) {
-      if (attribute.name == 'traveler_given_names') return attribute
-    })
-    patient_sur = attributesArray.find(function (attribute, index) {
-      if (attribute.name == 'traveler_surnames') return attribute
-    })
-    patient_name = patient_given.value + ' ' + patient_sur.value
-    // Values that depend on the credential being issued
     if (
       credentialSelected.credential !== null &&
       credentialSelected.credential !== undefined &&
@@ -76,7 +68,7 @@ function Credential(props) {
 
   return (
     <div id="contact">
-      <PageHeader title={showCredential.name + ' for ' + patient_name} />
+      <PageHeader title={showCredential.name} />
       <PageSection>
         <h2>General Information</h2>
         <AttributeTable>
