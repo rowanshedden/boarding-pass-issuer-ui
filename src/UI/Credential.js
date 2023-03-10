@@ -16,9 +16,12 @@ function Credential(props) {
   for (let i = 0; i < credentials.length; i++) {
     if (credentials[i].credential_exchange_id == credential) {
       credentialSelected = credentials[i]
-      attributesArray =
-        credentialSelected.credential_proposal_dict.credential_proposal
-          .attributes
+      if (credentialSelected.credential_proposal_dict) {
+        attributesArray =
+          credentialSelected.credential_proposal_dict.credential_proposal
+            .attributes
+      }
+
       break
     }
   }
@@ -39,17 +42,33 @@ function Credential(props) {
 
   // Now set the values if we have a credential
   if (credentialSelected !== '') {
-    showCredential.name =
-      credentialSelected.credential_proposal_dict.schema_name.replaceAll(
-        '_',
-        ' '
-      ) || ''
+    if (credentialSelected.credential_proposal_dict) {
+      showCredential.name =
+        credentialSelected.credential_proposal_dict.schema_name.replaceAll(
+          '_',
+          ' '
+        ) || ''
+    } else {
+      const schemaParts = credentialSelected.schema_id.split(':')
+      showCredential.name = schemaParts[2].replaceAll('_', ' ')
+    }
     showCredential.credential_exchange_id =
       credentialSelected.credential_exchange_id || ''
     showCredential.state = credentialSelected.state || ''
     showCredential.created_at =
       new Date(credentialSelected.created_at).toISOString().substring(0, 10) ||
       ''
+    if (attributesArray.length) {
+      patient_given = attributesArray.find(function (attribute, index) {
+        if (attribute.name == 'traveler_given_names') return attribute
+      })
+      patient_sur = attributesArray.find(function (attribute, index) {
+        if (attribute.name == 'traveler_surnames') return attribute
+      })
+
+      patient_name = patient_given.value + ' ' + patient_sur.value
+    }
+    // Values that depend on the credential being issued
     if (
       credentialSelected.credential !== null &&
       credentialSelected.credential !== undefined &&
@@ -68,7 +87,13 @@ function Credential(props) {
 
   return (
     <div id="contact">
-      <PageHeader title={showCredential.name} />
+      <PageHeader
+        title={
+          patient_name
+            ? showCredential.name + ' for ' + patient_name
+            : showCredential.name
+        }
+      />
       <PageSection>
         <h2>General Information</h2>
         <AttributeTable>

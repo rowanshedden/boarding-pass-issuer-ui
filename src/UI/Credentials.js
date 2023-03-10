@@ -32,6 +32,9 @@ function Credentials(props) {
         '_',
         ' '
       )
+    } else {
+      const schemaParts = credential_record.schema_id.split(':')
+      credentialName = schemaParts[2].replaceAll('_', ' ')
     }
 
     return (
