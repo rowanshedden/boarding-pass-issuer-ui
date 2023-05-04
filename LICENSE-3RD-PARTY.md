@@ -9,14 +9,17 @@ This software project includes the following third-party or open-source tools, c
 See also: https://mit-license.org/
 
 - [Axios](https://github.com/axios/axios)
-- [Prettier](https://github.com/prettier/prettier)
-- [React Router](https://github.com/ReactTraining/react-router)
-- [Reactjs-popup](https://github.com/yjose/reactjs-popup)
-- [Styled Components](https://github.com/styled-components/styled-components)
-- [qrcode react](https://github.com/zpao/qrcode.react)
 - [jwt-decode](https://github.com/auth0/jwt-decode)
-- [universal-cookie](https://github.com/reactivestack/cookies)
+- [Prettier](https://github.com/prettier/prettier)
+- [qrcode react](https://github.com/zpao/qrcode.react)
+- [react-redux](https://github.com/reduxjs/react-redux)
+- [React Router](https://github.com/ReactTraining/react-router)
 - [react-tooltip](https://github.com/wwayne/react-tooltip)
+- [Reactjs-popup](https://github.com/yjose/reactjs-popup)
+- [redux](https://github.com/reduxjs/redux)
+- [redux-devtools-extension](https://github.com/zalmoxisus/redux-devtools-extension)
+- [Styled Components](https://github.com/styled-components/styled-components)
+- [universal-cookie](https://github.com/reactivestack/cookies)
 
 ### SIL Open Font License
 

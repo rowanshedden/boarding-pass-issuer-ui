@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react'
-
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 import Popup from 'reactjs-popup'
 

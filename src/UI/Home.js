@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
-
+import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
-import FormQR from './FormQR'
-import FormInvitationAccept from './FormInvitationAccept'
 import { useNotification } from './NotificationProvider'
-
 import { CanUser } from './CanUser'
+
+import FormInvitationAccept from './FormInvitationAccept'
+import FormQR from './FormQR'
+
+import { clearNotificationsState } from '../redux/notificationsReducer'
 
 const DashboardRow = styled.div`
   display: flex;
@@ -37,10 +39,11 @@ const DashboardButton = styled.div`
 `
 
 function Home(props) {
-  const error = props.errorMessage
-  const success = props.successMessage
-  const warning = props.warningMessage
-  const localUser = props.loggedInUserState
+  const dispatch = useDispatch()
+  const error = useSelector((state) => state.notifications.errorMessage)
+  const success = useSelector((state) => state.notifications.successMessage)
+  const warning = useSelector((state) => state.notifications.warningMessage)
+  const localUser = useSelector((state) => state.login.loggedInUserState)
   const privileges = props.privileges
 
   const [oob, setOOB] = useState(false)
@@ -58,14 +61,14 @@ function Home(props) {
   useEffect(() => {
     if (success) {
       setNotification(success, 'notice')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
     } else if (error) {
       setNotification(error, 'error')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
       setIndex(index + 1)
     } else if (warning) {
       setNotification(warning, 'warning')
-      props.clearResponseState()
+      dispatch(clearNotificationsState())
       setIndex(index + 1)
     } else return
   }, [error, success, warning])
@@ -79,7 +82,14 @@ function Home(props) {
   const presentOutOfBand = () => {
     if (privileges && privileges.includes('verify_identity')) {
       setDisplayModalIsOpen((o) => !o)
-      props.sendRequest('OUT_OF_BAND', 'CREATE_INVITATION', {})
+      props.sendRequest('OUT_OF_BAND', 'CREATE_INVITATION', {
+        alias: 'OOB Invitation',
+        invitationMode: 'once',
+        accept: 'auto',
+        public: true,
+        invitationStatus: 'active',
+        invitationDescription: 'Invited from Boarding Pass Home Page',
+      })
     } else {
       setNotification("Error: you don't have the right privileges", 'error')
     }
@@ -88,7 +98,14 @@ function Home(props) {
   const presentInvitation = () => {
     if (privileges && privileges.includes('verify_identity')) {
       setDisplayModalIsOpen((o) => !o)
-      props.sendRequest('INVITATIONS', 'CREATE_SINGLE_USE', {})
+      props.sendRequest('INVITATIONS', 'CREATE', {
+        alias: 'Invitation',
+        invitationMode: 'once',
+        accept: 'auto',
+        public: false,
+        invitationStatus: 'active',
+        invitationDescription: 'Invited from Boarding Pass Home Page',
+      })
     } else {
       setNotification("Error: you don't have the right privileges", 'error')
     }
@@ -143,7 +160,7 @@ function Home(props) {
       <FormQR
         contactModalIsOpen={displayModalIsOpen}
         closeContactModal={closeDisplayModal}
-        QRCodeURL={props.QRCodeURL}
+        invitationURL={props.invitationURL}
         sendRequest={props.sendRequest}
       />
     </>

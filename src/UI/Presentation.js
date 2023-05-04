@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import PageHeader from './PageHeader.js'
 import PageSection from './PageSection.js'
@@ -8,26 +9,16 @@ import { AttributeTable, AttributeRow } from './CommonStylesTables'
 import { DateTime } from 'luxon'
 
 function Presentation(props) {
-  const contacts = props.contacts
   const presentationId = props.presentation
-  const presentationReports = props.presentationReports
+  const presentationReports = useSelector(
+    (state) => state.presentations.presentationReports
+  )
 
   let presentationSelected = ''
 
   for (let i = 0; i < presentationReports.length; i++) {
     if (presentationReports[i].presentation_exchange_id === presentationId) {
       presentationSelected = presentationReports[i]
-      break
-    }
-  }
-
-  // (AmmonBurgi) Find connection and give the selected presentation a contact_label.
-  for (let i = 0; i < contacts.length; i++) {
-    if (
-      contacts[i].Connections[0].connection_id ===
-      presentationSelected.connection_id
-    ) {
-      presentationSelected.contact_label = contacts[i].label
       break
     }
   }
@@ -435,6 +426,10 @@ function Presentation(props) {
               <AttributeRow>
                 <th>Contact Label:</th>
                 <td>{presentationSelected.contact_label || ''}</td>
+              </AttributeRow>
+              <AttributeRow>
+                <th>Contact ID:</th>
+                <td>{presentationSelected.contact_id || ''}</td>
               </AttributeRow>
               <AttributeRow>
                 <th>Connection ID:</th>

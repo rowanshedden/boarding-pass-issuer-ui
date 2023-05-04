@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import PageHeader from './PageHeader'
 import PageSection from './PageSection'
@@ -6,21 +7,9 @@ import PageSection from './PageSection'
 import { DataTable, DataRow, DataHeader, DataCell } from './CommonStylesTables'
 
 function Presentations(props) {
-  let presentations = props.presentationReports
-  const contacts = props.contacts
-
-  // (AmmonBurgi) Match up the connection_id's and give each presentation a contact_label. Used for-loop for speed.
-  for (let i = 0; i < presentations.length; i++) {
-    for (let j = 0; j < contacts.length; j++) {
-      if (
-        presentations[i].connection_id ===
-        contacts[j].Connections[0].connection_id
-      ) {
-        presentations[i].contact_label = contacts[j].label
-        break
-      }
-    }
-  }
+  let presentations = useSelector(
+    (state) => state.presentations.presentationReports
+  )
 
   function openPresentation(history, id) {
     if (history !== undefined) {

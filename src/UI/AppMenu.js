@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -61,7 +62,7 @@ const StyledSubLink = styled(NavLink)`
   }
 `
 function AppMenu(props) {
-  const localUser = props.loggedInUserState
+  const localUser = useSelector((state) => state.login.loggedInUserState)
 
   let pathMatch = ''
   if (props.match.path !== undefined) {
@@ -76,11 +77,17 @@ function AppMenu(props) {
               Home
             </StyledLink>
           </Item>
-          {/*<Item className={pathMatch === '/invitations' ? 'active' : undefined}>
-            <StyledLink to="/invitations">
-              Invitations
-            </StyledLink>
-          </Item>*/}
+          <CanUser
+            user={localUser}
+            perform="invitations:read"
+            yes={() => (
+              <Item
+                className={pathMatch === '/invitations' ? 'active' : undefined}
+              >
+                <StyledLink to="/invitations">Invitations</StyledLink>
+              </Item>
+            )}
+          />
           <CanUser
             user={localUser}
             perform="contacts:read"
@@ -91,18 +98,6 @@ function AppMenu(props) {
                 }
               >
                 <StyledLink to="/contacts">Contacts</StyledLink>
-                {/*<List>
-              <Item className={pathMatch === '/contacts' ? 'active' : undefined}>
-                <StyledSubLink exact to="/contacts">
-                  Contacts
-                </StyledSubLink>
-              </Item>
-              <Item>
-                <StyledSubLink to="/contacts/invitations">
-                  Invitations
-                </StyledSubLink>
-              </Item>
-            </List>*/}
               </Item>
             )}
           />
@@ -139,19 +134,6 @@ function AppMenu(props) {
               </Item>
             )}
           />
-          {/* <CanUser
-            user={localUser}
-            perform="basicMessages:read"
-            yes={() => (
-              <>
-                <Item
-                  className={pathMatch === '/messages' ? 'active' : undefined}
-                >
-                  <StyledLink to="/messages">Messages</StyledLink>
-                </Item>
-              </>
-            )}
-          /> */}
           <CanUser
             user={localUser}
             perform="settings:read"

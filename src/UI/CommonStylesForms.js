@@ -179,6 +179,16 @@ export const SubmitBtn = styled.button`
     cursor: pointer;
   }
 `
+export const Button = styled.button`
+  padding: 10px 20px;
+  color: ${(props) => props.theme.text_light};
+  border: none;
+  box-shadow: ${(props) => props.theme.drop_shadow};
+  background: ${(props) => props.theme.primary_color};
+  :hover {
+    cursor: pointer;
+  }
+`
 export const LogoHolder = styled.div`
   padding: 20px 0 10px 0;
   width: 100%;
@@ -234,4 +244,9 @@ export const ActionButton = styled.span`
   :hover {
     cursor: pointer;
   }
+`
+export const SortSelected = styled.select`
+  margin: auto 10px auto 0;
+  fontsize: 0.9em;
+  height: 1.4em;
 `

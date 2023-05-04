@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 
 import {
   StyledPopup,
@@ -13,9 +12,11 @@ import {
   SubmitBtnModal,
 } from './CommonStylesForms'
 
-function FormUserDelete(props) {
-  const userID = props.userId
-  const error = useSelector((state) => state.notifications.errorMessage)
+function FormInvitationDelete(props) {
+  const invitationID = props.invitationId
+  const success = props.successMessage
+
+  const error = props.error
 
   const submitBtn = useRef()
 
@@ -35,27 +36,32 @@ function FormUserDelete(props) {
   const handleSubmit = (e) => {
     e.preventDefault()
     onBtnClick()
-
-    props.sendRequest('USERS', 'DELETE', userID)
+    closeDeleteModal()
+    props.sendRequest('INVITATIONS', 'DELETE', invitationID)
+    if (props.history !== undefined) {
+      props.history.push('/invitations/')
+    }
   }
 
-  function closeModal() {
+  function closeDeleteModal() {
     props.closeDeleteModal()
   }
 
   return (
     <StyledPopup
-      open={props.deleteUserModalIsOpen}
+      open={props.deleteInvitationModalIsOpen}
       closeOnDocumentClick
-      onClose={closeModal}
+      onClose={closeDeleteModal}
     >
       <Modal className="modal">
-        <ModalHeader>Are you sure you want to remove this user?</ModalHeader>
+        <ModalHeader>
+          Are you sure you want to delete this invitation?
+        </ModalHeader>
         <ModalContentWrapper>
           <ModalContent>
             <form id="form" onSubmit={handleSubmit}>
               <Actions>
-                <CancelBtn type="button" onClick={closeModal}>
+                <CancelBtn type="button" onClick={closeDeleteModal}>
                   Cancel
                 </CancelBtn>
                 <SubmitBtnModal type="submit" ref={submitBtn}>
@@ -65,10 +71,10 @@ function FormUserDelete(props) {
             </form>
           </ModalContent>
         </ModalContentWrapper>
-        <CloseBtn onClick={closeModal}>&times;</CloseBtn>
+        <CloseBtn onClick={closeDeleteModal}>&times;</CloseBtn>
       </Modal>
     </StyledPopup>
   )
 }
 
-export default FormUserDelete
+export default FormInvitationDelete
