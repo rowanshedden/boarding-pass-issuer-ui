@@ -1,6 +1,6 @@
 import { createStore, combineReducers } from 'redux'
 
-import { composeWithDevTools } from 'redux-devtools-extension'
+// import { composeWithDevTools } from 'redux-devtools-extension'
 
 import loginReducer from './redux/loginReducer'
 import contactsReducer from './redux/contactsReducer'
@@ -22,4 +22,7 @@ const rootReducer = combineReducers({
   invitations: invitationsReducer,
 })
 
-export default createStore(rootReducer, composeWithDevTools())
+export default createStore(
+  rootReducer
+  // composeWithDevTools()
+)

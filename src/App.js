@@ -159,13 +159,47 @@ function App() {
     Axios({
       method: 'GET',
       url: '/api/logo',
-    }).then((res) => {
-      if (res.data.error) {
-        setNotification(res.data.error, 'error')
-      } else {
-        dispatch(setLogo(handleImageSrc(res.data[0].image.data)))
-      }
     })
+      .then((res) => {
+        if (res.data.error) {
+          console.error('Logo Error: ', res.data.error)
+        } else {
+          dispatch(setLogo(handleImageSrc(res.data[0].image.data)))
+        }
+      })
+      .catch((error) => console.error(error))
+  }
+
+  const requestSiteTitle = () => {
+    Axios({
+      method: 'GET',
+      url: '/api/site-title',
+    })
+      .then((res) => {
+        if (res.data.error) {
+          console.error('Site Title Error: ', res.data.error)
+        } else {
+          dispatch(setSiteTitle(res.data.title))
+        }
+      })
+      .catch((error) => console.error(error))
+  }
+
+  const requestTheme = () => {
+    Axios({
+      method: 'GET',
+      url: '/api/theme',
+    })
+      .then((res) => {
+        if (res.data.error) {
+          console.error('Theme Error: ', res.data.error)
+        } else {
+          const stringMessageTheme = JSON.stringify(res.data.theme.value)
+          window.localStorage.setItem('recentTheme', stringMessageTheme)
+          dispatch(setTheme(res.data.theme.value))
+        }
+      })
+      .catch((error) => console.error(error))
   }
 
   useEffect(() => {
@@ -186,6 +220,8 @@ function App() {
       })
       .catch((error) => {
         requestLogo()
+        requestSiteTitle()
+        requestTheme()
         setAppIsLoaded(true)
       })
   }, [loginState.loggedIn])
