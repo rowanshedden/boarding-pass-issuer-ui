@@ -1,79 +1,11 @@
-# SITA Boarding Pass Issuer Web App
+# boarding-pass-issuer-ui
+AACO demonstrator reference code Web App
 
 The SITA Boarding Pass Issuer Web App is a single-page app (SPA) for organizations who issue and verify self-sovereign identity (SSI) credentials via an Aries cloud agent (such as [ACA-Py](https://github.com/hyperledger/aries-cloudagent-python)). This app provides a friendly UI for end-users that can be easily deployed to a private or public cloud and accessed from any modern web browser.
 
 For an introduction to self-sovereign identity (SSI), please see [Phil Windley's article](https://www.windley.com/archives/2018/09/multi-source_and_self-sovereign_identity.shtml) on the topic.
 
 To learn more about Aries and to connect with the Hyperledger Aries community, please visit the [Hyperledger Aries Wiki](https://wiki.hyperledger.org/display/ARIES/Hyperledger+Aries)
-
-## Table of Contents
-
-- [Features](#background)
-- [Design](#install)
-- [Installation](#install)
-- [Quickstart](#usage)
-- [Security](#security)
-- [Docs](#api)
-- [Credit](#credit)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Features
-
-_TODO_
-
-## Design
-
-_TODO_
-
-- Philosophy
-- Goals/Requirements
-- Use cases
-- Big-picture diagrams
-
-## Installation
-
-_TODO_
-
-- Installing this app and dependencies (including cloud agent, network, etc.)
-- OS requirements, etc.
-- Quick test to make sure everything is working
-
-## Quickstart
-
-_TODO_
-
-## Deployment
-
-In the project directory, you can run the following command to build the app for production to the `build` folder:
-
-```bash
-$ `npm run build
-```
-
-This command correctly bundles React in production mode and optimizes the build for the best performance.
-
-See also the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-## Customization
-
-_TODO: How to skin, guidelines around forking, etc._
-
-## Security
-
-_TODO_
-
-## Docs
-
-_TODO_
-
-## Credit
-
-_TODO_
-
-## Contributing
-
-If you are a new contributor to the project, please read our [contribution guide](./CONTRIBUTING.md) at least once; it will save you a few review cycles!
 
 ## License
 
